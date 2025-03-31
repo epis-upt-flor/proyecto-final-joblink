@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import ForgotPasswordDialog from "./ForgotPasswordDialog";
 
 interface LoginFormProps {
   role: "admin" | "empresa";
@@ -30,9 +31,10 @@ export default function LoginForm({ role }: LoginFormProps) {
             Recordarme
           </label>
         </div>
-        <a href="#" className="text-sm text-muted-foreground hover:underline">
-          ¿Olvidaste tu contraseña?
-        </a>
+        
+        {/*llamado a componente ForgotPasswortdDialos */}
+        <ForgotPasswordDialog />
+
       </div>
 
       <Button type="submit" className="w-full">
