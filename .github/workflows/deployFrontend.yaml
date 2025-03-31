@@ -28,9 +28,9 @@ jobs:
       - name: Clean server folder via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.SERVER_IP }}
           username: root
-          password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
             echo "Limpiando contenido en $TARGET_PATH"
@@ -39,9 +39,9 @@ jobs:
       - name: Upload build via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.SERVER_IP }}
           username: root
-          password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           source: "${{ env.BUILD_FOLDER }}/**"
           target: ${{ env.TARGET_PATH }}
