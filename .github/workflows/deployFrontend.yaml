@@ -10,9 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SERVER_IP: ${{ secrets.SERVER_IP }}
-      SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
       TARGET_PATH: /var/www/html/
+      BUILD_FOLDER: Frontend/dist
 
     steps:
       - name: Checkout
@@ -26,21 +25,24 @@ jobs:
         working-directory: Frontend
         run: npm run build
 
-      - name: Limpiar contenido previo en servidor
-        uses: appleboy/ssh-action@master
+      - name: Clean server folder via SSH
+        uses: appleboy/ssh-action@v1
         with:
-          host: ${{ env.SERVER_IP }}
+          host: ${{ secrets.HOST }}
           username: root
-          password: ${{ env.SERVER_PASSWORD }}
+          password: ${{ secrets.PASSWORD }}
           port: 22
           script: |
-            rm -rf /var/www/html/*
-            
-      - name: Subir archivos al servidor
+            echo "Limpiando contenido en $TARGET_PATH"
+            rm -rf $TARGET_PATH/*
+
+      - name: Upload build via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ env.SERVER_IP }}
+          host: ${{ secrets.HOST }}
           username: root
-          password: ${{ env.SERVER_PASSWORD }}
-          source: "Frontend/dist/*"
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          source: "${{ env.BUILD_FOLDER }}/**"
           target: ${{ env.TARGET_PATH }}
+          overwrite: true
