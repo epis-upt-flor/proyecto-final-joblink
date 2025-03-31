@@ -40,6 +40,7 @@ jobs:
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
-          source: "Frontend/dist/**"
+          source: "Frontend/dist/*"
+          strip_components: 2
           target: /var/www/html
           overwrite: true
