@@ -5,13 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    env:
-      TARGET_PATH: /var/www/html/
-      BUILD_FOLDER: Frontend/dist
 
     steps:
       - name: Checkout
@@ -25,7 +22,7 @@ jobs:
         working-directory: Frontend
         run: npm run build
 
-      - name: Clean server folder via SSH
+      - name: Limpiar carpeta remota
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -33,16 +30,16 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
-            echo "Limpiando contenido en $TARGET_PATH"
-            rm -rf $TARGET_PATH/*
+            echo "Borrando contenido en /var/www/html"
+            rm -rf /var/www/html/*
 
-      - name: Upload build via SCP
+      - name: Subir archivos compilados al servidor
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
           username: root
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
-          source: "${{ env.BUILD_FOLDER }}/**"
-          target: ${{ env.TARGET_PATH }}
+          source: "Frontend/dist/**"
+          target: /var/www/html
           overwrite: true
