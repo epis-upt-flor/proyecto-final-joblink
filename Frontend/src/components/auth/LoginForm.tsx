@@ -1,6 +1,10 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import ForgotPasswordDialog from "./ForgotPasswordDialog";
 
 interface LoginFormProps {
@@ -8,33 +12,87 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ role }: LoginFormProps) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!username || !password) {
+      toast.error("Por favor completa todos los campos.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || "Error al iniciar sesión.");
+      }
+
+      const data = await res.json();
+      const tokenPayload = JSON.parse(atob(data.access_token.split(".")[1]));
+      if (tokenPayload.role !== role) {
+        toast.error(`El usuario no pertenece al rol: ${role}`);
+        return;
+      }
+
+      localStorage.setItem("token", data.access_token);
+      toast.success("Sesión iniciada correctamente");
+
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message || "Ocurrió un error.");
+      } else {
+        toast.error("Ocurrió un error.");
+      }
+    }
+  };
   return (
-    <form className="space-y-6">
+    <form onSubmit={handleLogin} className="space-y-6">
       <div className="space-y-2">
-        <label htmlFor={`${role}-username`} className="block text-sm font-medium text-foreground">
-          Usuario
-        </label>
-        <Input id={`${role}-username`} type="text" placeholder="correo@gmail.com" />
+        <Label htmlFor={`${role}-username`}>Usuario</Label>
+        <Input
+          id={`${role}-username`}
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="correo@ejemplo.com"
+        />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={`${role}-password`} className="block text-sm font-medium text-foreground">
-          Contraseña
-        </label>
-        <Input id={`${role}-password`} type="password" placeholder="••••••••" />
+        <Label htmlFor={`${role}-password`}>Contraseña</Label>
+        <Input
+          id={`${role}-password`}
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+        />
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Checkbox id={`${role}-remember`} />
-          <label htmlFor={`${role}-remember`} className="text-sm text-muted-foreground">
+          <label
+            htmlFor={`${role}-remember`}
+            className="text-sm text-muted-foreground"
+          >
             Recordarme
           </label>
         </div>
-        
-        {/*llamado a componente ForgotPasswortdDialos */}
-        <ForgotPasswordDialog />
 
+        <ForgotPasswordDialog />
       </div>
 
       <Button type="submit" className="w-full">

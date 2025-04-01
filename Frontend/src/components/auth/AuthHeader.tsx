@@ -1,5 +1,6 @@
 import { GraduationCap } from "lucide-react"
 import uptLogo from "@/assets/UPT.png"
+import DarkModeToggle from "../DarkModeToggle"
 
 export default function AuthHeader() {
   return (
@@ -16,6 +17,7 @@ export default function AuthHeader() {
         <span className="font-bold text-xl text-foreground whitespace-nowrap">
           Universidad Privada de Tacna
         </span>
+        <DarkModeToggle />
       </div>
     </div>
   )
