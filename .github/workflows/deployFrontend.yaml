@@ -17,6 +17,9 @@ jobs:
       - name: Instalar dependencias
         working-directory: Frontend
         run: npm install
+        
+      - name: Inyectar variable de entorno API
+        run: echo "VITE_API_URL=${{ secrets.PROD_API_URL }}" >> Frontend/.env.production
 
       - name: Compilar proyecto
         working-directory: Frontend
