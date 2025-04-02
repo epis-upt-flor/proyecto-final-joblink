@@ -27,7 +27,7 @@ export default function OfertaDetalle() {
             setOferta(ofertaSeleccionada);
         } else {
             toast.error("Oferta no encontrada.");
-            navigate("/"); 
+            navigate("/");
             return;
         }
 
@@ -142,7 +142,28 @@ export default function OfertaDetalle() {
             </Card>
 
             <div className="mt-4">
-                <Button variant="outline" onClick={() => navigate(-1)}>Volver</Button>
+                <Button
+                    variant="outline"
+                    onClick={() => {
+                        const role = localStorage.getItem("role");
+
+                        if (role === "admin") {
+                            navigate("/admin/dashboard");
+                        } else if (role === "empresa") {
+                            navigate("/empresa/dashboard");
+                        } else {
+                            // Si no hay rol o no es conocido, intenta ir atrás o al home
+                            if (window.history.length > 2) {
+                                navigate(-1);
+                            } else {
+                                navigate("/");
+                            }
+                        }
+                    }}
+                >
+                    Volver
+                </Button>
+
             </div>
         </div>
     );

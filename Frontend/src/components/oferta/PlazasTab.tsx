@@ -20,6 +20,7 @@ export default function PlazasTab({ isAdmin }: { isAdmin: boolean }) {
                 if (!res.ok) throw new Error("Error al obtener las ofertas");
                 const data = await res.json();
                 setOfertas(data);
+                localStorage.setItem("ofertas",JSON.stringify(data));
             } catch (err) {
                 setError((err as Error).message);
             } finally {
