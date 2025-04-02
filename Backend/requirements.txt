@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sentence-transformers
+upstash-vector
+SQLAlchemy
+psycopg2-binary
+python-dotenv
+passlib[bcrypt]
+python-jose
