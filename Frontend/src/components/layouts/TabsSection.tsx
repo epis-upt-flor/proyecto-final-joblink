@@ -12,7 +12,7 @@ export default function TabsSection({ role }: TabsSectionProps) {
     console.log("Rol recibido: ",role);
     return (
         <Tabs defaultValue="plazas" className="w-full">
-            <TabsList className="flex flex-wrap gap-2">
+            <TabsList className="flex justify-center bg-background rounded-md shadow p-2">
                 <TabsTrigger value="plazas">Plazas</TabsTrigger>
                 {role === "admin" && (
                     <>
