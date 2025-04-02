@@ -1,6 +1,6 @@
 import { GraduationCap } from "lucide-react"
 import uptLogo from "@/assets/UPT.png"
-import DarkModeToggle from "../DarkModeToggle"
+import DarkModeToggle from "../color/DarkModeToggle"
 
 export default function AuthHeader() {
   return (

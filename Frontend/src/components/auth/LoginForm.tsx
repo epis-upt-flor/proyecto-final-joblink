@@ -12,6 +12,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ role }: LoginFormProps) {
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function LoginForm({ role }: LoginFormProps) {
       toast.error("Por favor completa todos los campos.");
       return;
     }
+    setLoading(true);
 
     try {
       const API_URL = import.meta.env.VITE_API_URL;
@@ -31,7 +33,7 @@ export default function LoginForm({ role }: LoginFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      
+
 
       if (!res.ok) {
         const error = await res.json();
@@ -48,13 +50,20 @@ export default function LoginForm({ role }: LoginFormProps) {
       localStorage.setItem("token", data.access_token);
       toast.success("Sesión iniciada correctamente");
 
-      navigate("/dashboard");
+      if (tokenPayload.role === "admin") {
+        navigate("/admin/dashboard");
+      } else if (tokenPayload.role === "empresa") {
+        navigate("/empresa/dashboard");
+      }
+
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error(err.message || "Ocurrió un error.");
       } else {
         toast.error("Ocurrió un error.");
       }
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -95,9 +104,36 @@ export default function LoginForm({ role }: LoginFormProps) {
         <ForgotPasswordDialog />
       </div>
 
-      <Button type="submit" className="w-full">
-        Iniciar sesión
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <div className="flex items-center justify-center gap-2">
+            <svg
+              className="animate-spin h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16 8 8 0 010-16z"
+              ></path>
+            </svg>
+            Cargando...
+          </div>
+        ) : (
+          "Iniciar sesión"
+        )}
       </Button>
+
     </form>
   );
 }

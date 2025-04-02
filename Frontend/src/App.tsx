@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { DarkModeProvider } from "@/context/DarkModeContext";
 import LoginPage from "@/pages/Login";
-import Dashboard from "@/pages/Dashboard";
+import EmpresaDashboard from "./pages/empresa/Dashboard";
+import AdminDashboard from "@/pages/admin/Dashboard";
 import OfertaDetalle from "@/pages/OfertaDetalle";
 import EgresadoDetalle from "@/pages/EgresadoDetalle";
 
@@ -13,7 +14,8 @@ function App() {
         <div>
           <Routes>
             <Route path="/" element={<LoginPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/empresa/dashboard" element={<EmpresaDashboard />} />
             <Route path="/oferta/:id" element={<OfertaDetalle />} />
             <Route path="/egresado/:id" element={<EgresadoDetalle />} />
           </Routes>
