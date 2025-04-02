@@ -15,12 +15,8 @@ export default function PlazasTab({ isAdmin }: { isAdmin: boolean }) {
         const fetchOfertas = async () => {
             try {
                 const API_URL = import.meta.env.VITE_API_URL;
-                const cleanUrl = `${API_URL.replace(/\/$/, "")}/ofertas`;
-                console.log("Fetch URL:", cleanUrl);
-                const res = await fetch(cleanUrl);
+                const res = await fetch(`${API_URL}/ofertas/`);
 
-
-                console.log(`${API_URL}/api/ofertas`);
                 if (!res.ok) throw new Error("Error al obtener las ofertas");
                 const data = await res.json();
                 setOfertas(data);
