@@ -31,7 +31,7 @@ def obtener_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = De
 
 def usuario_requiere_rol(roles_permitidos: list):
     def verificar_rol(usuario: Usuario = Depends(obtener_usuario_actual)):
-        if usuario.rol not in roles_permitidos:
+        if usuario.role not in roles_permitidos:
             raise HTTPException(status_code=403, detail=f"Acceso denegado para rol: {usuario.rol}")
         return usuario
     return verificar_rol
@@ -60,7 +60,7 @@ def registrar_usuario(data: dict, db: Session):
     db.commit()
     db.refresh(nuevo_usuario)
 
-    token = crear_token({"sub": nuevo_usuario.username, "role": nuevo_usuario.rol})
+    token = crear_token({"sub": nuevo_usuario.username, "rol": nuevo_usuario.rol})
 
     return {
         "message": "Usuario registrado exitosamente",
