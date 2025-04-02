@@ -2,7 +2,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlazasTab from "@/components/oferta/PlazasTab";
 import EgresadosTab from "@/components/egresado/EgresadosTab";
 import EmpresasTab from "@/components/empresa/EmpresasTab";
-import AprobacionesTab from "@/components/AprobacionesTab";
 import HistorialTab from "@/components/historial/HistorialTab";
 import ReportesTab from "@/components/reportes/ReportesTab";
 interface TabsSectionProps {

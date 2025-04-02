@@ -12,7 +12,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, title = "Panel" }: DashboardLayoutProps) {
   const navigate = useNavigate();
-  const { isDark } = useDarkMode();
+  //const { isDark } = useDarkMode();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
