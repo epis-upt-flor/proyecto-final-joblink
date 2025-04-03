@@ -27,7 +27,13 @@ export const OfertasProvider = ({ children }: { children: React.ReactNode }) => 
         setOfertas((prev) => {
           const existing = new Set(prev.map((o) => o.id));
           const nuevas = data.filter((o) => !existing.has(o.id));
-          return [...prev, ...nuevas];
+          const actualizadas = [...prev, ...nuevas];
+
+          // Guardar en localStorage
+          localStorage.setItem("ofertas", JSON.stringify(actualizadas));
+          console.log("📝 Ofertas guardadas en localStorage:", actualizadas);
+
+          return actualizadas;
         });
       } catch (err) {
         setError((err as Error).message);
@@ -40,6 +46,7 @@ export const OfertasProvider = ({ children }: { children: React.ReactNode }) => 
     const interval = setInterval(fetchAndMergeOfertas, 30000);
     return () => clearInterval(interval);
   }, []);
+
 
   return (
     <OfertasContext.Provider value={{ ofertas, setOfertas, loading, error }}>
