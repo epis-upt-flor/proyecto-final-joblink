@@ -12,7 +12,6 @@ from app.utils.security import (
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
-
 def obtener_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Usuario:
     payload = verificar_token(token)
     if not payload:
@@ -28,10 +27,9 @@ def obtener_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = De
 
     return usuario
 
-
 def usuario_requiere_rol(roles_permitidos: list):
     def verificar_rol(usuario: Usuario = Depends(obtener_usuario_actual)):
-        if usuario.role not in roles_permitidos:
+        if usuario.rol not in roles_permitidos:
             raise HTTPException(status_code=403, detail=f"Acceso denegado para rol: {usuario.rol}")
         return usuario
     return verificar_rol
@@ -67,7 +65,6 @@ def registrar_usuario(data: dict, db: Session):
         "access_token": token,
         "token_type": "bearer"
     }
-
 
 def login_usuario(data: dict, db: Session):
     username = data.get("username")

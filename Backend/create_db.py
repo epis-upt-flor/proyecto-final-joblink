@@ -1,4 +1,4 @@
-from Backend.app.models import contrato, plaza
+from Backend.app.models import contrato, oferta
 from app.models.database import Base, engine
 from app.models import egresado, empresa, usuario, administrador, postulacion
 

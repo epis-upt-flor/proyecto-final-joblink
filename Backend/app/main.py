@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import empresa, usuario, contratacion, auth
+from app.routes import usuario, auth, empresa, contrato
 
 app = FastAPI()
 
@@ -15,13 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(egresado.router, prefix="/api")
-app.include_router(empresa.router, prefix="/api")
-# app.include_router(plaza.router, prefix="/api")
-# app.include_router(recomendacion.router, prefix="/api")
 app.include_router(usuario.router, prefix="/api")
-app.include_router(contratacion.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
+app.include_router(empresa.router, prefix="/api")
+#app.include_router(egresado.router, prefix="/api")
+#app.include_router(oferta.router, prefix="/api")
+#app.include_router(recomendacion.router, prefix="/api")
+app.include_router(contrato.router, prefix="/api")
 
 @app.get("/")
 def read_root():
