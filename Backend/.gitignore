@@ -1,6 +1,17 @@
 # Archivos de configuración locales
-/.env
+.env
 
+# Caché de Python
 __pycache__/
-/venv
+*.pyc
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+.venv/
+
+# Configuración y caché de herramientas
 .qodo
+.idea/  # Para JetBrains (PyCharm)
+.vscode/  # Para VS Code

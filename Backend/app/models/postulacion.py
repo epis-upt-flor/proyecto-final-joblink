@@ -10,7 +10,7 @@ class Postulacion(Base):
     idOferta = Column(Integer, ForeignKey('oferta.id'), nullable=False)
     idEgresado = Column(Integer, ForeignKey('egresado.id'), nullable=False)
     estado = Column(Enum(EstadoPostulacion), nullable=False)
-    ranking = Column(Integer, nullable=True)
+    posicionRanking = Column(Integer, nullable=True)
 
     oferta = relationship("Oferta", back_populates="postulaciones")
     egresado = relationship("Egresado", back_populates="postulaciones")
