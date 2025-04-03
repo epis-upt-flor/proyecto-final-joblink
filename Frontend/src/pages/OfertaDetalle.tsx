@@ -8,6 +8,7 @@ import { Oferta } from "@/types/Oferta";
 import { Egresado } from "@/types/Egresado";
 import { Postulacion } from "@/types/Postulacion";
 import { toast } from "sonner";
+import { getRoleFromToken } from "@/helpers/auth";
 
 export default function OfertaDetalle() {
     const { id } = useParams();
@@ -18,49 +19,60 @@ export default function OfertaDetalle() {
     const [openRecomendaciones, setOpenRecomendaciones] = useState(false);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = getRoleFromToken();
+        console.log("Token:", token);
+        console.log("Role:", role);
+        console.log("ID de oferta:", id);
+    
         if (!id) return;
-
-        const ofertasGuardadas: Oferta[] = JSON.parse(localStorage.getItem("ofertas") || "[]");
+    
+        const ofertasGuardadasRaw = localStorage.getItem("ofertas");
+        const ofertasGuardadas: Oferta[] = JSON.parse(ofertasGuardadasRaw || "[]");
         const ofertaSeleccionada = ofertasGuardadas.find((o) => o.id === Number(id));
-
+    
         if (ofertaSeleccionada) {
             setOferta(ofertaSeleccionada);
         } else {
-            toast.error("Oferta no encontrada.");
-            navigate("/"); 
+            const API_URL = import.meta.env.VITE_API_URL;
+            fetch(`${API_URL}/oferta/${id}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error("No se pudo cargar la oferta");
+                    return res.json();
+                })
+                .then((data: Oferta) => {
+                    console.log("🆕 Oferta cargada desde API:", data);
+                    setOferta(data);
+                })
+                .catch((err) => {
+                    console.error("❌ Error al obtener oferta:", err);
+                    toast.error("Oferta no encontrada.");
+                    navigate("/");
+                });
             return;
         }
 
-        let egresadosGuardados: Egresado[] = JSON.parse(localStorage.getItem("egresados") || "[]");
+        const egresadosRaw = localStorage.getItem("egresados");
+        console.log("📦 Egresados en localStorage:", egresadosRaw);
+
+        let egresadosGuardados: Egresado[] = JSON.parse(egresadosRaw || "[]");
         if (egresadosGuardados.length === 0) {
-            egresadosGuardados = [
-                {
-                    id: 1,
-                    nombre: "Carlos",
-                    apellido: "Mendoza",
-                    dni: "12345678",
-                    telefono: "987654321",
-                    lugar_nacimiento: "Lima",
-                    fecha_nacimiento: "1995-06-15",
-                    nacionalidad: "Peruano",
-                    correo: "carlos.mendoza@email.com",
-                    direccion: "Av. Siempre Viva 123",
-                    linkedin: "https://linkedin.com/in/carlosmendoza",
-                    github: "https://github.com/carlosmendoza",
-                    habilidades: "React; Node.js; SQL",
-                    experiencia_laboral: "3 años como FullStack Developer",
-                    certificados: "Certificado AWS",
-                    idiomas: "Inglés Avanzado; Español Nativo",
-                    proyectos: "Sistema de gestión de ventas",
-                }
-            ];
+            console.log("ℹ️ No hay egresados en localStorage, usando dummy.");
+            egresadosGuardados = [ /* ...datos hardcodeados... */];
             localStorage.setItem("egresados", JSON.stringify(egresadosGuardados));
         }
         setEgresados(egresadosGuardados);
 
-        const postulacionesGuardadas: Postulacion[] = JSON.parse(localStorage.getItem("postulaciones") || "[]");
-        setPostulaciones(postulacionesGuardadas.filter((p) => p.oferta_id === Number(id)));
+        const postulacionesRaw = localStorage.getItem("postulaciones");
+        console.log("📦 Postulaciones en localStorage:", postulacionesRaw);
+
+        const postulacionesGuardadas: Postulacion[] = JSON.parse(postulacionesRaw || "[]");
+        const filtradas = postulacionesGuardadas.filter((p) => p.oferta_id === Number(id));
+        console.log("📄 Postulaciones para esta oferta:", filtradas);
+
+        setPostulaciones(filtradas);
     }, [id, navigate]);
+
 
     const handlePostular = (egresado: Egresado) => {
         if (postulaciones.some((p) => p.egresado_id === egresado.id && p.oferta_id === Number(id))) {
@@ -142,7 +154,26 @@ export default function OfertaDetalle() {
             </Card>
 
             <div className="mt-4">
-                <Button variant="outline" onClick={() => navigate(-1)}>Volver</Button>
+                <Button
+                    variant="outline"
+                    onClick={() => {
+                        const role = getRoleFromToken();
+                        console.log("🔙 Volver presionado. Rol actual:", role);
+
+                        if (role === "admin") {
+                            navigate("/admin/dashboard");
+                        } else if (role === "empresa") {
+                            navigate("/empresa/dashboard");
+                        } else {
+                            console.warn("⚠️ Rol desconocido, redirigiendo al login");
+                            navigate("/");
+                        }
+                    }}
+
+                >
+                    Volver
+                </Button>
+
             </div>
         </div>
     );
