@@ -1,4 +1,4 @@
-name: Deploy Frontend
+name: 🚀 Deploy Frontend
 
 on:
   push:
@@ -13,21 +13,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: 📥 Checkout código
         uses: actions/checkout@v3
 
-      - name: Instalar dependencias
+      - name: 📦 Instalar dependencias
         working-directory: Frontend
         run: npm install
-        
-      - name: Inyectar variable de entorno API
+
+      - name: 🔐 Inyectar variable de entorno API
         run: echo "VITE_API_URL=${{ secrets.PROD_API_URL }}" >> Frontend/.env.production
 
-      - name: Compilar proyecto
+      - name: 🛠️ Compilar proyecto
         working-directory: Frontend
         run: npm run build
 
-      - name: Limpiar carpeta remota
+      - name: 🧹 Limpiar carpeta remota
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_IP }}
@@ -35,10 +35,10 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
-            echo "Borrando contenido en /var/www/html"
+            echo "🧽 Borrando contenido en /var/www/html"
             rm -rf /var/www/html/*
 
-      - name: Subir archivos compilados al servidor
+      - name: 📤 Subir archivos compilados al servidor
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_IP }}
