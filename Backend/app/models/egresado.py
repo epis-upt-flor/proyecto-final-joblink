@@ -1,25 +1,29 @@
-from sqlalchemy import ForeignKey, Column, Integer, String, Text, Date, Boolean
+from sqlalchemy import Column, Integer, String, Date, Boolean, Enum
+from app.models.enum import TipoDocumento
 from app.models.database import Base
+from sqlalchemy.orm import relationship
 
 class Egresado(Base):
-    __tablename__ = "egresados"
+    __tablename__ = "egresado"
 
     id = Column(Integer, primary_key=True, index=True)
     nombres = Column(String(100), nullable=False)
     apellidos = Column(String(100), nullable=False)
-    tipoDoc = Column(Integer, nullable=False)
+    tipoDoc = Column(Enum(TipoDocumento), nullable=False)
     numDoc = Column(String(15), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     telefono = Column(String(15), nullable=False)
-    direccion = Column(Text)
+    direccion = Column(String)
     nacionalidad = Column(String(50))
-    fechaNaci = Column(Date, nullable=False)
-    habilidades = Column(Text)
-    logrosAcad = Column(Text)
-    certificados = Column(Text)
-    expLaboral = Column(Text)
-    idiomas = Column(Text)
-    linkedin = Column(Text)
-    github = Column(Text)
+    fechaNacimiento = Column(Date, nullable=False)
+    habilidades = Column(String)
+    logrosAcademicos = Column(String)
+    certificados = Column(String)
+    experienciaLaboral = Column(String)
+    idiomas = Column(String)
+    linkedin = Column(String)
+    github = Column(String)
     cv = Column(String(255))
     disponibilidad = Column(Boolean, default=True)
+
+    postulaciones = relationship("Postulacion", back_populates="egresado")
