@@ -1,5 +1,6 @@
 # Archivos de configuración locales
 /.env
 
+__pycache__/
 /venv
 .qodo
