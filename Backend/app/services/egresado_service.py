@@ -19,3 +19,22 @@ def registrar_egresado(db: Session, data: dict):
     db.commit()
     db.refresh(egresado)
     return egresado
+
+
+def obtener_egresados(db: Session):
+    return db.query(Egresado).all()
+
+
+def actualizar_egresado_service(db: Session, id: int, data: dict):
+    egresado = db.query(Egresado).filter(Egresado.id == id).first()
+
+    if not egresado:
+        return None
+
+    for key, value in data.items():
+        if hasattr(egresado, key):
+            setattr(egresado, key, value)
+
+    db.commit()
+    db.refresh(egresado)
+    return egresado
