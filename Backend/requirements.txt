@@ -8,6 +8,3 @@ python-dotenv
 passlib[bcrypt]
 python-jose
 redis
-pandas
-typing-extensions
-python-multipart
