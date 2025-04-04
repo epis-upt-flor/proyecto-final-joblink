@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Empresa } from "@/types/Empresa";
 import EmpresasTable from "./EmpresaTable";
 import EmpresaModal from "./EmpresaModal";

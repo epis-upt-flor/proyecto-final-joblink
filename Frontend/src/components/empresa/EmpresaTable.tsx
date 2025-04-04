@@ -5,7 +5,6 @@ import AccionesEmpresa from "./AccionesEmpresa";
 export default function EmpresasTable({
     empresas,
     onEdit,
-    onView,
 }: {
     empresas: Empresa[];
     onEdit: (empresa: Empresa) => void;

@@ -68,7 +68,7 @@ export default function EmpresaDetalle() {
                                 />
                             </div>
                             <CardTitle className="mt-2">{empresa.nombre}</CardTitle>
-                            <Badge variant={empresa.estado ? "success" : "destructive"}>
+                            <Badge>
                                 {empresa.estado ? "Activo" : "Inactivo"}
                             </Badge>
                         </CardHeader>
