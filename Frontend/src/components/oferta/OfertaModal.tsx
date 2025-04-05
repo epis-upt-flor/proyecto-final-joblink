@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Oferta } from "@/types/Oferta";
 import { Empresa } from "@/types/Empresa";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useOfertas } from "@/context/OfertasContext";
 
 export default function OfertaModal({
     oferta,
@@ -31,30 +32,38 @@ export default function OfertaModal({
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
 }) {
-
+    const { crearOferta } = useOfertas();
     const [internalOpen, setInternalOpen] = useState(false);
     const isControlled = open !== undefined && onOpenChange !== undefined;
     const isOpen = isControlled ? open : internalOpen;
     const setOpen = isControlled ? onOpenChange! : setInternalOpen;
 
-    const [formData, setFormData] = useState<Oferta>(
-        oferta || {
-            titulo: "",
-            tipo: "",
-            funciones: "",
-            requisitos: "",
-            beneficios: "",
-            area: "",
-            modalidad: "",
-            carga_horaria: "",
-            vacantes: 1,
-            experiencia: "",
-            ubigeo: "",
-            salario: "",
-            empresa_id: empresas.length > 0 ? empresas[0].id || 1 : 1,
-            cerrada: false,
-        }
-    );
+    const [formData, setFormData] = useState<Oferta>(() => {
+        const defaultEmpresa = empresas[0];
+
+        return (
+            oferta || {
+                titulo: "",
+                tipo: "",
+                area: "",
+                modalidad: "",
+                horario: "",
+                vacantes: 1,
+                experiencia: "",
+                locacion: "",
+                salario: 0,
+                funciones: "",
+                requisitos: "",
+                beneficios: "",
+                fechaInicio: "",
+                tiempo: 1,
+                idEmpresa: defaultEmpresa?.id ?? 1,
+                empresaNombre: defaultEmpresa?.nombre ?? "",
+            }
+        );
+    });
+
+
     useEffect(() => {
         if (oferta) {
             setFormData(oferta);
@@ -88,13 +97,41 @@ export default function OfertaModal({
         setCreatingEmpresa(false);
     };
 
-    const handleSave = () => {
-        onSave(formData);
-        toast.success("Oferta guardada", {
-            description: "La oferta ha sido registrada correctamente.",
-        });
-        setOpen(false);
+    const handleSave = async () => {
+        const { empresaNombre, ...payload } = formData;
+        if (!formData.fechaInicio) {
+            toast.error("Por favor, selecciona una fecha de inicio válida");
+            return;
+        }
+
+
+        if (!oferta) {
+            const success = await crearOferta(payload);
+            if (success) {
+                toast.success("Oferta registrada correctamente");
+                setOpen(false);
+            } else {
+                toast.error("Error al registrar oferta");
+            }
+        } else {
+            onSave(formData);
+            toast.success("Oferta actualizada correctamente");
+            setOpen(false);
+        }
     };
+    const [empresasDisponibles, setEmpresasDisponibles] = useState<Empresa[]>(empresas);
+
+    useEffect(() => {
+        if (empresas.length === 0) {
+            const local = localStorage.getItem("empresas");
+            const parsed = local ? JSON.parse(local) as Empresa[] : [];
+            setEmpresasDisponibles(parsed);
+        } else {
+            setEmpresasDisponibles(empresas);
+        }
+    }, [empresas]);
+
+
 
     return (
         <Dialog open={isOpen} onOpenChange={setOpen}>
@@ -130,19 +167,26 @@ export default function OfertaModal({
                             {!creatingEmpresa ? (
                                 <>
                                     <select
-                                        name="empresa_id"
-                                        value={formData.empresa_id}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, empresa_id: Number(e.target.value) })
-                                        }
+                                        name="idEmpresa"
+                                        value={formData.idEmpresa}
+                                        onChange={(e) => {
+                                            const selectedId = Number(e.target.value);
+                                            const selectedEmpresa = empresasDisponibles.find(emp => emp.id === selectedId);
+                                            setFormData({
+                                                ...formData,
+                                                idEmpresa: selectedId,
+                                                empresaNombre: selectedEmpresa?.nombre || "",
+                                            });
+                                        }}
                                         className="w-full p-2 border rounded"
                                     >
-                                        {empresas.map((empresa) => (
+                                        {empresasDisponibles.map((empresa) => (
                                             <option key={empresa.id} value={empresa.id}>
                                                 {empresa.nombre}
                                             </option>
                                         ))}
                                     </select>
+
                                     <Button
                                         variant="outline"
                                         onClick={() => setCreatingEmpresa(true)}
@@ -180,13 +224,33 @@ export default function OfertaModal({
                         />
                         <InputGroup label="Área" name="area" value={formData.area} onChange={handleChange} />
                         <InputGroup label="Modalidad" name="modalidad" value={formData.modalidad} onChange={handleChange} />
-                        <InputGroup label="Carga Horaria" name="carga_horaria" value={formData.carga_horaria} onChange={handleChange} />
+                        <InputGroup
+                            label="Fecha de Inicio"
+                            name="fechaInicio"
+                            value={formData.fechaInicio}
+                            onChange={handleChange}
+                            type="date"
+                        />
+
+                        <InputGroup
+                            label="Carga Horaria"
+                            name="horario"
+                            value={formData.horario}
+                            onChange={handleChange}
+                        />
+
                     </TabsContent>
 
                     <TabsContent value="requisitos" className="space-y-4">
                         <InputGroup label="Vacantes" name="vacantes" type="number" value={formData.vacantes} onChange={handleChange} />
                         <InputGroup label="Experiencia" name="experiencia" value={formData.experiencia} onChange={handleChange} />
-                        <InputGroup label="Ubicación" name="ubigeo" value={formData.ubigeo} onChange={handleChange} />
+                        <InputGroup
+                            label="Ubicación"
+                            name="locacion"
+                            value={formData.locacion}
+                            onChange={handleChange}
+                        />
+
                         <InputGroup label="Salario" name="salario" value={formData.salario} onChange={handleChange} />
                     </TabsContent>
 
