@@ -4,12 +4,13 @@ import OfertaModal from "./OfertaModal";
 import PlazasTable from "./PlazasTable";
 import { useState } from "react";
 import { Oferta } from "@/types/Oferta";
+import { useNavigate } from "react-router-dom";
 
 export default function PlazasTab({ isAdmin }: { isAdmin: boolean }) {
   const { ofertas, setOfertas, loading, error } = useOfertas(); // 👈 desde contexto
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [selectedOferta, setSelectedOferta] = useState<Oferta | null>(null);
-
+  const navigate = useNavigate();
 
   const handleSaveOferta = (oferta: Oferta) => {
     if (oferta.id) {
@@ -40,7 +41,7 @@ export default function PlazasTab({ isAdmin }: { isAdmin: boolean }) {
         <PlazasTable
           ofertas={ofertas}
           isAdmin={isAdmin}
-          onView={(id) => (window.location.href = `/oferta/${id}`)}
+          onView={(id) => navigate(`/oferta/${id}`)}
           onEdit={(oferta) => setSelectedOferta(oferta)}
         />
       )}

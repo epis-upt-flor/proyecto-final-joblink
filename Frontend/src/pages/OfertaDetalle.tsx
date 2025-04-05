@@ -1,180 +1,211 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import { Oferta } from "@/types/Oferta";
-import { Egresado } from "@/types/Egresado";
-import { Postulacion } from "@/types/Postulacion";
-import { toast } from "sonner";
-import { getRoleFromToken } from "@/helpers/auth";
+"use client"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom" // Si usás React Router
+import { useNavigate } from "react-router-dom"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
+import { getRoleFromToken } from "@/helpers/auth"
+import {
+    Building2,
+    MapPin,
+    Clock,
+    Users,
+    Briefcase,
+    GraduationCap,
+    DollarSign,
+} from "lucide-react"
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+
+interface Empresa {
+    id: number
+    nombre: string
+    logo?: string
+}
+
+interface Oferta {
+    id: number
+    titulo: string
+    tipo: string
+    area: string
+    modalidad: string
+    horario: string
+    vacantes: number
+    experiencia: boolean | string
+    locacion: string
+    salario?: number
+    funciones: string
+    requisitos: string
+    beneficios?: string
+    fechaInicio: string
+    tiempo: number
+    estado?: string
+    estadoPubli?: string | null
+    motivo?: string | null
+    fechaPubli?: string
+    fechaCierre?: string | null
+    idEmpresa: number
+}
 
 export default function OfertaDetalle() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [oferta, setOferta] = useState<Oferta | null>(null);
-    const [egresados, setEgresados] = useState<Egresado[]>([]);
-    const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
-    const [openRecomendaciones, setOpenRecomendaciones] = useState(false);
+    const { id } = useParams()
+    const [oferta, setOferta] = useState<Oferta | null>(null)
+    const [empresa, setEmpresa] = useState<Empresa | null>(null)
+    const navigate = useNavigate()
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        const role = getRoleFromToken();
-        console.log("Token:", token);
-        console.log("Role:", role);
-        console.log("ID de oferta:", id);
-    
-        if (!id) return;
-    
-        const ofertasGuardadasRaw = localStorage.getItem("ofertas");
-        const ofertasGuardadas: Oferta[] = JSON.parse(ofertasGuardadasRaw || "[]");
-        const ofertaSeleccionada = ofertasGuardadas.find((o) => o.id === Number(id));
-    
-        if (ofertaSeleccionada) {
-            setOferta(ofertaSeleccionada);
-        } else {
-            const API_URL = import.meta.env.VITE_API_URL;
-            fetch(`${API_URL}/oferta/${id}`)
-                .then((res) => {
-                    if (!res.ok) throw new Error("No se pudo cargar la oferta");
-                    return res.json();
-                })
-                .then((data: Oferta) => {
-                    console.log("🆕 Oferta cargada desde API:", data);
-                    setOferta(data);
-                })
-                .catch((err) => {
-                    console.error("❌ Error al obtener oferta:", err);
-                    toast.error("Oferta no encontrada.");
-                    navigate("/");
-                });
-            return;
-        }
+        if (!id) return
 
-        const egresadosRaw = localStorage.getItem("egresados");
-        console.log("📦 Egresados en localStorage:", egresadosRaw);
+        const ofertasRaw = localStorage.getItem("ofertas")
+        const empresasRaw = localStorage.getItem("empresas")
 
-        let egresadosGuardados: Egresado[] = JSON.parse(egresadosRaw || "[]");
-        if (egresadosGuardados.length === 0) {
-            console.log("ℹ️ No hay egresados en localStorage, usando dummy.");
-            egresadosGuardados = [ /* ...datos hardcodeados... */];
-            localStorage.setItem("egresados", JSON.stringify(egresadosGuardados));
-        }
-        setEgresados(egresadosGuardados);
+        if (!ofertasRaw || !empresasRaw) return
 
-        const postulacionesRaw = localStorage.getItem("postulaciones");
-        console.log("📦 Postulaciones en localStorage:", postulacionesRaw);
+        const ofertas: Oferta[] = JSON.parse(ofertasRaw)
+        const empresas: Empresa[] = JSON.parse(empresasRaw)
 
-        const postulacionesGuardadas: Postulacion[] = JSON.parse(postulacionesRaw || "[]");
-        const filtradas = postulacionesGuardadas.filter((p) => p.oferta_id === Number(id));
-        console.log("📄 Postulaciones para esta oferta:", filtradas);
+        const encontrada = ofertas.find((o) => o.id === Number(id))
+        if (!encontrada) return
 
-        setPostulaciones(filtradas);
-    }, [id, navigate]);
+        const empresaOferta = empresas.find((e) => e.id === encontrada.idEmpresa)
+
+        setOferta(encontrada)
+        setEmpresa(empresaOferta || null)
+    }, [id])
 
 
-    const handlePostular = (egresado: Egresado) => {
-        if (postulaciones.some((p) => p.egresado_id === egresado.id && p.oferta_id === Number(id))) {
-            toast.warning(`El egresado ${egresado.nombre} ya está postulado.`);
-            return;
-        }
+    if (!oferta || !empresa) return <p className="text-center">Cargando oferta...</p>
 
-        const nuevaPostulacion: Postulacion = {
-            id: Date.now(),
-            egresado_id: egresado.id!,
-            oferta_id: Number(id),
-            estado: "pendiente",
-        };
+    const fechaInicio = format(new Date(oferta.fechaInicio), "dd 'de' MMMM 'de' yyyy", { locale: es })
+    const fechaPubli = oferta.fechaPubli
+        ? format(new Date(oferta.fechaPubli), "dd 'de' MMMM 'de' yyyy")
+        : "No publicado"
 
-        const nuevasPostulaciones = [...postulaciones, nuevaPostulacion];
-        setPostulaciones(nuevasPostulaciones);
-        localStorage.setItem("postulaciones", JSON.stringify(nuevasPostulaciones));
+    const fechaCierre = oferta.fechaCierre
+        ? format(new Date(oferta.fechaCierre), "dd 'de' MMMM 'de' yyyy", { locale: es })
+        : "No especificado"
 
-        toast.success(`Egresado ${egresado.nombre} postulado correctamente.`);
-    };
-
-    if (!oferta) {
-        return <p className="text-center">Cargando oferta...</p>;
-    }
+    const renderText = (txt?: string) => txt?.split("\n").map((l, i) => <p key={i}>{l}</p>)
 
     return (
-        <div className="max-w-3xl mx-auto p-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle>{oferta.titulo}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <p><strong>Tipo:</strong> {oferta.tipo}</p>
-                    <p><strong>Área:</strong> {oferta.area}</p>
-                    <p><strong>Modalidad:</strong> {oferta.modalidad}</p>
-                    <p><strong>Carga Horaria:</strong> {oferta.carga_horaria}</p>
-                    <p><strong>Vacantes:</strong> {oferta.vacantes}</p>
-                    <p><strong>Ubicación:</strong> {oferta.ubigeo}</p>
-                    <p><strong>Salario:</strong> {oferta.salario || "No especificado"}</p>
-                    <p><strong>Funciones:</strong> {oferta.funciones}</p>
-                    <p><strong>Requisitos:</strong> {oferta.requisitos}</p>
-                    <p><strong>Beneficios:</strong> {oferta.beneficios || "No especificado"}</p>
-
-                    <div className="flex justify-end">
-                        <Dialog open={openRecomendaciones} onOpenChange={setOpenRecomendaciones}>
-                            <DialogTrigger asChild>
-                                <Button variant="default" onClick={() => setOpenRecomendaciones(true)}>Recomendar Egresados</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Recomendar Egresados</DialogTitle>
-                                </DialogHeader>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Nombre</TableHead>
-                                            <TableHead>Habilidades</TableHead>
-                                            <TableHead>Acción</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {egresados.map((egresado) => (
-                                            <TableRow key={egresado.id}>
-                                                <TableCell>{egresado.nombre} {egresado.apellido}</TableCell>
-                                                <TableCell>{egresado.habilidades}</TableCell>
-                                                <TableCell>
-                                                    <Button variant="outline" size="sm" onClick={() => handlePostular(egresado)}>
-                                                        Postular
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </DialogContent>
-                        </Dialog>
+        <div className="container py-10 mx-auto">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex flex-col md:flex-row justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold">{oferta.titulo}</h1>
+                            <div className="flex items-center text-muted-foreground mt-2">
+                                <Building2 className="h-4 w-4 mr-2" />
+                                <span>{empresa.nombre}</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Badge>{oferta.estado || "pendiente"}</Badge>
+                            {oferta.estadoPubli && <Badge variant="secondary">{oferta.estadoPubli}</Badge>}
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
 
-            <div className="mt-4">
-                <Button
-                    variant="outline"
-                    onClick={() => {
-                        const role = getRoleFromToken();
-                        console.log("🔙 Volver presionado. Rol actual:", role);
+                    <Separator />
 
-                        if (role === "admin") {
-                            navigate("/admin/dashboard");
-                        } else if (role === "empresa") {
-                            navigate("/empresa/dashboard");
-                        } else {
-                            console.warn("⚠️ Rol desconocido, redirigiendo al login");
-                            navigate("/");
-                        }
-                    }}
+                    <Card>
+                        <CardHeader><CardTitle>Detalles del Puesto</CardTitle></CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <DetailItem icon={<Briefcase />} label="Tipo" value={oferta.tipo} />
+                            <DetailItem icon={<MapPin />} label="Ubicación" value={oferta.locacion} />
+                            <DetailItem icon={<Clock />} label="Horario" value={oferta.horario} />
+                            <DetailItem icon={<Users />} label="Modalidad" value={oferta.modalidad} />
+                            <DetailItem icon={<GraduationCap />} label="Experiencia" value={oferta.experiencia === "true" || oferta.experiencia === true ? "Sí" : "No"} />
+                            <DetailItem icon={<DollarSign />} label="Salario" value={oferta.salario ? `S/ ${oferta.salario}` : "No especificado"} />
+                        </CardContent>
+                    </Card>
 
-                >
-                    Volver
-                </Button>
+                    <Card>
+                        <CardHeader><CardTitle>Funciones</CardTitle></CardHeader>
+                        <CardContent>{renderText(oferta.funciones)}</CardContent>
+                    </Card>
 
+                    <Card>
+                        <CardHeader><CardTitle>Requisitos</CardTitle></CardHeader>
+                        <CardContent>{renderText(oferta.requisitos)}</CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Beneficios</CardTitle></CardHeader>
+                        <CardContent>{renderText(oferta.beneficios)}</CardContent>
+                    </Card>
+                    <div className="mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                const role = getRoleFromToken()
+                                if (role === "admin") {
+                                    navigate("/admin/dashboard")
+                                } else if (role === "empresa") {
+                                    navigate("/empresa/dashboard")
+                                } else {
+                                    navigate("/")
+                                }
+                            }}
+                        >
+                            ← Volver
+                        </Button>
+                    </div>
+
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            {/* Logo */}
+                            <div className="relative h-14 w-14 rounded-md overflow-hidden border">
+                                <img
+                                    src={empresa.logo || "/placeholder.svg"}
+                                    alt={empresa.nombre}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+
+                            {/* Info de la empresa */}
+                            <div>
+                                <CardTitle className="text-base">{empresa.nombre}</CardTitle>
+                                <CardDescription>Empresa</CardDescription>
+                            </div>
+                        </CardHeader>
+
+                    </Card>
+
+                    <Card>
+                        <CardHeader><CardTitle>Información de la Oferta</CardTitle></CardHeader>
+                        <CardContent className="space-y-2">
+                            <p><strong>Fecha Publicación:</strong> {fechaPubli}</p>
+                            <p><strong>Fecha Inicio:</strong> {fechaInicio}</p>
+                            <p><strong>Fecha Cierre:</strong> {fechaCierre}</p>
+                            <p><strong>Vacantes:</strong> {oferta.vacantes}</p>
+                            <p><strong>Área:</strong> {oferta.area}</p>
+                            <p><strong>Duración:</strong> {oferta.tiempo} meses</p>
+                        </CardContent>
+                    </Card>
+                    <Button className="w-full" onClick={() => { }}>
+                        Recomendar Egresados
+                    </Button>
+                </div>
             </div>
         </div>
-    );
+    )
+}
+
+function DetailItem({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
+    return (
+        <div className="flex items-start gap-2">
+            <div className="text-muted-foreground mt-0.5">{icon}</div>
+            <div>
+                <p className="font-medium">{label}</p>
+                <p>{value}</p>
+            </div>
+        </div>
+    )
 }

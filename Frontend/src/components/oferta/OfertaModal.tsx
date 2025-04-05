@@ -178,7 +178,7 @@ export default function OfertaModal({
                                                 empresaNombre: selectedEmpresa?.nombre || "",
                                             });
                                         }}
-                                        className="w-full p-2 border rounded"
+                                        className="w-full p-2 border rounded bg-white text-black dark:bg-neutral-800 dark:text-white dark:border-gray-700"
                                     >
                                         {empresasDisponibles.map((empresa) => (
                                             <option key={empresa.id} value={empresa.id}>
@@ -330,7 +330,7 @@ function SelectGroup({
                 name={name}
                 value={value}
                 onChange={onChange}
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded bg-white text-black dark:bg-neutral-800 dark:text-white dark:border-gray-700"
                 required
             >
                 <option value="">Seleccione...</option>
