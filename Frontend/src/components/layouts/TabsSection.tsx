@@ -8,7 +8,6 @@ interface TabsSectionProps {
     role: "admin" | "empresa";
 }
 export default function TabsSection({ role }: TabsSectionProps) {
-    console.log("Rol recibido: ",role);
     return (
         <Tabs defaultValue="plazas" className="w-full">
             <TabsList className="flex justify-center bg-background rounded-md shadow p-2">
