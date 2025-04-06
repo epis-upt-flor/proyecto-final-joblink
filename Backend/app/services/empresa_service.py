@@ -12,10 +12,10 @@ def listar_empresas(db: Session):
 
 def eliminar_empresa(db: Session, empresa_id: int):
     empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()
-    if not empresa:
-        raise HTTPException(status_code=404, detail="Empresa no encontrada.")
 
-    # Elimina primero de Empresa, luego de Usuario
+    if not empresa:
+        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+
     db.delete(empresa)
     db.commit()
 
@@ -24,7 +24,7 @@ def eliminar_empresa(db: Session, empresa_id: int):
         db.delete(usuario)
         db.commit()
 
-    return True
+    return {"message": "Empresa y usuario asociados eliminados correctamente", "empresa_id": empresa_id}
 
 def editar_empresa(db: Session, empresa_id: int, nombre: str, ruc: str, telefono: str, logo: str):
     empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()

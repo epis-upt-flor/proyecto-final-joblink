@@ -14,8 +14,7 @@ def listar_empresas(db: Session = Depends(get_db)):
 
 @router.delete("/empresas/{empresa_id}")
 def eliminar_empresa_endpoint(empresa_id: int, db: Session = Depends(get_db)):
-    eliminar_empresa(db, empresa_id)
-    return {"message": "Empresa eliminada correctamente."}
+    return eliminar_empresa(db, empresa_id)
 
 @router.put("/empresas/{empresa_id}")
 async def editar_empresa_endpoint(empresa_id: int, request: Request, db: Session = Depends(get_db)):
