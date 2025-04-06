@@ -10,6 +10,7 @@ import OfertaDetalle from "@/pages/OfertaDetalle";
 import EgresadoDetalle from "@/pages/EgresadoDetalle";
 import { EmpresasProvider } from "./context/EmpresaContext";
 import EmpresaDetalle from "./pages/EmpresaDetalle";
+import RecuperarContrasena from "./pages/Recuperar";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/oferta/:id" element={<OfertaDetalle />} />
                 <Route path="/egresado/:id" element={<EgresadoDetalle />} />
                 <Route path="/empresa/:id" element={<EmpresaDetalle />} />
+                <Route path="/recuperar" element={<RecuperarContrasena />} />
               </Routes>
               <Toaster />
             </div>

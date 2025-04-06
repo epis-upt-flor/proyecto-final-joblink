@@ -15,16 +15,33 @@ export default function ForgotPasswordDialog() {
   const [email, setEmail] = useState("");
   const [open, setOpen] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!email) {
       toast.error("Por favor, ingresa tu correo electrónico.");
       return;
     }
 
-    toast.success("Revisa tu correo para restablecer tu contraseña.");
-    setOpen(false);
-    setEmail("");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/recuperacion/solicitar/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) {
+        throw new Error("No se pudo enviar el correo. Verifica que el email esté registrado.");
+      }
+
+      toast.success("Correo de recuperación enviado. Revisa tu bandeja de entrada.");
+      setOpen(false);
+      setEmail("");
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
