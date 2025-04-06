@@ -8,24 +8,29 @@ import EmpresaDashboard from "./pages/empresa/Dashboard";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import OfertaDetalle from "@/pages/OfertaDetalle";
 import EgresadoDetalle from "@/pages/EgresadoDetalle";
+import { EmpresasProvider } from "./context/EmpresaContext";
+import EmpresaDetalle from "./pages/EmpresaDetalle";
 
 function App() {
   return (
     <DarkModeProvider>
-      <OfertasProvider>
-        <Router>
-          <div>
-            <Routes>
-              <Route path="/" element={<LoginPage />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/empresa/dashboard" element={<EmpresaDashboard />} />
-              <Route path="/oferta/:id" element={<OfertaDetalle />} />
-              <Route path="/egresado/:id" element={<EgresadoDetalle />} />
-            </Routes>
-            <Toaster />
-          </div>
-        </Router>
-      </OfertasProvider>
+      <EmpresasProvider>
+        <OfertasProvider>
+          <Router>
+            <div>
+              <Routes>
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/empresa/dashboard" element={<EmpresaDashboard />} />
+                <Route path="/oferta/:id" element={<OfertaDetalle />} />
+                <Route path="/egresado/:id" element={<EgresadoDetalle />} />
+                <Route path="/empresa/:id" element={<EmpresaDetalle />} />
+              </Routes>
+              <Toaster />
+            </div>
+          </Router>
+        </OfertasProvider>
+      </EmpresasProvider>
     </DarkModeProvider>
   );
 }

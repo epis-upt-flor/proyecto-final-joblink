@@ -1,11 +1,11 @@
 from enum import Enum
 
-class EstadoOferta(Enum):
+class EstadoPubli(Enum):
     en_revision = "En revisión"
     aceptada = "Aceptada"
     rechazada = "Rechazada"
 
-class EstadoPubli(Enum):
+class EstadoOferta(Enum):
     pendiente = "Pendiente"
     abierta = "Abierta"
     cerrada = "Cerrada"
