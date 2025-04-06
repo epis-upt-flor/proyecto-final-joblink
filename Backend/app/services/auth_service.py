@@ -5,6 +5,7 @@ from app.models.database import get_db
 from app.models.usuario import Usuario
 from app.models.empresa import Empresa
 from app.models.administrador import Administrador
+from app.factory.usuario_factory import UsuarioFactory
 from app.utils.security import (
     verificar_token,
     generar_hash,
@@ -40,12 +41,7 @@ def usuario_requiere_rol(roles_permitidos: list):
     return verificar_rol
 
 
-def registrar_usuario(data: dict, db: Session):
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
-    rol = data.get("rol")
-
+def registrar_usuario(data: dict, db: Session, username: str, email: str, password: str, rol: str):
     if not username or not password or not rol or not email:
         raise HTTPException(
             status_code=400, detail="Faltan campos obligatorios")
@@ -59,36 +55,10 @@ def registrar_usuario(data: dict, db: Session):
 
     hashed_password = generar_hash(password)
 
-    if rol == "empresa":
-        nuevo_usuario = Empresa(
-            username=username,
-            email=email,
-            password=hashed_password,
-            rol=rol,
-            nombre=data.get("nombre"),
-            ruc=data.get("ruc"),
-            telefono=data.get("telefono"),
-            logo=data.get("logo"),
-        )
-    elif rol == "admin":
-        nuevo_usuario = Administrador(
-            username=username,
-            email=email,
-            password=hashed_password,
-            rol=rol,
-            nombres=data.get("nombres"),
-            apellidos=data.get("apellidos"),
-            telefono=data.get("telefono"),
-            tipoDoc=data.get("tipoDoc"),
-            numDoc=data.get("numDoc"),
-        )
-    else:
-        nuevo_usuario = Usuario(
-            username=username,
-            email=email,
-            password=hashed_password,
-            rol=rol
-        )
+    # Usar el Factory Method para crear usuarios con los roles 'empresa' y 'admin'
+    factory = UsuarioFactory()
+    creador = factory.get_creador(rol)
+    nuevo_usuario = creador.crear_usuario(data, hashed_password)
 
     db.add(nuevo_usuario)
     db.commit()
@@ -97,11 +67,8 @@ def registrar_usuario(data: dict, db: Session):
     token = crear_token(
         {"sub": nuevo_usuario.username, "rol": nuevo_usuario.rol})
 
-    return {
-        "message": "Usuario registrado exitosamente",
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    return nuevo_usuario  # Ahora devuelve el usuario creado
+
 
 def login_usuario(data: dict, db: Session):
     username = data.get("username")

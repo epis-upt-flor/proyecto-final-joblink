@@ -1,0 +1,58 @@
+from app.models.usuario import Usuario
+from app.models.empresa import Empresa
+from app.models.administrador import Administrador
+from app.utils.security import generar_hash
+
+# Creador Base
+class CreadorUsuario:
+    def crear_usuario(self, data, hashed_password):
+        raise NotImplementedError
+
+# Creador para Usuario
+class CreadorUsuarioComun(CreadorUsuario):
+    def crear_usuario(self, data, hashed_password):
+        return Usuario(
+            username=data["username"],
+            email=data["email"],
+            password=hashed_password,
+            rol=data["rol"]
+        )
+
+# Creador para Empresa
+class CreadorEmpresa(CreadorUsuario):
+    def crear_usuario(self, data, hashed_password):
+        return Empresa(
+            username=data["username"],
+            email=data["email"],
+            password=hashed_password,
+            rol=data["rol"],
+            nombre=data["nombre"],
+            ruc=data["ruc"],
+            telefono=data["telefono"],
+            logo=data["logo"]
+        )
+
+# Creador para Administrador
+class CreadorAdministrador(CreadorUsuario):
+    def crear_usuario(self, data, hashed_password):
+        return Administrador(
+            username=data["username"],
+            email=data["email"],
+            password=hashed_password,
+            rol=data["rol"],
+            nombres=data["nombres"],
+            apellidos=data["apellidos"],
+            telefono=data["telefono"],
+            tipoDoc=data["tipoDoc"],
+            numDoc=data["numDoc"]
+        )
+
+# Factory que selecciona el creador adecuado
+class UsuarioFactory:
+    def get_creador(self, rol):
+        if rol == "empresa":
+            return CreadorEmpresa()
+        elif rol == "admin":
+            return CreadorAdministrador()
+        else:
+            return CreadorUsuarioComun()
