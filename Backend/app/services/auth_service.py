@@ -6,6 +6,7 @@ from app.models.usuario import Usuario
 from app.models.empresa import Empresa
 from app.models.administrador import Administrador
 from app.factory.usuario_factory import UsuarioFactory
+from app.factory.email_factory import EmailFactory
 from app.utils.security import (
     verificar_token,
     generar_hash,
@@ -55,7 +56,6 @@ def registrar_usuario(data: dict, db: Session, username: str, email: str, passwo
 
     hashed_password = generar_hash(password)
 
-    # Usar el Factory Method para crear usuarios con los roles 'empresa' y 'admin'
     factory = UsuarioFactory()
     creador = factory.get_creador(rol)
     nuevo_usuario = creador.crear_usuario(data, hashed_password)
@@ -63,11 +63,15 @@ def registrar_usuario(data: dict, db: Session, username: str, email: str, passwo
     db.add(nuevo_usuario)
     db.commit()
     db.refresh(nuevo_usuario)
-
+    if hasattr(creador, "post_creacion"):
+        try:
+            creador.post_creacion(nuevo_usuario, password)
+        except Exception as e:
+            print(f"⚠️ Error post_creación: {e}")
     token = crear_token(
         {"sub": nuevo_usuario.username, "rol": nuevo_usuario.rol})
 
-    return nuevo_usuario  # Ahora devuelve el usuario creado
+    return nuevo_usuario
 
 
 def login_usuario(data: dict, db: Session):

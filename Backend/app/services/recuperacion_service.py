@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
 from app.utils.security import generar_hash
 from uuid import uuid4
+from app.factory.email_factory import EmailFactory
 
 def generar_token_y_enviar(email: str, db: Session):
     usuario = db.query(Usuario).filter_by(email=email).first()
@@ -14,7 +15,9 @@ def generar_token_y_enviar(email: str, db: Session):
     token = str(uuid.uuid4()).split("-")[0]
     redis_conn.set(f"recuperar:{token}", usuario.id, ex=600)
 
-    enviar_email_token(email, token)
+    email_sender = EmailFactory.get("recuperacion")
+    email_sender.send(to=email,token=token)
+
     return {"message": "Token enviado"}
 
 def cambiar_contrasena_con_token(token: str, nueva_contrasena: str, db: Session):
@@ -30,8 +33,3 @@ def cambiar_contrasena_con_token(token: str, nueva_contrasena: str, db: Session)
     db.commit()
     redis_conn.delete(f"recuperar:{token}")
     return {"message": "Contraseña actualizada correctamente"}
-
-def generar_token(email: str) -> str:
-    token = str(uuid4())
-    redis_conn.set(token, email, ex=600)
-    return token
