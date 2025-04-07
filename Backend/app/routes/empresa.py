@@ -6,7 +6,7 @@ from app.services.empresa_service import *
 router = APIRouter()
 
 @router.get("/empresas/")
-def listar_empresas(db: Session = Depends(get_db)):
+def listar_empresas_endpoint(db: Session = Depends(get_db)):
     empresas = listar_empresas(db)
     if not empresas:
         raise HTTPException(status_code=404, detail="No hay empresas registradas.")
