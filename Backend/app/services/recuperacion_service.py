@@ -33,8 +33,3 @@ def cambiar_contrasena_con_token(token: str, nueva_contrasena: str, db: Session)
     db.commit()
     redis_conn.delete(f"recuperar:{token}")
     return {"message": "Contraseña actualizada correctamente"}
-
-def generar_token(email: str) -> str:
-    token = str(uuid4())
-    redis_conn.set(token, email, ex=600)
-    return token
