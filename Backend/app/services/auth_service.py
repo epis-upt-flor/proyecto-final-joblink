@@ -42,7 +42,11 @@ def usuario_requiere_rol(roles_permitidos: list):
     return verificar_rol
 
 
-def registrar_usuario(data: dict, db: Session, username: str, email: str, password: str, rol: str):
+def registrar_usuario(data: dict, db: Session):
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+    rol = data.get("rol")
     if not username or not password or not rol or not email:
         raise HTTPException(
             status_code=400, detail="Faltan campos obligatorios")
