@@ -1,11 +1,9 @@
-from app.models.usuario import Usuario
 from app.models.empresa import Empresa
 from app.models.administrador import Administrador
-from app.utils.security import generar_hash
 
 # Creador Base
 class CreadorUsuario:
-    def crear_usuario(self, data, hashed_password):
+    def crear_usuario(self):
         raise NotImplementedError
 
 # Creador para Empresa
@@ -54,3 +52,4 @@ class UsuarioFactory:
             return CreadorAdministrador()
         else:
             raise ValueError(f"Rol desconocido al intentar registrar usuario: {rol}")
+
