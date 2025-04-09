@@ -8,16 +8,6 @@ class CreadorUsuario:
     def crear_usuario(self, data, hashed_password):
         raise NotImplementedError
 
-# Creador para Usuario
-class CreadorUsuarioComun(CreadorUsuario):
-    def crear_usuario(self, data, hashed_password):
-        return Usuario(
-            username=data["username"],
-            email=data["email"],
-            password=hashed_password,
-            rol=data["rol"]
-        )
-
 # Creador para Empresa
 class CreadorEmpresa(CreadorUsuario):
     def crear_usuario(self, data, hashed_password):
@@ -63,4 +53,4 @@ class UsuarioFactory:
         elif rol == "admin":
             return CreadorAdministrador()
         else:
-            return CreadorUsuarioComun()
+            raise ValueError(f"Rol desconocido al intentar registrar usuario: {rol}")
