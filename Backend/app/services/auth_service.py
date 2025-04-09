@@ -5,7 +5,7 @@ from app.models.database import get_db
 from app.models.usuario import Usuario
 from app.models.empresa import Empresa
 from app.models.administrador import Administrador
-from app.factory.usuario_factory import UsuarioFactory
+from app.factory.usuario.factory import UsuarioFactory
 from app.factory.email_factory import EmailFactory
 from app.utils.security import (
     verificar_token,
