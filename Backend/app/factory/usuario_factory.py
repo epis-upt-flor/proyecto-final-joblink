@@ -3,7 +3,7 @@ from app.models.administrador import Administrador
 
 # Creador Base
 class CreadorUsuario:
-    def crear_usuario(self):
+    def crear_usuario(self, data, hashed_password):
         raise NotImplementedError
 
 # Creador para Empresa
