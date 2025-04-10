@@ -3,7 +3,7 @@ from app.utils.redis_client import redis_conn
 from app.utils.email import enviar_email_token
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
-from app.utils.security import generar_hash
+from app.utils.security import Security
 from uuid import uuid4
 from app.factory.email_factory import EmailFactory
 
@@ -29,7 +29,7 @@ def cambiar_contrasena_con_token(token: str, nueva_contrasena: str, db: Session)
     if not usuario:
         raise Exception("Usuario no encontrado")
 
-    usuario.password = generar_hash(nueva_contrasena)
+    usuario.password = Security.generar_hash(nueva_contrasena)
     db.commit()
     redis_conn.delete(f"recuperar:{token}")
     return {"message": "Contraseña actualizada correctamente"}
