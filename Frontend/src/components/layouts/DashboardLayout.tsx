@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-//import { useDarkMode } from "@/context/DarkModeContext";
 import DarkModeToggle from "../color/DarkModeToggle";
 
 interface DashboardLayoutProps {
@@ -12,7 +11,6 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children, title = "Panel" }: DashboardLayoutProps) {
   const navigate = useNavigate();
-  //const { isDark } = useDarkMode();
 
   const handleLogout = () => {
     localStorage.removeItem("token");

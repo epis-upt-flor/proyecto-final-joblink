@@ -1,11 +1,11 @@
 "use client"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom" // Si usás React Router
-import { useNavigate } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Button } from "@/components/ui/button"
-import { getRoleFromToken } from "@/helpers/auth"
+import { BackButton } from "@/components/shared/BackButton"
+
 import {
     Building2,
     MapPin,
@@ -54,7 +54,6 @@ export default function OfertaDetalle() {
     const { id } = useParams()
     const [oferta, setOferta] = useState<Oferta | null>(null)
     const [empresa, setEmpresa] = useState<Empresa | null>(null)
-    const navigate = useNavigate()
 
     useEffect(() => {
         if (!id) return
@@ -136,24 +135,10 @@ export default function OfertaDetalle() {
                         <CardHeader><CardTitle>Beneficios</CardTitle></CardHeader>
                         <CardContent>{renderText(oferta.beneficios)}</CardContent>
                     </Card>
-                    <div className="mt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                const role = getRoleFromToken()
-                                if (role === "admin") {
-                                    navigate("/admin/dashboard")
-                                } else if (role === "empresa") {
-                                    navigate("/empresa/dashboard")
-                                } else {
-                                    navigate("/")
-                                }
-                            }}
-                        >
-                            ← Volver
-                        </Button>
-                    </div>
 
+                    <div className="mt-4">
+                        <BackButton fallback="/admin/dashboard?tab=plazas" />
+                    </div>
                 </div>
 
                 {/* Sidebar */}
