@@ -1,49 +1,9 @@
-from fastapi import HTTPException, Depends, Header
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
 from app.factory.usuario.factory import UsuarioFactory
+from app.services.token_service import TokenService
 from app.utils.security import Security
-from app.models.database import get_db
-
-
-class TokenService:
-    @staticmethod
-    def verificar_token(token: str) -> dict:
-        payload = Security.verificar_token(token)
-        if not payload:
-            raise HTTPException(status_code=401, detail="Token inválido")
-        return payload
-
-    @staticmethod
-    def crear_token(username: str, rol: str) -> str:
-        return Security.crear_token({"sub": username, "role": rol})
-
-
-class UserService:
-    def obtener_usuario_actual(self, token: str, db: Session) -> Usuario:
-        payload = TokenService.verificar_token(token)
-        username = payload.get("sub")
-        if not username:
-            raise HTTPException(status_code=401, detail="Token inválido")
-
-        usuario = db.query(Usuario).filter(Usuario.username == username).first()
-        if not usuario:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-        return usuario
-
-    def usuario_requiere_rol(self, roles_permitidos: list):
-        async def verificar_rol(
-            authorization: str = Header(...),
-            db: Session = Depends(get_db)
-        ):
-            token = authorization.replace("Bearer ", "")
-            usuario = self.obtener_usuario_actual(token, db)
-            if usuario.rol not in roles_permitidos:
-                raise HTTPException(
-                    status_code=403, detail=f"Acceso denegado para rol: {usuario.rol}")
-            return usuario
-        return verificar_rol
 
 
 class AuthService:
@@ -91,7 +51,7 @@ class AuthService:
         if not usuario or not Security.verificar_password(password, usuario.password):
             raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-        token = TokenService.crear_token(usuario.username, usuario.rol)
+        token = TokenService.crear_token({"sub": usuario.username, "role": usuario.rol})
 
         return {
             "access_token": token,
