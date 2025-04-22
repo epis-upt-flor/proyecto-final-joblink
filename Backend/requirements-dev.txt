@@ -1,9 +1,10 @@
 -r requirements.txt
 pytest
 pytest-bdd
-playwright
 locust
 black
 isort
 pytest-cov
 pytest-mock
+bandit
+safety

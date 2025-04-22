@@ -1,6 +1,5 @@
 import uuid
 from app.utils.redis_client import redis_conn
-from app.utils.email import enviar_email_token
 from sqlalchemy.orm import Session
 from app.models.usuario import Usuario
 from app.utils.security import Security

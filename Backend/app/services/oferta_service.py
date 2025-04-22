@@ -5,55 +5,54 @@ from datetime import date
 
 
 def registrar_oferta(db: Session, data: dict):
+    requeridos = ["titulo", "tipo", "area", "modalidad", "horario",
+                  "vacantes", "experiencia", "locacion", "funciones", "requisitos",
+                  "beneficios", "fechaInicio", "tiempo", "idEmpresa"]
+
+    faltantes = [campo for campo in requeridos if campo not in data]
+    if faltantes:
+        raise ValueError(f"Faltan campos requeridos: {', '.join(faltantes)}")
+
     try:
-        requeridos = ["titulo", "tipo", "area", "modalidad", "horario",
-                      "vacantes", "experiencia", "locacion", "funciones", "requisitos",
-                      "beneficios", "fechaInicio", "tiempo", "idEmpresa"]
+        estado = EstadoOferta[data.get("estado", "pendiente")]
+    except KeyError:
+        estado = EstadoOferta.pendiente
 
-        faltantes = [campo for campo in requeridos if campo not in data]
-        if faltantes:
-            raise ValueError(
-                f"Faltan campos requeridos: {', '.join(faltantes)}")
+    estado_publi = None
+    try:
+        estado_publi = EstadoPubli[data.get("estadoPubli")]
+    except (KeyError, TypeError):
+        pass
 
-        estado_str = data.get("estado")
-        estado = EstadoOferta[estado_str] if estado_str in EstadoOferta.__members__ else EstadoOferta.pendiente
+    fecha_publicacion = data.get("fechaPubli") or date.today()
 
-        estado_publi_str = data.get("estadoPubli")
-        estado_publi = EstadoPubli[estado_publi_str] if estado_publi_str in EstadoPubli.__members__ else None
+    oferta = Oferta(
+        titulo=data["titulo"],
+        tipo=data["tipo"],
+        fechaCierre=data.get("fechaCierre"),
+        area=data["area"],
+        modalidad=data["modalidad"],
+        horario=data["horario"],
+        vacantes=data["vacantes"],
+        experiencia=data["experiencia"],
+        locacion=data["locacion"],
+        salario=data.get("salario"),
+        funciones=data["funciones"],
+        requisitos=data["requisitos"],
+        estado=estado,
+        motivo=data.get("motivo"),
+        beneficios=data["beneficios"],
+        fechaInicio=data["fechaInicio"],
+        tiempo=data["tiempo"],
+        fechaPubli=fecha_publicacion,
+        estadoPubli=estado_publi,
+        idEmpresa=data["idEmpresa"]
+    )
 
-        fecha_publicacion = data.get("fechaPubli") or date.today()
-
-        oferta = Oferta(
-            titulo=data["titulo"],
-            tipo=data["tipo"],
-            fechaCierre=data.get("fechaCierre"),
-            area=data["area"],
-            modalidad=data["modalidad"],
-            horario=data["horario"],
-            vacantes=data["vacantes"],
-            experiencia=data["experiencia"],
-            locacion=data["locacion"],
-            salario=data.get("salario"),
-            funciones=data["funciones"],
-            requisitos=data["requisitos"],
-            estado=estado,
-            motivo=data.get("motivo"),
-            beneficios=data["beneficios"],
-            fechaInicio=data["fechaInicio"],
-            tiempo=data["tiempo"],
-            fechaPubli=fecha_publicacion,
-            estadoPubli=estado_publi,
-            idEmpresa=data["idEmpresa"]
-        )
-
-        db.add(oferta)
-        db.commit()
-        db.refresh(oferta)
-        return oferta
-
-    except Exception as e:
-        print(f"❌ Error al registrar oferta: {e}")
-        return None
+    db.add(oferta)
+    db.commit()
+    db.refresh(oferta)
+    return oferta
 
 
 def listar_ofertas(db: Session):
@@ -75,12 +74,12 @@ def actualizar_oferta(db: Session, id: int, data: dict):
         if key == "estado":
             try:
                 value = EstadoOferta[value]
-            except:
+            except KeyError:
                 continue
         elif key == "estadoPubli":
             try:
                 value = EstadoPubli[value]
-            except:
+            except KeyError:
                 continue
 
         if hasattr(oferta, key):

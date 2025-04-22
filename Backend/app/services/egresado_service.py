@@ -111,7 +111,7 @@ def actualizar_egresado_service(db: Session, id: int, data: dict):
         if key == "tipoDoc":
             try:
                 value = TipoDocumento(value)
-            except Exception:
+            except ValueError:
                 continue
 
         if hasattr(egresado, key):
