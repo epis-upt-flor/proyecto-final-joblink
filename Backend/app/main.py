@@ -5,7 +5,7 @@ from app.routes import usuario, auth, empresa, contrato, recuperacion, egresado,
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "*"
 ]
 app.add_middleware(
     CORSMiddleware,
