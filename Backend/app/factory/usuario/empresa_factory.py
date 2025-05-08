@@ -13,12 +13,3 @@ class CreadorEmpresa(CreadorUsuario):
             telefono=data["telefono"],
             logo=data["logo"]
         )
-
-    def post_creacion(self, usuario, password):
-        from app.factory.email_factory import EmailFactory
-        sender = EmailFactory.get("bienvenida")
-        sender.send(
-            to=usuario.email,
-            password=password,
-            nombre_empresa=usuario.nombre
-        )
