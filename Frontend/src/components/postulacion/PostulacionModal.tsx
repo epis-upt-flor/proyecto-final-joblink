@@ -52,7 +52,7 @@ export default function PostulacionModal({
                         <Select onValueChange={(value) => setSelectedEgresado(Number(value))}>
                             {egresados.map((egresado) => (
                                 <SelectItem key={egresado.id} value={egresado.id!.toString()}>
-                                    {egresado.nombre} {egresado.apellido} - {egresado.dni}
+                                    {egresado.nombres} {egresado.apellidos} - {egresado.numDoc}
                                 </SelectItem>
                             ))}
                         </Select>

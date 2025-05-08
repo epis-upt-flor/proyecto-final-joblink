@@ -3,10 +3,10 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import { Empresa } from "@/types/Empresa"
 import { toast } from "sonner"
-import { getRoleFromToken } from "@/helpers/auth"
+import { BackButton } from "@/components/shared/BackButton"
+
 import {
     Building2,
     Mail,
@@ -136,22 +136,9 @@ export default function EmpresaDetalle() {
                     </Card>
 
                     <div className="mt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                const role = getRoleFromToken()
-                                if (role === "admin") {
-                                    navigate("/admin/dashboard")
-                                } else if (role === "empresa") {
-                                    navigate("/empresa/dashboard")
-                                } else {
-                                    navigate("/")
-                                }
-                            }}
-                        >
-                            Volver
-                        </Button>
+                        <BackButton fallback="/admin/dashboard?tab=empresas" />
                     </div>
+
                 </div>
             </div>
         </div>

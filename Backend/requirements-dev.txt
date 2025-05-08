@@ -1,0 +1,10 @@
+-r requirements.txt
+pytest
+pytest-bdd
+locust
+black
+isort
+pytest-cov
+pytest-mock
+bandit
+safety
