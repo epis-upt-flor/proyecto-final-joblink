@@ -3,41 +3,46 @@ from fastapi import HTTPException
 from app.models.empresa import Empresa
 from app.models.usuario import Usuario
 
-def listar_empresas(db: Session):
-    try:
-        return db.query(Empresa).all()
-    except Exception as e:
-        print(f"Error al listar empresas: {e}")
-        return []
 
-def eliminar_empresa(db: Session, empresa_id: int):
-    empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()
+class EmpresaService:
+    def listar_empresas(self, db: Session) -> list:
+        try:
+            return db.query(Empresa).all()
+        except Exception as e:
+            print(f"Error al listar empresas: {e}")
+            return []
 
-    if not empresa:
-        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    def eliminar_empresa(self, db: Session, empresa_id: int) -> dict:
+        empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()
 
-    db.delete(empresa)
-    db.commit()
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
 
-    usuario = db.query(Usuario).filter(Usuario.id == empresa_id).first()
-    if usuario:
-        db.delete(usuario)
+        db.delete(empresa)
         db.commit()
 
-    return {"message": "Empresa y usuario asociados eliminados correctamente", "empresa_id": empresa_id}
+        usuario = db.query(Usuario).filter(Usuario.id == empresa_id).first()
+        if usuario:
+            db.delete(usuario)
+            db.commit()
 
-def editar_empresa(db: Session, empresa_id: int, nombre: str, ruc: str, telefono: str, logo: str):
-    empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()
+        return {
+            "message": "Empresa y usuario asociados eliminados correctamente",
+            "empresa_id": empresa_id
+        }
 
-    if not empresa:
-        raise HTTPException(status_code=404, detail="Empresa no encontrada")
+    def editar_empresa(self, db: Session, empresa_id: int, nombre: str, ruc: str, telefono: str, logo: str) -> Empresa:
+        empresa = db.query(Empresa).filter(Empresa.id == empresa_id).first()
 
-    empresa.nombre = nombre
-    empresa.ruc = ruc
-    empresa.telefono = telefono
-    empresa.logo = logo
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa no encontrada")
 
-    db.commit()
-    db.refresh(empresa)
+        empresa.nombre = nombre
+        empresa.ruc = ruc
+        empresa.telefono = telefono
+        empresa.logo = logo
 
-    return empresa
+        db.commit()
+        db.refresh(empresa)
+
+        return empresa
