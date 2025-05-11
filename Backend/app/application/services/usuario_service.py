@@ -2,10 +2,13 @@ from fastapi import HTTPException, Header, Depends
 from sqlalchemy.orm import Session
 from app.domain.models.usuario import Usuario
 from app.application.services.token_service import TokenService
-from app.infrastructure.database.dependency import get_db
+from app.infrastructure.database.session_provider import DBSessionProvider
 
 
 class UserService:
+    def __init__(self):
+        self.db_provider = DBSessionProvider()
+
     def obtener_usuario_actual(self, token: str, db: Session) -> Usuario:
         payload = TokenService.verificar_token(token)
         username = payload.get("sub")
@@ -19,9 +22,9 @@ class UserService:
         return usuario
 
     def usuario_requiere_rol(self, roles_permitidos: list):
-        async def verificar_rol(
+        def verificar_rol(
             authorization: str = Header(...),
-            db: Session = Depends(get_db)
+            db: Session = Depends(DBSessionProvider().get_session)
         ):
             token = authorization.replace("Bearer ", "")
             usuario = self.obtener_usuario_actual(token, db)
