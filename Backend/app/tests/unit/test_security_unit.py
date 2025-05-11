@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from app.utils.security import Security
+from Backend.infrastructure.security.security import Security
 
 
 class TestSecurity:

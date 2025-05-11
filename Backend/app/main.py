@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import usuario, auth, empresa, contrato, recuperacion, egresado, oferta, recomendacion
+from app.infrastructure.routes import usuario, auth, empresa, contrato, recuperacion, egresado, oferta, recomendacion
 
 app = FastAPI()
 
