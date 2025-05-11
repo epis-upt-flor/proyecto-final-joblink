@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.infrastructure.database.session_provider import DBSessionProvider
-from app.application.services.recomendador import Recomendador
-from app.domain.models.egresado import Egresado
-from app.domain.models.oferta import Oferta
+from Backend.app.infrastructure.database.db_session_provider import DBSessionProvider
+from Backend.app.application.services.recomendador_service import Recomendador
+from Backend.app.infrastructure.orm_models.egresado_orm import Egresado
+from Backend.app.infrastructure.orm_models.oferta_orm import Oferta
 
 router = APIRouter()
 recomendador = Recomendador()

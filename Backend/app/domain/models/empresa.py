@@ -1,17 +1,26 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from app.infrastructure.database.singleton import Base
-from app.domain.models.usuario import Usuario
+from .usuario import Usuario
 
 
 class Empresa(Usuario):
-    __tablename__ = "empresa"
-    id = Column(Integer, ForeignKey("usuario.id"), primary_key=True)
-    nombre = Column(String(100), nullable=False)
-    ruc = Column(String(11), unique=True, nullable=False)
-    telefono = Column(String(15), nullable=False)
-    logo = Column(String)
-    estado = Column(Boolean, default=True)
+    def __init__(
+        self,
+        id: int,
+        username: str,
+        password: str,
+        email: str,
+        rol: str,
+        nombre: str,
+        ruc: str,
+        telefono: str,
+        logo: str,
+        estado: bool
+    ):
+        super().__init__(id, username, password, email, rol)
+        self.nombre = nombre
+        self.ruc = ruc
+        self.telefono = telefono
+        self.logo = logo
+        self.estado = estado
 
-    __mapper_args__ = {
-        "polymorphic_identity": "empresa",
-    }
+    def __repr__(self):
+        return f"<Empresa(id={self.id}, nombre={self.nombre}, ruc={self.ruc})>"

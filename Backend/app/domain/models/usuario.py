@@ -1,15 +1,17 @@
-from sqlalchemy import Column, Integer, String
-from app.infrastructure.database.singleton import Base
+class Usuario:
+    def __init__(
+        self,
+        id: int,
+        username: str,
+        password: str,
+        email: str,
+        rol: str
+    ):
+        self.id = id
+        self.username = username
+        self.password = password
+        self.email = email
+        self.rol = rol
 
-class Usuario(Base):
-    __tablename__ = "usuario"
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
-    rol = Column(String(10), nullable=False)
-
-    __mapper_args__ = {
-        "polymorphic_on": rol,
-        "polymorphic_identity": "usuario",
-    }
+    def __repr__(self):
+        return f"<Usuario(id={self.id}, username={self.username}, rol={self.rol})>"

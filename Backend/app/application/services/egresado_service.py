@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.domain.models.egresado import Egresado
-from app.domain.models.enum import TipoDocumento
+from Backend.app.infrastructure.orm_models.egresado_orm import Egresado
+from Backend.app.domain.models.enum import TipoDocumento
 
 
 class EgresadoService:

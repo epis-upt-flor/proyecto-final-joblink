@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
-from app.infrastructure.database.session_provider import DBSessionProvider
+from Backend.app.infrastructure.database.db_session_provider import DBSessionProvider
 from app.application.services.auth_service import AuthService
 from app.infrastructure.observers.bienvenida_observer import BienvenidaObserver
 

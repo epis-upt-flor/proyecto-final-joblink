@@ -1,4 +1,4 @@
-from app.infrastructure.database.singleton import DatabaseSingleton
+from Backend.app.infrastructure.database.database_singleton import DatabaseSingleton
 
 class DBSessionProvider:
     def __init__(self):

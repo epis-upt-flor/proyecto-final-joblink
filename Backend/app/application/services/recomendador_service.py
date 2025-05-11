@@ -2,8 +2,8 @@ from upstash_vector import Index, Vector
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from app.domain.models.oferta import Oferta
-from app.domain.models.egresado import Egresado
+from Backend.app.infrastructure.orm_models.oferta_orm import Oferta
+from Backend.app.infrastructure.orm_models.egresado_orm import Egresado
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 from app.application.services.postulacion_service import PostulacionService
 

@@ -1,17 +1,29 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from app.infrastructure.database.singleton import Base
-from app.domain.models.usuario import Usuario
+from .usuario import Usuario
 
 
 class Administrador(Usuario):
-    __tablename__ = "administrador"
-    id = Column(Integer, ForeignKey("usuario.id"), primary_key=True)
-    nombres = Column(String(100), nullable=False)
-    apellidos = Column(String(100), nullable=False)
-    telefono = Column(String(15), nullable=False)
-    tipoDoc = Column(String(20), nullable=False)
-    numDoc = Column(String(15), unique=True, nullable=False)
+    def __init__(
+        self,
+        id: int,
+        username: str,
+        password: str,
+        email: str,
+        rol: str,
+        nombres: str,
+        apellidos: str,
+        telefono: str,
+        tipo_doc: str,
+        num_doc: str
+    ):
+        super().__init__(id, username, password, email, rol)
+        self.nombres = nombres
+        self.apellidos = apellidos
+        self.telefono = telefono
+        self.tipo_doc = tipo_doc
+        self.num_doc = num_doc
 
-    __mapper_args__ = {
-        "polymorphic_identity": "admin",
-    }
+    def __repr__(self):
+        return (
+            f"<Administrador(id={self.id}, username={self.username}, "
+            f"nombres={self.nombres}, apellidos={self.apellidos})>"
+        )

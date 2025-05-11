@@ -1,34 +1,30 @@
-from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, Enum, DECIMAL
-from sqlalchemy.orm import relationship
-from app.domain.models.enum import EstadoOferta, EstadoPubli
-from app.infrastructure.database.singleton import Base
+from datetime import date
+from Backend.app.domain.models.enum import EstadoOferta, EstadoPubli
 
 
-class Oferta(Base):
-    __tablename__ = "oferta"
-
-    id = Column(Integer, primary_key=True, index=True)
-    titulo = Column(String(150), nullable=False)
-    tipo = Column(String(10), nullable=False)
-    fechaCierre = Column(Date, nullable=True)
-    area = Column(String(100), nullable=False)
-    modalidad = Column(String(50), nullable=False)
-    horario = Column(String(50), nullable=False)
-    vacantes = Column(Integer, nullable=False)
-    experiencia = Column(String(100), nullable=True)
-    locacion = Column(String(150), nullable=False)
-    salario = Column(DECIMAL(10, 2), nullable=True)
-    funciones = Column(Text, nullable=False)
-    requisitos = Column(Text, nullable=False)
-    estado = Column(Enum(EstadoOferta), nullable=False)
-    motivo = Column(Text, nullable=True)
-    beneficios = Column(Text, nullable=False)
-    fechaInicio = Column(Date, nullable=False)
-    tiempo = Column(Integer, nullable=False)
-    fechaPubli = Column(Date, nullable=True)
-    estadoPubli = Column(Enum(EstadoPubli), nullable=True, default=None)
-
-    idEmpresa = Column(Integer, ForeignKey('empresa.id'), nullable=False)
-    empresa = relationship("Empresa", backref="ofertas", uselist=False)
-
-    postulaciones = relationship("Postulacion", back_populates="oferta")
+class Oferta:
+    def __init__(self, id: int, titulo: str, tipo: str, fecha_cierre: date, area: str, modalidad: str,
+                 horario: str, vacantes: int, experiencia: str, locacion: str, salario: float, funciones: str,
+                 requisitos: str, estado: EstadoOferta, motivo: str, beneficios: str, fecha_inicio: date,
+                 tiempo: int, fecha_publi: date, estado_publi: EstadoPubli, id_empresa: int):
+        self.id = id
+        self.titulo = titulo
+        self.tipo = tipo
+        self.fecha_cierre = fecha_cierre
+        self.area = area
+        self.modalidad = modalidad
+        self.horario = horario
+        self.vacantes = vacantes
+        self.experiencia = experiencia
+        self.locacion = locacion
+        self.salario = salario
+        self.funciones = funciones
+        self.requisitos = requisitos
+        self.estado = estado
+        self.motivo = motivo
+        self.beneficios = beneficios
+        self.fecha_inicio = fecha_inicio
+        self.tiempo = tiempo
+        self.fecha_publi = fecha_publi
+        self.estado_publi = estado_publi
+        self.id_empresa = id_empresa

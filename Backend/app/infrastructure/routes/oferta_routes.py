@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
-from app.infrastructure.database.session_provider import DBSessionProvider
+from Backend.app.infrastructure.database.db_session_provider import DBSessionProvider
 from app.application.services.oferta_service import OfertaService
 
 router = APIRouter(prefix="/ofertas", tags=["Ofertas"])
