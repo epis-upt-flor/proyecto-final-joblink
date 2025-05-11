@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.domain.models.oferta import Oferta
 from app.domain.models.egresado import Egresado
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
+from app.application.services.postulacion_service import PostulacionService
 
 
 class Recomendador:
@@ -57,6 +58,7 @@ class Recomendador:
     def recomendar(self, oferta_id: int, db: Session):
         vector_db = self._get_vector_db()
         embeddings = GeneradorEmbeddings()
+        postulacion_service = PostulacionService()
 
         oferta = db.query(Oferta).filter(Oferta.id == oferta_id).first()
         if not oferta:
@@ -67,19 +69,16 @@ class Recomendador:
         print(texto_oferta)
 
         vector_query = embeddings.generar_embedding_oferta(oferta)
-
         response = vector_db.query(vector=vector_query, top_k=10, include_metadata=True)
-        
+
         recomendaciones = []
 
         print("\n📊 Resultados de similitud:")
         for item in response:
             eid = item.id
-            
-            # 🔒 Omitir ofertas que están en la base de vectores
             if eid.startswith("oferta-"):
                 continue
-            
+
             nombres = item.metadata.get("nombres")
             habilidades = item.metadata.get("habilidades")
             experienciaLaboral = item.metadata.get("experienciaLaboral")
@@ -88,17 +87,8 @@ class Recomendador:
             logrosAcademicos = item.metadata.get("logrosAcademicos")
             score = round(item.score * 100, 2)
 
-            print(f"🧪 Comparando con egresado ID: {eid}")
-            print(f"   Nombres: {nombres}")
-            print(f"   Habilidades: {habilidades}")
-            print(f"   Experiencia laboral: {experienciaLaboral}")
-            print(f"   Certificados: {certificados}")
-            print(f"   Idiomas: {idiomas}")
-            print(f"   Logros académicos: {logrosAcademicos}")
-            print(f"   Score: {score}")
-            print("   ✅ Candidato válido. Agregado a recomendaciones.\n")
-
             recomendaciones.append({
+                "id": int(eid),
                 "nombres": nombres,
                 "habilidades": habilidades,
                 "experienciaLaboral": experienciaLaboral,
@@ -107,6 +97,11 @@ class Recomendador:
                 "logrosAcademicos": logrosAcademicos,
                 "score": score
             })
+
+        recomendaciones = sorted(recomendaciones, key=lambda x: x["score"], reverse=True)[:3]
+
+        for idx, rec in enumerate(recomendaciones, start=1):
+            postulacion_service.crear_postulacion(oferta_id, rec["id"], idx, db)
 
         return {
             "criterios_usados": texto_oferta,
