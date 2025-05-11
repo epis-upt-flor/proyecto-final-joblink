@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from app.infrastructure.routes import usuario, auth, empresa, contrato, recuperacion, egresado, oferta, recomendacion
 
@@ -14,6 +14,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def ignore_favicon():
+    return Response(status_code=204)
 
 app.include_router(usuario.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
