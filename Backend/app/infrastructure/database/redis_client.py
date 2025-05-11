@@ -4,6 +4,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-UPSTASH_URL = os.getenv("UPSTASH_REDIS_URL")
+class RedisClient:
+    _client = None
 
-redis_conn = redis.from_url(UPSTASH_URL, decode_responses=True)
+    @classmethod
+    def get_client(cls):
+        if cls._client is None:
+            url = os.getenv("UPSTASH_REDIS_URL")
+            if not url:
+                raise ValueError("⚠️ ERROR: UPSTASH_REDIS_URL no está configurada.")
+            cls._client = redis.from_url(url, decode_responses=True)
+        return cls._client
