@@ -1,5 +1,5 @@
 from datetime import date
-from Backend.app.domain.models.enum import EstadoContrato
+from app.domain.models.enum import EstadoContrato
 
 
 class Contrato:

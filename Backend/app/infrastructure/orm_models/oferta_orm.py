@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, Enum, DECIMAL
 from sqlalchemy.orm import relationship
-from Backend.app.domain.models.enum import EstadoOferta, EstadoPubli
-from Backend.app.infrastructure.database.database_singleton import Base
+from app.domain.models.enum import EstadoOferta, EstadoPubli
+from app.infrastructure.database.database_singleton import Base
 
 
 class Oferta(Base):

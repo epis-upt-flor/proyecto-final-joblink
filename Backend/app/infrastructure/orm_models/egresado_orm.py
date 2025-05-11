@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Boolean, Enum
-from Backend.app.domain.models.enum import TipoDocumento
-from Backend.app.infrastructure.database.database_singleton import Base
+from app.domain.models.enum import TipoDocumento
+from app.infrastructure.database.database_singleton import Base
 from sqlalchemy.orm import relationship
 
 

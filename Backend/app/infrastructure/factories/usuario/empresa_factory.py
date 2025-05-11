@@ -1,4 +1,4 @@
-from Backend.app.infrastructure.orm_models.empresa_orm import Empresa
+from app.infrastructure.orm_models.empresa_orm import Empresa
 from app.infrastructure.factories.usuario.base import CreadorUsuario
 
 

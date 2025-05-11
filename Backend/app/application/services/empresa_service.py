@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from Backend.app.infrastructure.orm_models.empresa_orm import Empresa
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.orm_models.empresa_orm import Empresa
+from app.infrastructure.orm_models.usuario_orm import Usuario
 
 
 class EmpresaService:

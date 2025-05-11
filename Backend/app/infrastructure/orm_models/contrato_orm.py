@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, Enum
 from sqlalchemy.orm import relationship
-from Backend.app.domain.models.enum import EstadoContrato
-from Backend.app.infrastructure.database.database_singleton import Base
+from app.domain.models.enum import EstadoContrato
+from app.infrastructure.database.database_singleton import Base
 
 
 class Contrato(Base):

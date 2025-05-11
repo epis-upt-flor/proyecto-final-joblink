@@ -1,19 +1,17 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from app.domain.models.enum import TipoDocumento
-
 
 class EgresadoBase(BaseModel):
     nombres: str
     apellidos: str
-    tipoDoc: TipoDocumento
+    tipoDoc: str
     numDoc: str
-    email: EmailStr
+    email: str
     telefono: str
+    fechaNacimiento: date
     direccion: Optional[str] = None
     nacionalidad: Optional[str] = None
-    fechaNacimiento: Optional[date] = None
     habilidades: Optional[str] = None
     logrosAcademicos: Optional[str] = None
     certificados: Optional[str] = None
@@ -24,10 +22,11 @@ class EgresadoBase(BaseModel):
     cv: Optional[str] = None
     disponibilidad: bool = True
 
-
 class EgresadoCreate(EgresadoBase):
     pass
 
+class EgresadoUpdate(EgresadoBase):
+    pass
 
 class EgresadoOut(EgresadoBase):
     id: int

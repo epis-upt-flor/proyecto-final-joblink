@@ -1,13 +1,28 @@
-from Backend.app.domain.models.enum import TipoDocumento
-import datetime
-
+from datetime import date
+from typing import Optional
 
 class Egresado:
-    def __init__(self, id: int, nombres: str, apellidos: str, tipoDoc: TipoDocumento, numDoc: str, email: str,
-                 telefono: str, direccion: str = None, nacionalidad: str = None, fechaNacimiento: datetime.date = None,
-                 habilidades: str = None, logrosAcademicos: str = None, certificados: str = None, 
-                 experienciaLaboral: str = None, idiomas: str = None, linkedin: str = None, github: str = None, 
-                 cv: str = None, disponibilidad: bool = True):
+    def __init__(self, 
+                 nombres: str,
+                 apellidos: str,
+                 tipoDoc: str,
+                 numDoc: str,
+                 email: str,
+                 telefono: str,
+                 fechaNacimiento: date,
+                 id: Optional[int] = None,
+                 direccion: Optional[str] = None,
+                 nacionalidad: Optional[str] = None,
+                 habilidades: Optional[str] = None,
+                 logrosAcademicos: Optional[str] = None,
+                 certificados: Optional[str] = None,
+                 experienciaLaboral: Optional[str] = None,
+                 idiomas: Optional[str] = None,
+                 linkedin: Optional[str] = None,
+                 github: Optional[str] = None,
+                 cv: Optional[str] = None,
+                 disponibilidad: bool = True):
+        
         self.id = id
         self.nombres = nombres
         self.apellidos = apellidos
@@ -15,9 +30,9 @@ class Egresado:
         self.numDoc = numDoc
         self.email = email
         self.telefono = telefono
+        self.fechaNacimiento = fechaNacimiento
         self.direccion = direccion
         self.nacionalidad = nacionalidad
-        self.fechaNacimiento = fechaNacimiento
         self.habilidades = habilidades
         self.logrosAcademicos = logrosAcademicos
         self.certificados = certificados
@@ -27,6 +42,3 @@ class Egresado:
         self.github = github
         self.cv = cv
         self.disponibilidad = disponibilidad
-
-    def __repr__(self):
-        return f"<Egresado(id={self.id}, nombres={self.nombres}, apellidos={self.apellidos})>"

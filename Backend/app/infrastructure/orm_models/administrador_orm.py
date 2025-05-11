@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from Backend.app.infrastructure.database.database_singleton import Base
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.database.database_singleton import Base
+from app.infrastructure.orm_models.usuario_orm import Usuario
 
 
 class Administrador(Usuario):

@@ -1,14 +1,15 @@
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.orm_models.usuario_orm import Usuario
 from app.infrastructure.factories.usuario.factory import UsuarioFactory
 from app.application.services.token_service import TokenService
 from app.infrastructure.security.security import Security
 from app.infrastructure.observers.usuario_observer import UsuarioObserver
+from app.domain.interfaces.IN.auth_usecase import AuthUseCase
 
 
-class AuthService:
+class AuthService(AuthUseCase):
     def __init__(self):
         self.observers: List[UsuarioObserver] = []
 
@@ -20,8 +21,7 @@ class AuthService:
             try:
                 observer.notificar(usuario, password)
             except Exception as e:
-                print(
-                    f"⚠️ Error notificando observer {observer.__class__.__name__}: {e}")
+                print(f"⚠️ Error notificando observer {observer.__class__.__name__}: {e}")
 
     def registrar_usuario(self, data: dict, db: Session) -> Usuario:
         username = data.get("username")
@@ -30,15 +30,13 @@ class AuthService:
         rol = data.get("rol")
 
         if not username or not password or not rol or not email:
-            raise HTTPException(
-                status_code=400, detail="Faltan campos obligatorios")
+            raise HTTPException(status_code=400, detail="Faltan campos obligatorios")
 
         if db.query(Usuario).filter(Usuario.username == username).first():
             raise HTTPException(status_code=400, detail="El usuario ya existe")
 
         if db.query(Usuario).filter(Usuario.email == email).first():
-            raise HTTPException(
-                status_code=400, detail="El correo ya está registrado")
+            raise HTTPException(status_code=400, detail="El correo ya está registrado")
 
         hashed_password = Security.generar_hash(password)
 
@@ -54,21 +52,18 @@ class AuthService:
 
         return nuevo_usuario
 
-    def login_usuario(self, data: dict, db: Session):
+    def login_usuario(self, data: dict, db: Session) -> dict:
         username = data.get("username")
         password = data.get("password")
 
         if not username or not password:
             raise HTTPException(status_code=400, detail="Faltan credenciales")
 
-        usuario = db.query(Usuario).filter(
-            Usuario.username == username).first()
+        usuario = db.query(Usuario).filter(Usuario.username == username).first()
         if not usuario or not Security.verificar_password(password, usuario.password):
-            raise HTTPException(
-                status_code=401, detail="Credenciales inválidas")
+            raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-        token = TokenService.crear_token(
-            {"sub": usuario.username, "role": usuario.rol})
+        token = TokenService.crear_token({"sub": usuario.username, "role": usuario.rol})
 
         return {
             "access_token": token,

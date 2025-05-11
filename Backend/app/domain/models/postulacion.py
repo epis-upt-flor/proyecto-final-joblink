@@ -1,4 +1,4 @@
-from Backend.app.domain.models.enum import EstadoPostulacion
+from app.domain.models.enum import EstadoPostulacion
 
 
 class Postulacion:

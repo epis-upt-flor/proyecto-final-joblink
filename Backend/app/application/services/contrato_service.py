@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.contrato_orm import Contrato
+from app.infrastructure.orm_models.contrato_orm import Contrato
 
 def registrar_contratacion(db: Session, data: dict):
     contratacion = Contrato(

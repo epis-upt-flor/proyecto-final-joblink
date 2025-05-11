@@ -1,4 +1,4 @@
-from Backend.app.infrastructure.orm_models.administrador_orm import Administrador
+from app.infrastructure.orm_models.administrador_orm import Administrador
 from app.infrastructure.factories.usuario.base import CreadorUsuario
 
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any
-from domain.models.usuario import Usuario
+from app.domain.models.usuario import Usuario
 
 
 class AuthUseCase(ABC):

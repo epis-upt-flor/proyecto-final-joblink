@@ -1,6 +1,6 @@
 from uuid import uuid4
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.orm_models.usuario_orm import Usuario
 from app.infrastructure.database.redis_client import RedisClient
 from app.infrastructure.security.security import Security
 from app.infrastructure.factories.email_factory import EmailFactory

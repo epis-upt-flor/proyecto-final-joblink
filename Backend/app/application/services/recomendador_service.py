@@ -2,13 +2,13 @@ from upstash_vector import Index, Vector
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.oferta_orm import Oferta
-from Backend.app.infrastructure.orm_models.egresado_orm import Egresado
+from app.infrastructure.orm_models.oferta_orm import Oferta
+from app.infrastructure.orm_models.egresado_orm import Egresado
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 from app.application.services.postulacion_service import PostulacionService
 
 
-class Recomendador:
+class RecomendadorService:
     @staticmethod
     def _get_vector_db():
         load_dotenv()  # Asegura que se cargue el .env cada vez

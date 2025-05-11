@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.postulacion_orm import Postulacion
-from Backend.app.domain.models.enum import EstadoPostulacion
+from app.infrastructure.orm_models.postulacion_orm import Postulacion
+from app.domain.models.enum import EstadoPostulacion
+
 
 class PostulacionService:
 

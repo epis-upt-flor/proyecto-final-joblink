@@ -1,130 +1,48 @@
-from sqlalchemy.orm import Session
+from app.domain.interfaces.OUT.egresado_repository import EgresadoRepository
+from app.domain.interfaces.IN.egresado_usecase import EgresadoUseCase
+from app.domain.models.egresado import Egresado
 from fastapi import HTTPException
-from Backend.app.infrastructure.orm_models.egresado_orm import Egresado
-from Backend.app.domain.models.enum import TipoDocumento
 
+class EgresadoService(EgresadoUseCase):
+    def __init__(self, egresado_repository: EgresadoRepository):
+        self.egresado_repository = egresado_repository
 
-class EgresadoService:
-    def registrar_egresado(self, db: Session, data: dict) -> Egresado:
-        requeridos = ["nombres", "apellidos", "tipoDoc",
-                      "numDoc", "email", "telefono", "fechaNacimiento"]
-        faltantes = [campo for campo in requeridos if campo not in data]
-        if faltantes:
-            raise HTTPException(
-                status_code=400, detail=f"Faltan campos requeridos: {', '.join(faltantes)}")
-
-        if db.query(Egresado).filter(Egresado.numDoc == data["numDoc"]).first():
-            raise HTTPException(
-                status_code=400, detail="Número de documento ya registrado")
-
-        if db.query(Egresado).filter(Egresado.email == data["email"]).first():
-            raise HTTPException(
-                status_code=400, detail="Correo ya registrado")
-
+    def registrar_egresado(self, data: dict) -> Egresado:
         egresado = Egresado(
             nombres=data["nombres"],
             apellidos=data["apellidos"],
-            tipoDoc=TipoDocumento(data["tipoDoc"]),
-            numDoc=data["numDoc"],
+            tipo_doc=data["tipoDoc"],
+            num_doc=data["numDoc"],
             email=data["email"],
             telefono=data["telefono"],
+            fechaNacimiento=data["fechaNacimiento"],
             direccion=data.get("direccion"),
             nacionalidad=data.get("nacionalidad"),
-            fechaNacimiento=data["fechaNacimiento"],
             habilidades=data.get("habilidades"),
-            logrosAcademicos=data.get("logrosAcademicos"),
+            logros_academicos=data.get("logrosAcademicos"),
             certificados=data.get("certificados"),
-            experienciaLaboral=data.get("experienciaLaboral"),
+            experiencia_laboral=data.get("experienciaLaboral"),
             idiomas=data.get("idiomas"),
             linkedin=data.get("linkedin"),
             github=data.get("github"),
             cv=data.get("cv"),
             disponibilidad=data.get("disponibilidad", True),
         )
+        return self.egresado_repository.registrar_egresado(egresado)
 
-        db.add(egresado)
-        db.commit()
-        db.refresh(egresado)
-        return egresado
+    def obtener_egresados(self) -> list:
+        return self.egresado_repository.obtener_egresados()
 
-    def obtener_egresados(self, db: Session) -> list:
-        egresados = db.query(Egresado).all()
-        resultado = []
-        for e in egresados:
-            resultado.append({
-                "id": e.id,
-                "nombres": e.nombres,
-                "apellidos": e.apellidos,
-                "tipoDoc": e.tipoDoc.name if e.tipoDoc else None,
-                "numDoc": e.numDoc,
-                "email": e.email,
-                "telefono": e.telefono,
-                "direccion": e.direccion,
-                "nacionalidad": e.nacionalidad,
-                "fechaNacimiento": e.fechaNacimiento.isoformat() if e.fechaNacimiento else None,
-                "habilidades": e.habilidades,
-                "logrosAcademicos": e.logrosAcademicos,
-                "certificados": e.certificados,
-                "experienciaLaboral": e.experienciaLaboral,
-                "idiomas": e.idiomas,
-                "linkedin": e.linkedin,
-                "github": e.github,
-                "cv": e.cv,
-                "disponibilidad": e.disponibilidad
-            })
-        return resultado
+    def obtener_egresado_por_id(self, id: int) -> Egresado | None:
+        return self.egresado_repository.obtener_egresado_por_id(id)
 
-    def obtener_egresado_por_id(self, db: Session, id: int) -> dict | None:
-        e = db.query(Egresado).filter(Egresado.id == id).first()
-        if not e:
-            return None
-
-        return {
-            "id": e.id,
-            "nombres": e.nombres,
-            "apellidos": e.apellidos,
-            "tipoDoc": e.tipoDoc.name if e.tipoDoc else None,
-            "numDoc": e.numDoc,
-            "email": e.email,
-            "telefono": e.telefono,
-            "direccion": e.direccion,
-            "nacionalidad": e.nacionalidad,
-            "fechaNacimiento": e.fechaNacimiento.isoformat() if e.fechaNacimiento else None,
-            "habilidades": e.habilidades,
-            "logrosAcademicos": e.logrosAcademicos,
-            "certificados": e.certificados,
-            "experienciaLaboral": e.experienciaLaboral,
-            "idiomas": e.idiomas,
-            "linkedin": e.linkedin,
-            "github": e.github,
-            "cv": e.cv,
-            "disponibilidad": e.disponibilidad
-        }
-
-    def actualizar_egresado(self, db: Session, id: int, data: dict) -> Egresado | None:
-        egresado = db.query(Egresado).filter(Egresado.id == id).first()
+    def actualizar_egresado(self, id: int, data: dict) -> Egresado | None:
+        egresado = self.egresado_repository.obtener_egresado_por_id(id)
         if not egresado:
-            return None
-
+            raise HTTPException(status_code=404, detail="Egresado no encontrado")
         for key, value in data.items():
-            if key == "tipoDoc":
-                try:
-                    value = TipoDocumento(value)
-                except ValueError:
-                    continue
+            setattr(egresado, key, value)
+        return self.egresado_repository.actualizar_egresado(egresado)
 
-            if hasattr(egresado, key):
-                setattr(egresado, key, value)
-
-        db.commit()
-        db.refresh(egresado)
-        return egresado
-
-    def eliminar_egresado(self, db: Session, id: int) -> bool:
-        egresado = db.query(Egresado).filter(Egresado.id == id).first()
-        if not egresado:
-            return False
-
-        db.delete(egresado)
-        db.commit()
-        return True
+    def eliminar_egresado(self, id: int) -> bool:
+        return self.egresado_repository.eliminar_egresado(id)

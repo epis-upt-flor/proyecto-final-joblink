@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.orm_models.usuario_orm import Usuario
 
 
 class UsuarioObserver(ABC):

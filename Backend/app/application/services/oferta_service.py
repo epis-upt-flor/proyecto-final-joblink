@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from Backend.app.infrastructure.orm_models.oferta_orm import Oferta
-from Backend.app.domain.models.enum import EstadoOferta, EstadoPubli
+from app.infrastructure.orm_models.oferta_orm import Oferta
+from app.domain.models.enum import EstadoOferta, EstadoPubli
 from datetime import date
 
 

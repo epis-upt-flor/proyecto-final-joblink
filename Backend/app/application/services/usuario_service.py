@@ -1,8 +1,8 @@
 from fastapi import HTTPException, Header, Depends
 from sqlalchemy.orm import Session
-from Backend.app.infrastructure.orm_models.usuario_orm import Usuario
+from app.infrastructure.orm_models.usuario_orm import Usuario
 from app.application.services.token_service import TokenService
-from Backend.app.infrastructure.database.db_session_provider import DBSessionProvider
+from app.infrastructure.database.db_session_provider import DBSessionProvider
 
 
 class UserService:

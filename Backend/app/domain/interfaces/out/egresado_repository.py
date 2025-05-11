@@ -1,30 +1,25 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
-
+from typing import List, Optional
+from app.domain.models.egresado import Egresado
 
 class EgresadoRepository(ABC):
-
+    
     @abstractmethod
-    def registrar_egresado(self, data: dict) -> Dict:
-        """Registra un nuevo egresado en la base de datos."""
+    def registrar_egresado(self, egresado: Egresado) -> Egresado:
         pass
 
     @abstractmethod
-    def obtener_egresados(self) -> List[Dict]:
-        """Devuelve todos los egresados."""
+    def obtener_egresados(self) -> List[Egresado]:
         pass
 
     @abstractmethod
-    def obtener_egresado_por_id(self, id: int) -> Optional[Dict]:
-        """Devuelve un egresado según su ID."""
+    def obtener_egresado_por_id(self, id: int) -> Optional[Egresado]:
         pass
 
     @abstractmethod
-    def actualizar_egresado(self, id: int, data: dict) -> Optional[Dict]:
-        """Actualiza un egresado y devuelve el nuevo estado."""
+    def actualizar_egresado(self, egresado: Egresado) -> Optional[Egresado]:
         pass
 
     @abstractmethod
     def eliminar_egresado(self, id: int) -> bool:
-        """Elimina un egresado por ID."""
         pass
