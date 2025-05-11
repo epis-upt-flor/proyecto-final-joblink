@@ -8,7 +8,7 @@ class RedisClient:
     _client = None
 
     @classmethod
-    def get_client(cls):
+    def get_connection(cls):
         if cls._client is None:
             url = os.getenv("UPSTASH_REDIS_URL")
             if not url:
