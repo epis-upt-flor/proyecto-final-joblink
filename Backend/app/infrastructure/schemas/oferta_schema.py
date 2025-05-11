@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from app.domain.models.enum import EstadoOferta, EstadoPubli
 
 
 class OfertaBase(BaseModel):

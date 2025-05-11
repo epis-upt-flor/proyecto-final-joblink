@@ -11,17 +11,17 @@ class EgresadoService(EgresadoUseCase):
         egresado = Egresado(
             nombres=data["nombres"],
             apellidos=data["apellidos"],
-            tipo_doc=data["tipoDoc"],
-            num_doc=data["numDoc"],
+            tipoDoc=data["tipoDoc"],
+            numDoc=data["numDoc"],
             email=data["email"],
             telefono=data["telefono"],
             fechaNacimiento=data["fechaNacimiento"],
             direccion=data.get("direccion"),
             nacionalidad=data.get("nacionalidad"),
             habilidades=data.get("habilidades"),
-            logros_academicos=data.get("logrosAcademicos"),
+            logrosAcademicos=data.get("logrosAcademicos"),
             certificados=data.get("certificados"),
-            experiencia_laboral=data.get("experienciaLaboral"),
+            experienciaLaboral=data.get("experienciaLaboral"),
             idiomas=data.get("idiomas"),
             linkedin=data.get("linkedin"),
             github=data.get("github"),
@@ -40,8 +40,12 @@ class EgresadoService(EgresadoUseCase):
         egresado = self.egresado_repository.obtener_egresado_por_id(id)
         if not egresado:
             raise HTTPException(status_code=404, detail="Egresado no encontrado")
-        for key, value in data.items():
+
+        update_data = {key: value for key, value in data.items() if value is not None}
+
+        for key, value in update_data.items():
             setattr(egresado, key, value)
+
         return self.egresado_repository.actualizar_egresado(egresado)
 
     def eliminar_egresado(self, id: int) -> bool:

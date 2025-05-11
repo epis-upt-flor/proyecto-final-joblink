@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, Enum, DECIMAL
+from sqlalchemy import Column, Integer, String, Date, Text, ForeignKey, DECIMAL
 from sqlalchemy.orm import relationship
-from app.domain.models.enum import EstadoOferta, EstadoPubli
 from app.infrastructure.database.database_singleton import Base
-
 
 class Oferta(Base):
     __tablename__ = "oferta"
@@ -20,13 +18,13 @@ class Oferta(Base):
     salario = Column(DECIMAL(10, 2), nullable=True)
     funciones = Column(Text, nullable=False)
     requisitos = Column(Text, nullable=False)
-    estado = Column(Enum(EstadoOferta), nullable=False)
+    estado = Column(String, nullable=False)
     motivo = Column(Text, nullable=True)
     beneficios = Column(Text, nullable=False)
     fechaInicio = Column(Date, nullable=False)
     tiempo = Column(Integer, nullable=False)
     fechaPubli = Column(Date, nullable=True)
-    estadoPubli = Column(Enum(EstadoPubli), nullable=True, default=None)
+    estadoPubli = Column(String, nullable=True, default=None)
 
     idEmpresa = Column(Integer, ForeignKey('empresa.id'), nullable=False)
     empresa = relationship("Empresa", backref="ofertas", uselist=False)

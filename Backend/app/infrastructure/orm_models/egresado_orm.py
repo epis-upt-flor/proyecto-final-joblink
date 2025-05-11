@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date, Boolean, Enum
-from app.domain.models.enum import TipoDocumento
+from sqlalchemy import Column, Integer, String, Date, Boolean
 from app.infrastructure.database.database_singleton import Base
 from sqlalchemy.orm import relationship
-
 
 class Egresado(Base):
     __tablename__ = "egresado"
@@ -10,7 +8,7 @@ class Egresado(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombres = Column(String(100), nullable=False)
     apellidos = Column(String(100), nullable=False)
-    tipoDoc = Column(Enum(TipoDocumento), nullable=False)
+    tipoDoc = Column(String, nullable=False)
     numDoc = Column(String(15), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     telefono = Column(String(15), nullable=False)

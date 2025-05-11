@@ -93,6 +93,8 @@ class EgresadoRepositorySQL(EgresadoRepository):
             email=egresado_orm.email,
             telefono=egresado_orm.telefono,
             fechaNacimiento=egresado_orm.fechaNacimiento,
+            direccion=egresado_orm.direccion,
+            nacionalidad=egresado_orm.nacionalidad,
             habilidades=egresado_orm.habilidades,
             logrosAcademicos=egresado_orm.logrosAcademicos,
             certificados=egresado_orm.certificados,

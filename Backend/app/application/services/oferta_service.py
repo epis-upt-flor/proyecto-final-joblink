@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.infrastructure.orm_models.oferta_orm import Oferta
-from app.domain.models.enum import EstadoOferta, EstadoPubli
 from datetime import date
 
 
@@ -16,16 +15,8 @@ class OfertaService:
             raise HTTPException(
                 status_code=400, detail=f"Faltan campos requeridos: {', '.join(faltantes)}")
 
-        try:
-            estado = EstadoOferta[data.get("estado", "pendiente")]
-        except KeyError:
-            estado = EstadoOferta.pendiente
-
-        estado_publi = None
-        try:
-            estado_publi = EstadoPubli[data.get("estadoPubli")]
-        except (KeyError, TypeError):
-            pass
+        estado = data.get("estado", "pendiente")
+        estado_publi = data.get("estadoPubli")
 
         fecha_publicacion = data.get("fechaPubli") or date.today()
 
@@ -75,15 +66,9 @@ class OfertaService:
 
         for key, value in data.items():
             if key == "estado":
-                try:
-                    value = EstadoOferta[value]
-                except KeyError:
-                    continue
+                value = value if isinstance(value, str) else "pendiente"
             elif key == "estadoPubli":
-                try:
-                    value = EstadoPubli[value]
-                except KeyError:
-                    continue
+                value = value if isinstance(value, str) else None
 
             if hasattr(oferta, key):
                 setattr(oferta, key, value)
@@ -115,12 +100,12 @@ class OfertaService:
             "salario": float(o.salario) if o.salario else None,
             "funciones": o.funciones,
             "requisitos": o.requisitos,
-            "estado": o.estado.name if o.estado else None,
+            "estado": o.estado,
             "motivo": o.motivo,
             "beneficios": o.beneficios,
             "fechaInicio": o.fechaInicio.isoformat() if o.fechaInicio else None,
             "tiempo": o.tiempo,
             "fechaPubli": o.fechaPubli.isoformat() if o.fechaPubli else None,
-            "estadoPubli": o.estadoPubli.name if o.estadoPubli else None,
+            "estadoPubli": o.estadoPubli,
             "idEmpresa": o.idEmpresa
         }

@@ -1,12 +1,11 @@
 from datetime import date
-from app.domain.models.enum import EstadoOferta, EstadoPubli
 
 
 class Oferta:
     def __init__(self, id: int, titulo: str, tipo: str, fecha_cierre: date, area: str, modalidad: str,
                  horario: str, vacantes: int, experiencia: str, locacion: str, salario: float, funciones: str,
-                 requisitos: str, estado: EstadoOferta, motivo: str, beneficios: str, fecha_inicio: date,
-                 tiempo: int, fecha_publi: date, estado_publi: EstadoPubli, id_empresa: int):
+                 requisitos: str, estado: str, motivo: str, beneficios: str, fecha_inicio: date,
+                 tiempo: int, fecha_publi: date, estado_publi: str, id_empresa: int):
         self.id = id
         self.titulo = titulo
         self.tipo = tipo

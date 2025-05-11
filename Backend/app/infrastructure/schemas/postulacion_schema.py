@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from app.domain.models.enum import EstadoPostulacion
 from typing import Optional
 
 
