@@ -1,28 +1,31 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
+from app.domain.models.enum import TipoDocumento
+
 
 class Egresado:
-    def __init__(self, 
-                 nombres: str,
-                 apellidos: str,
-                 tipoDoc: str,
-                 numDoc: str,
-                 email: str,
-                 telefono: str,
-                 fechaNacimiento: date,
-                 id: Optional[int] = None,
-                 direccion: Optional[str] = None,
-                 nacionalidad: Optional[str] = None,
-                 habilidades: Optional[str] = None,
-                 logrosAcademicos: Optional[str] = None,
-                 certificados: Optional[str] = None,
-                 experienciaLaboral: Optional[str] = None,
-                 idiomas: Optional[str] = None,
-                 linkedin: Optional[str] = None,
-                 github: Optional[str] = None,
-                 cv: Optional[str] = None,
-                 disponibilidad: bool = True):
-        
+    def __init__(
+        self,
+        nombres: str,
+        apellidos: str,
+        tipoDoc: TipoDocumento,
+        numDoc: str,
+        email: str,
+        telefono: str,
+        fechaNacimiento: date,
+        id: Optional[int] = None,
+        direccion: Optional[str] = None,
+        nacionalidad: Optional[str] = None,
+        habilidades: Optional[List[str]] = None,
+        logrosAcademicos: Optional[List[str]] = None,
+        certificados: Optional[List[str]] = None,
+        experienciaLaboral: Optional[List[str]] = None,
+        idiomas: Optional[List[str]] = None,
+        linkedin: Optional[str] = None,
+        github: Optional[str] = None,
+        cv: Optional[str] = None,
+        disponibilidad: bool = True,
+    ):
         self.id = id
         self.nombres = nombres
         self.apellidos = apellidos
@@ -33,11 +36,11 @@ class Egresado:
         self.fechaNacimiento = fechaNacimiento
         self.direccion = direccion
         self.nacionalidad = nacionalidad
-        self.habilidades = habilidades
-        self.logrosAcademicos = logrosAcademicos
-        self.certificados = certificados
-        self.experienciaLaboral = experienciaLaboral
-        self.idiomas = idiomas
+        self.habilidades = habilidades or []
+        self.logrosAcademicos = logrosAcademicos or []
+        self.certificados = certificados or []
+        self.experienciaLaboral = experienciaLaboral or []
+        self.idiomas = idiomas or []
         self.linkedin = linkedin
         self.github = github
         self.cv = cv

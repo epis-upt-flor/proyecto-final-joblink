@@ -1,7 +1,6 @@
-from app.infrastructure.observers.usuario_observer import UsuarioObserver
+from app.domain.observers.usuario_observer import UsuarioObserver
 from app.infrastructure.factories.email_factory import EmailFactory
-from app.infrastructure.orm_models.usuario_orm import Usuario
-
+from app.domain.models.usuario import Usuario
 
 class BienvenidaObserver(UsuarioObserver):
     def notificar(self, usuario: Usuario, password: str):
@@ -9,6 +8,5 @@ class BienvenidaObserver(UsuarioObserver):
         sender.send(
             to=usuario.email,
             password=password,
-            nombre_empresa=getattr(
-                usuario, "nombre", usuario.username)
+            nombre_empresa=getattr(usuario, "nombre", usuario.username)
         )

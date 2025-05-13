@@ -1,7 +1,21 @@
+from datetime import date
+from typing import Optional
+from app.domain.models.enum import EstadoPostulacion
+
+
 class Postulacion:
-    def __init__(self, id: int, id_oferta: int, id_egresado: int, estado: str, posicion_ranking: int = None):
+    def __init__(
+        self,
+        id: Optional[int],
+        idOferta: int,
+        idEgresado: int,
+        fechaRecomendacion: date,
+        posicionRanking: int,
+        estado: EstadoPostulacion
+    ):
         self.id = id
-        self.id_oferta = id_oferta
-        self.id_egresado = id_egresado
+        self.idOferta = idOferta
+        self.idEgresado = idEgresado
+        self.fechaRecomendacion = fechaRecomendacion
+        self.posicionRanking = posicionRanking
         self.estado = estado
-        self.posicion_ranking = posicion_ranking

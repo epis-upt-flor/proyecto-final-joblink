@@ -2,8 +2,8 @@ from upstash_vector import Index, Vector
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from app.infrastructure.orm_models.oferta_orm import Oferta
-from app.infrastructure.orm_models.egresado_orm import Egresado
+from app.infrastructure.orm_models.oferta_orm import OfertaORM
+from app.infrastructure.orm_models.egresado_orm import EgresadoORM
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 from app.application.services.postulacion_service import PostulacionService
 
@@ -11,12 +11,12 @@ from app.application.services.postulacion_service import PostulacionService
 class RecomendadorService:
     @staticmethod
     def _get_vector_db():
-        load_dotenv()  # Asegura que se cargue el .env cada vez
+        load_dotenv()
         url = os.getenv("UPSTASH_URL", "").strip()
         token = os.getenv("UPSTASH_TOKEN", "").strip()
         return Index(url=url, token=token)
 
-    def agregar_egresado_a_vector_db(self, egresado: Egresado):
+    def agregar_egresado_a_vector_db(self, egresado: EgresadoORM):
         vector_db = self._get_vector_db()
         embeddings = GeneradorEmbeddings()
         vector = embeddings.generar_embedding_egresado(egresado)
@@ -36,7 +36,7 @@ class RecomendadorService:
             )
         ])
 
-    def agregar_oferta_a_vector_db(self, oferta: Oferta):
+    def agregar_oferta_a_vector_db(self, oferta: OfertaORM):
         vector_db = self._get_vector_db()
         embeddings = GeneradorEmbeddings()
         embedding = embeddings.generar_embedding_oferta(oferta)
@@ -60,7 +60,7 @@ class RecomendadorService:
         embeddings = GeneradorEmbeddings()
         postulacion_service = PostulacionService()
 
-        oferta = db.query(Oferta).filter(Oferta.id == oferta_id).first()
+        oferta = db.query(OfertaORM).filter(OfertaORM.id == oferta_id).first()
         if not oferta:
             return {"error": "Oferta no encontrada"}
 

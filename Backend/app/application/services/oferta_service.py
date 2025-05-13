@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.infrastructure.orm_models.oferta_orm import Oferta
+from app.infrastructure.orm_models.oferta_orm import OfertaORM
 from datetime import date
 
 
 class OfertaService:
-    def registrar_oferta(self, db: Session, data: dict) -> Oferta:
+    def registrar_oferta(self, db: Session, data: dict) -> OfertaORM:
         requeridos = ["titulo", "tipo", "area", "modalidad", "horario",
                       "vacantes", "experiencia", "locacion", "funciones", "requisitos",
                       "beneficios", "fechaInicio", "tiempo", "idEmpresa"]
@@ -20,7 +20,7 @@ class OfertaService:
 
         fecha_publicacion = data.get("fechaPubli") or date.today()
 
-        oferta = Oferta(
+        oferta = OfertaORM(
             titulo=data["titulo"],
             tipo=data["tipo"],
             fechaCierre=data.get("fechaCierre"),
@@ -49,18 +49,18 @@ class OfertaService:
         return oferta
 
     def listar_ofertas(self, db: Session) -> list:
-        ofertas = db.query(Oferta).all()
+        ofertas = db.query(OfertaORM).all()
         return [self._oferta_to_dict(o) for o in ofertas]
 
     def obtener_oferta_por_id(self, db: Session, id: int) -> dict | None:
-        oferta = db.query(Oferta).filter(Oferta.id == id).first()
+        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
         if not oferta:
             return None
 
         return self._oferta_to_dict(oferta)
 
-    def actualizar_oferta(self, db: Session, id: int, data: dict) -> Oferta | None:
-        oferta = db.query(Oferta).filter(Oferta.id == id).first()
+    def actualizar_oferta(self, db: Session, id: int, data: dict) -> OfertaORM | None:
+        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
         if not oferta:
             return None
 
@@ -78,14 +78,14 @@ class OfertaService:
         return oferta
 
     def eliminar_oferta(self, db: Session, id: int) -> bool:
-        oferta = db.query(Oferta).filter(Oferta.id == id).first()
+        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
         if not oferta:
             return False
         db.delete(oferta)
         db.commit()
         return True
 
-    def _oferta_to_dict(self, o: Oferta) -> dict:
+    def _oferta_to_dict(self, o: OfertaORM) -> dict:
         return {
             "id": o.id,
             "titulo": o.titulo,

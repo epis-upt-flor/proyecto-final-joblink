@@ -1,9 +1,17 @@
 from datetime import date
+from typing import Optional
+from app.domain.models.enum import EstadoContrato
 
 
 class Contrato:
-    def __init__(self, id: int, id_postulacion: int, fecha_fin: date, estado: str):
+    def __init__(
+        self,
+        id: Optional[int],
+        idOfertaEgresado: int,
+        fechaFin: date,
+        estado: EstadoContrato
+    ):
         self.id = id
-        self.id_postulacion = id_postulacion
-        self.fecha_fin = fecha_fin
+        self.idOfertaEgresado = idOfertaEgresado
+        self.fechaFin = fechaFin
         self.estado = estado

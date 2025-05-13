@@ -1,16 +1,17 @@
 from fastapi import HTTPException, Header, Depends
 from sqlalchemy.orm import Session
 from app.infrastructure.orm_models.usuario_orm import Usuario
-from app.application.services.token_service import TokenService
+from app.domain.interfaces.external.security import ISecurity
 from app.infrastructure.database.db_session_provider import DBSessionProvider
 
 
 class UserService:
     def __init__(self):
         self.db_provider = DBSessionProvider()
+        self.security = ISecurity()
 
     def obtener_usuario_actual(self, token: str, db: Session) -> Usuario:
-        payload = TokenService.verificar_token(token)
+        payload = self.security.verificar_token(token)
         username = payload.get("sub")
         if not username:
             raise HTTPException(status_code=401, detail="Token inválido")

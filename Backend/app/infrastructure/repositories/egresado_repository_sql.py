@@ -1,14 +1,59 @@
-from app.domain.interfaces.OUT.egresado_repository import EgresadoRepository
-from app.infrastructure.orm_models.egresado_orm import Egresado as EgresadoORM
-from app.domain.models.egresado import Egresado
 from sqlalchemy.orm import Session
+from typing import List, Optional
+from app.domain.models.egresado import Egresado as EgresadoDomain
+from app.domain.interfaces.external.egresado_repository import EgresadoRepository
+from app.infrastructure.orm_models.egresado_orm import EgresadoORM
+
 
 class EgresadoRepositorySQL(EgresadoRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    def registrar_egresado(self, egresado: Egresado) -> Egresado:
-        egresado_orm = EgresadoORM(
+    #Metodos Publicos
+    def registrar_egresado(self, egresado: EgresadoDomain) -> EgresadoDomain:
+        orm = self._to_orm(egresado)
+        self.db.add(orm)
+        self.db.commit()
+        self.db.refresh(orm)
+        return self._to_domain(orm)
+
+    def obtener_egresados(self) -> List[EgresadoDomain]:
+        egresados = self.db.query(EgresadoORM).all()
+        return [self._to_domain(e) for e in egresados]
+
+    def obtener_egresado_por_id(self, id: int) -> Optional[EgresadoDomain]:
+        orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
+        return self._to_domain(orm) if orm else None
+
+    def actualizar_egresado(self, egresado: EgresadoDomain) -> EgresadoDomain:
+        orm = self.db.query(EgresadoORM).filter(
+            EgresadoORM.id == egresado.id).first()
+        if orm:
+            updated_data = self._to_orm(egresado)
+            self._update_fields(orm, updated_data)
+            self.db.commit()
+            self.db.refresh(orm)
+        return self._to_domain(orm)
+
+    def eliminar_egresado(self, id: int) -> bool:
+        orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
+        if orm:
+            self.db.delete(orm)
+            self.db.commit()
+            return True
+        return False
+
+
+    #Metodos Privados
+    def _update_fields(self, target: EgresadoORM, source: EgresadoORM):
+        for field in vars(source):
+            if not field.startswith("_") and field != "id":
+                setattr(target, field, getattr(source, field))
+
+
+    def _to_orm(self, egresado: EgresadoDomain) -> EgresadoORM:
+        return EgresadoORM(
+            id=egresado.id,
             nombres=egresado.nombres,
             apellidos=egresado.apellidos,
             tipoDoc=egresado.tipoDoc,
@@ -16,6 +61,8 @@ class EgresadoRepositorySQL(EgresadoRepository):
             email=egresado.email,
             telefono=egresado.telefono,
             fechaNacimiento=egresado.fechaNacimiento,
+            direccion=egresado.direccion,
+            nacionalidad=egresado.nacionalidad,
             habilidades=egresado.habilidades,
             logrosAcademicos=egresado.logrosAcademicos,
             certificados=egresado.certificados,
@@ -26,82 +73,26 @@ class EgresadoRepositorySQL(EgresadoRepository):
             cv=egresado.cv,
             disponibilidad=egresado.disponibilidad
         )
-        self.db.add(egresado_orm)
-        self.db.commit()
-        self.db.refresh(egresado_orm)
-        return self._map_to_domain(egresado_orm)
 
-    def obtener_egresados(self) -> list:
-        egresados_orm = self.db.query(EgresadoORM).all()
-        egresados = []
-
-        for egresado in egresados_orm:
-            egresado_dict = egresado.__dict__.copy()
-            egresado_dict.pop('_sa_instance_state', None)
-            egresado_dict['tipoDoc'] = str(egresado.tipoDoc)
-            egresados.append(Egresado(**egresado_dict))
-
-        return egresados
-
-    def obtener_egresado_por_id(self, id: int) -> Egresado | None:
-        egresado_orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
-        if not egresado_orm:
-            return None
-        return self._map_to_domain(egresado_orm)
-
-    def actualizar_egresado(self, egresado: Egresado) -> Egresado | None:
-        egresado_orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == egresado.id).first()
-        if not egresado_orm:
-            return None
-
-        egresado_orm.nombres = egresado.nombres
-        egresado_orm.apellidos = egresado.apellidos
-        egresado_orm.tipoDoc = egresado.tipoDoc
-        egresado_orm.numDoc = egresado.numDoc
-        egresado_orm.email = egresado.email
-        egresado_orm.telefono = egresado.telefono
-        egresado_orm.fechaNacimiento = egresado.fechaNacimiento
-        egresado_orm.habilidades = egresado.habilidades
-        egresado_orm.logrosAcademicos = egresado.logrosAcademicos
-        egresado_orm.certificados = egresado.certificados
-        egresado_orm.experienciaLaboral = egresado.experienciaLaboral
-        egresado_orm.idiomas = egresado.idiomas
-        egresado_orm.linkedin = egresado.linkedin
-        egresado_orm.github = egresado.github
-        egresado_orm.cv = egresado.cv
-        egresado_orm.disponibilidad = egresado.disponibilidad
-
-        self.db.commit()
-        self.db.refresh(egresado_orm)
-        return self._map_to_domain(egresado_orm)
-
-    def eliminar_egresado(self, id: int) -> bool:
-        egresado_orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
-        if not egresado_orm:
-            return False
-        self.db.delete(egresado_orm)
-        self.db.commit()
-        return True
-
-    def _map_to_domain(self, egresado_orm: EgresadoORM) -> Egresado:
-        return Egresado(
-            id=egresado_orm.id,
-            nombres=egresado_orm.nombres,
-            apellidos=egresado_orm.apellidos,
-            tipoDoc=egresado_orm.tipoDoc,
-            numDoc=egresado_orm.numDoc,
-            email=egresado_orm.email,
-            telefono=egresado_orm.telefono,
-            fechaNacimiento=egresado_orm.fechaNacimiento,
-            direccion=egresado_orm.direccion,
-            nacionalidad=egresado_orm.nacionalidad,
-            habilidades=egresado_orm.habilidades,
-            logrosAcademicos=egresado_orm.logrosAcademicos,
-            certificados=egresado_orm.certificados,
-            experienciaLaboral=egresado_orm.experienciaLaboral,
-            idiomas=egresado_orm.idiomas,
-            linkedin=egresado_orm.linkedin,
-            github=egresado_orm.github,
-            cv=egresado_orm.cv,
-            disponibilidad=egresado_orm.disponibilidad
+    def _to_domain(self, orm: EgresadoORM) -> EgresadoDomain:
+        return EgresadoDomain(
+            id=orm.id,
+            nombres=orm.nombres,
+            apellidos=orm.apellidos,
+            tipoDoc=orm.tipoDoc,
+            numDoc=orm.numDoc,
+            email=orm.email,
+            telefono=orm.telefono,
+            fechaNacimiento=orm.fechaNacimiento,
+            direccion=orm.direccion,
+            nacionalidad=orm.nacionalidad,
+            habilidades=orm.habilidades,
+            logrosAcademicos=orm.logrosAcademicos,
+            certificados=orm.certificados,
+            experienciaLaboral=orm.experienciaLaboral,
+            idiomas=orm.idiomas,
+            linkedin=orm.linkedin,
+            github=orm.github,
+            cv=orm.cv,
+            disponibilidad=orm.disponibilidad
         )

@@ -1,17 +1,18 @@
-from app.infrastructure.orm_models.administrador_orm import Administrador
-from app.infrastructure.factories.usuario.base import CreadorUsuario
-
+from app.infrastructure.orm_models.administrador_orm import AdministradorORM
+from app.infrastructure.schemas.auth_schema import AdminCreate
+from app.domain.factories.creador_usuario import CreadorUsuario
 
 class CreadorAdministrador(CreadorUsuario):
-    def crear_usuario(self, data, hashed_password):
-        return Administrador(
-            username=data["username"],
-            email=data["email"],
+    def crear_usuario(self, schema: AdminCreate, hashed_password: str) -> AdministradorORM:
+        return AdministradorORM(
+            username=schema.username,
+            email=schema.email,
             password=hashed_password,
-            rol=data["rol"],
-            nombres=data["nombres"],
-            apellidos=data["apellidos"],
-            telefono=data["telefono"],
-            tipoDoc=data["tipoDoc"],
-            numDoc=data["numDoc"]
+            idRol=schema.idRol,
+            nombres=schema.nombres,
+            apellidos=schema.apellidos,
+            telefono=schema.telefono,
+            tipoDoc=schema.tipoDoc,
+            numDoc=schema.numDoc,
+            tipo="admin"
         )

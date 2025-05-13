@@ -1,11 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from app.infrastructure.database.database_singleton import Base
-from app.infrastructure.orm_models.usuario_orm import Usuario
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
+from sqlalchemy.orm import relationship
+from app.infrastructure.orm_models.usuario_orm import UsuarioORM
 
 
-class Empresa(Usuario):
-    __tablename__ = "empresa"
-    id = Column(Integer, ForeignKey("usuario.id"), primary_key=True)
+class EmpresaORM(UsuarioORM):
+    __tablename__ = "empresas"
+
+    id = Column(Integer, ForeignKey("usuarios.id"), primary_key=True)
     nombre = Column(String(100), nullable=False)
     ruc = Column(String(11), unique=True, nullable=False)
     telefono = Column(String(15), nullable=False)
@@ -15,3 +16,6 @@ class Empresa(Usuario):
     __mapper_args__ = {
         "polymorphic_identity": "empresa",
     }
+
+    ofertas = relationship(
+        "OfertaORM", back_populates="empresa", cascade="all, delete-orphan")

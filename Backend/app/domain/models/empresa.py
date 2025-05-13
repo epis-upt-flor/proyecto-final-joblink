@@ -1,26 +1,23 @@
 from .usuario import Usuario
+from typing import Optional
 
 
 class Empresa(Usuario):
     def __init__(
         self,
-        id: int,
+        id: Optional[int],
         username: str,
         password: str,
         email: str,
-        rol: str,
         nombre: str,
         ruc: str,
         telefono: str,
-        logo: str,
-        estado: bool
+        logo: Optional[str] = None,
+        estado: bool = True
     ):
-        super().__init__(id, username, password, email, rol)
+        super().__init__(id, username, password, email)
         self.nombre = nombre
         self.ruc = ruc
         self.telefono = telefono
         self.logo = logo
         self.estado = estado
-
-    def __repr__(self):
-        return f"<Empresa(id={self.id}, nombre={self.nombre}, ruc={self.ruc})>"

@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from app.infrastructure.database.database_singleton import Base
-from app.infrastructure.orm_models.usuario_orm import Usuario
+from sqlalchemy import Column, String, Integer, ForeignKey
+from app.infrastructure.orm_models.usuario_orm import UsuarioORM
 
 
-class Administrador(Usuario):
-    __tablename__ = "administrador"
-    id = Column(Integer, ForeignKey("usuario.id"), primary_key=True)
+class AdministradorORM(UsuarioORM):
+    __tablename__ = "administradores"
+
+    id = Column(Integer, ForeignKey("usuarios.id"), primary_key=True)
     nombres = Column(String(100), nullable=False)
     apellidos = Column(String(100), nullable=False)
     telefono = Column(String(15), nullable=False)
