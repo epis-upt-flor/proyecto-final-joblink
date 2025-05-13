@@ -1,39 +1,51 @@
+# app/application/services/recuperacion_service.py
 from uuid import uuid4
-from sqlalchemy.orm import Session
-from app.infrastructure.orm_models.usuario_orm import UsuarioORM
-from app.infrastructure.cache.redis_client import RedisClient
-from app.infrastructure.security.security import Security
-from app.infrastructure.factories.email_factory import EmailFactory
+from app.domain.interfaces.internal.recuperacion_usecase import RecuperacionUseCase
+from app.domain.interfaces.external.usuario_repository import IUsuarioRepository
+from app.domain.interfaces.external.security import ISecurity
+from app.domain.interfaces.external.email_sender import IEmailSender
+from app.domain.interfaces.external.cache import ICache
+from fastapi import HTTPException
 
 
-class RecuperacionService:
-    def __init__(self):
-        self.redis = RedisClient().get_connection()
+class RecuperacionService(RecuperacionUseCase):
+    def __init__(
+        self,
+        usuario_repo: IUsuarioRepository,
+        security: ISecurity,
+        cache: ICache,
+        email_sender: IEmailSender
+    ):
+        self.usuario_repo = usuario_repo
+        self.security = security
+        self.cache = cache
+        self.email_sender = email_sender
 
-    def generar_token_y_enviar(self, email: str, db: Session):
-        usuario = db.query(UsuarioORM).filter_by(email=email).first()
+    def generar_token_y_enviar(self, email: str) -> dict:
+        usuario = self.usuario_repo.obtener_por_email(email)
         if not usuario:
-            raise Exception("Usuario no encontrado")
+            raise HTTPException(
+                status_code=404, detail="Usuario no encontrado")
 
         token = str(uuid4()).split("-")[0]
-        self.redis.set(f"recuperar:{token}", usuario.id, ex=600)
-
-        email_sender = EmailFactory.get("recuperacion")
-        email_sender.send(to=email, token=token)
+        self.cache.set(f"recuperar:{token}", usuario.id, ex=600)
+        self.email_sender.send(to=email, token=token)
 
         return {"message": "Token enviado"}
 
-    def cambiar_contrasena_con_token(self, token: str, nueva_contrasena: str, db: Session):
-        user_id = self.redis.get(f"recuperar:{token}")
+    def cambiar_contrasena_con_token(self, token: str, nueva_contrasena: str) -> dict:
+        user_id = self.cache.get(f"recuperar:{token}")
         if not user_id:
-            raise Exception("Token inválido o expirado")
+            raise HTTPException(
+                status_code=400, detail="Token inválido o expirado")
 
-        usuario = db.query(UsuarioORM).filter_by(id=user_id).first()
+        usuario = self.usuario_repo.obtener_por_id(int(user_id))
         if not usuario:
-            raise Exception("Usuario no encontrado")
+            raise HTTPException(
+                status_code=404, detail="Usuario no encontrado")
 
-        usuario.password = Security.generar_hash(nueva_contrasena)
-        db.commit()
-        self.redis.delete(f"recuperar:{token}")
+        usuario.password = self.security.generar_hash(nueva_contrasena)
+        self.usuario_repo.actualizar(usuario)
+        self.cache.delete(f"recuperar:{token}")
 
         return {"message": "Contraseña actualizada correctamente"}

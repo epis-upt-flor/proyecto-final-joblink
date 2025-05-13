@@ -1,9 +1,9 @@
-from .email_strategy import EmailStrategy
+from app.domain.interfaces.external.email_sender import IEmailSender
 from email.message import EmailMessage
 import smtplib
 import os
 
-class BienvenidaEmpresaEmail(EmailStrategy):
+class BienvenidaEmpresaEmail(IEmailSender):
     def send(self, to: str, password: str, nombre_empresa: str):
         msg = EmailMessage()
         msg["Subject"] = "Bienvenido a LinkJob - Credenciales de acceso"

@@ -1,9 +1,10 @@
-from .email_strategy import EmailStrategy
+from app.domain.interfaces.external.email_sender import IEmailSender
 from email.message import EmailMessage
 import smtplib
 import os
 
-class RecuperacionEmail(EmailStrategy):
+
+class RecuperacionEmail(IEmailSender):
     def send(self, to: str, token: str):
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
         recovery_link = f"{frontend_url}/recuperar?token={token}"

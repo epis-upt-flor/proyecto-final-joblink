@@ -1,27 +1,25 @@
-from pydantic import BaseModel
+# app/infrastructure/schemas/egresado_schema.py
+from pydantic import BaseModel, EmailStr
 from datetime import date
 from typing import Optional, List
 from app.domain.models.egresado import Egresado
-from app.domain.models.enum import TipoDocumento
 
 
 class EgresadoBase(BaseModel):
     nombres: str
     apellidos: str
-    tipoDoc: TipoDocumento
+    tipoDoc: str
     numDoc: str
-    email: str
+    email: EmailStr
     telefono: str
     fechaNacimiento: date
     direccion: Optional[str] = None
     nacionalidad: Optional[str] = None
-
-    habilidades: Optional[List[str]] = None
-    logrosAcademicos: Optional[List[str]] = None
-    certificados: Optional[List[str]] = None
-    experienciaLaboral: Optional[List[str]] = None
-    idiomas: Optional[List[str]] = None
-
+    habilidades: Optional[List[str]] = []
+    logrosAcademicos: Optional[List[str]] = []
+    certificados: Optional[List[str]] = []
+    experienciaLaboral: Optional[List[str]] = []
+    idiomas: Optional[List[str]] = []
     linkedin: Optional[str] = None
     github: Optional[str] = None
     cv: Optional[str] = None
@@ -30,7 +28,7 @@ class EgresadoBase(BaseModel):
 
 class EgresadoCreate(EgresadoBase):
     def to_domain(self) -> Egresado:
-        return Egresado(**self.dict())
+        return Egresado(id=None, **self.dict())
 
 
 class EgresadoUpdate(EgresadoBase):
@@ -38,19 +36,9 @@ class EgresadoUpdate(EgresadoBase):
     apellidos: Optional[str] = None
     tipoDoc: Optional[str] = None
     numDoc: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     telefono: Optional[str] = None
     fechaNacimiento: Optional[date] = None
-    direccion: Optional[str] = None
-    nacionalidad: Optional[str] = None
-    habilidades: Optional[str] = None
-    logrosAcademicos: Optional[str] = None
-    certificados: Optional[str] = None
-    experienciaLaboral: Optional[str] = None
-    idiomas: Optional[str] = None
-    linkedin: Optional[str] = None
-    github: Optional[str] = None
-    cv: Optional[str] = None
     disponibilidad: Optional[bool] = None
 
     def to_update_dict(self) -> dict:
@@ -62,24 +50,7 @@ class EgresadoOut(EgresadoBase):
 
     @classmethod
     def from_domain(cls, egresado: Egresado):
-        return cls(
-            id=egresado.id,
-            nombres=egresado.nombres,
-            apellidos=egresado.apellidos,
-            tipoDoc=egresado.tipoDoc,
-            numDoc=egresado.numDoc,
-            email=egresado.email,
-            telefono=egresado.telefono,
-            fechaNacimiento=egresado.fechaNacimiento,
-            direccion=egresado.direccion,
-            nacionalidad=egresado.nacionalidad,
-            habilidades=egresado.habilidades,
-            logrosAcademicos=egresado.logrosAcademicos,
-            certificados=egresado.certificados,
-            experienciaLaboral=egresado.experienciaLaboral,
-            idiomas=egresado.idiomas,
-            linkedin=egresado.linkedin,
-            github=egresado.github,
-            cv=egresado.cv,
-            disponibilidad=egresado.disponibilidad
-        )
+        return cls(**egresado.__dict__)
+
+    class Config:
+        from_attributes = True

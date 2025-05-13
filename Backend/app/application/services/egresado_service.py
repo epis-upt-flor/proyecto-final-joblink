@@ -1,34 +1,43 @@
+# app/application/services/egresado_service.py
+from typing import List, Optional
+from app.domain.models.egresado import Egresado
 from app.domain.interfaces.external.egresado_repository import EgresadoRepository
 from app.domain.interfaces.internal.egresado_usecase import EgresadoUseCase
-from app.domain.models.egresado import Egresado
 from fastapi import HTTPException
-from typing import List
 
 
 class EgresadoService(EgresadoUseCase):
-    def __init__(self, egresado_repository: EgresadoRepository):
-        self.egresado_repository = egresado_repository
+    def __init__(self, repository: EgresadoRepository):
+        self.repository = repository
 
     def registrar_egresado(self, egresado: Egresado) -> Egresado:
-        return self.egresado_repository.registrar_egresado(egresado)
+        if self.repository.existe_por_email(egresado.email):
+            raise HTTPException(
+                status_code=400, detail="El correo ya está registrado")
+        if self.repository.existe_por_num_doc(egresado.numDoc):
+            raise HTTPException(
+                status_code=400, detail="El número de documento ya está registrado")
+        return self.repository.registrar_egresado(egresado)
 
-    def obtener_egresados(self) -> List[Egresado]:
-        return self.egresado_repository.obtener_egresados()
+    def obtener_todos(self) -> List[Egresado]:
+        return self.repository.obtener_egresados()
 
-    def obtener_egresado_por_id(self, id: int) -> Egresado | None:
-        return self.egresado_repository.obtener_egresado_por_id(id)
-
-    def actualizar_egresado(self, id: int, nuevos_datos: dict) -> Egresado:
-        egresado = self.egresado_repository.obtener_egresado_por_id(id)
+    def obtener_por_id(self, id: int) -> Optional[Egresado]:
+        egresado = self.repository.obtener_egresado_por_id(id)
         if not egresado:
             raise HTTPException(
                 status_code=404, detail="Egresado no encontrado")
+        return egresado
 
-        for key, value in nuevos_datos.items():
-            if value is not None:
-                setattr(egresado, key, value)
-
-        return self.egresado_repository.actualizar_egresado(egresado)
+    def actualizar_egresado(self, egresado: Egresado) -> Optional[Egresado]:
+        actualizado = self.repository.actualizar_egresado(egresado)
+        if not actualizado:
+            raise HTTPException(
+                status_code=404, detail="Egresado no encontrado")
+        return actualizado
 
     def eliminar_egresado(self, id: int) -> bool:
-        return self.egresado_repository.eliminar_egresado(id)
+        if not self.repository.eliminar_egresado(id):
+            raise HTTPException(
+                status_code=404, detail="Egresado no encontrado")
+        return True

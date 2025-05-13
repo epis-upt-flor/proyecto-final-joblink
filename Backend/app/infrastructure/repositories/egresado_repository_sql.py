@@ -9,7 +9,6 @@ class EgresadoRepositorySQL(EgresadoRepository):
     def __init__(self, db: Session):
         self.db = db
 
-    #Metodos Publicos
     def registrar_egresado(self, egresado: EgresadoDomain) -> EgresadoDomain:
         orm = self._to_orm(egresado)
         self.db.add(orm)
@@ -25,14 +24,15 @@ class EgresadoRepositorySQL(EgresadoRepository):
         orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
         return self._to_domain(orm) if orm else None
 
-    def actualizar_egresado(self, egresado: EgresadoDomain) -> EgresadoDomain:
+    def actualizar_egresado(self, egresado: EgresadoDomain) -> Optional[EgresadoDomain]:
         orm = self.db.query(EgresadoORM).filter(
             EgresadoORM.id == egresado.id).first()
-        if orm:
-            updated_data = self._to_orm(egresado)
-            self._update_fields(orm, updated_data)
-            self.db.commit()
-            self.db.refresh(orm)
+        if not orm:
+            return None
+        updated = self._to_orm(egresado)
+        self._update_fields(orm, updated)
+        self.db.commit()
+        self.db.refresh(orm)
         return self._to_domain(orm)
 
     def eliminar_egresado(self, id: int) -> bool:
@@ -43,13 +43,16 @@ class EgresadoRepositorySQL(EgresadoRepository):
             return True
         return False
 
+    def existe_por_email(self, email: str) -> bool:
+        return self.db.query(EgresadoORM).filter(EgresadoORM.email == email).first() is not None
 
-    #Metodos Privados
+    def existe_por_num_doc(self, num_doc: str) -> bool:
+        return self.db.query(EgresadoORM).filter(EgresadoORM.numDoc == num_doc).first() is not None
+
     def _update_fields(self, target: EgresadoORM, source: EgresadoORM):
-        for field in vars(source):
-            if not field.startswith("_") and field != "id":
-                setattr(target, field, getattr(source, field))
-
+        for attr in vars(source):
+            if not attr.startswith("_") and hasattr(target, attr) and attr != "id":
+                setattr(target, attr, getattr(source, attr))
 
     def _to_orm(self, egresado: EgresadoDomain) -> EgresadoORM:
         return EgresadoORM(
@@ -60,9 +63,9 @@ class EgresadoRepositorySQL(EgresadoRepository):
             numDoc=egresado.numDoc,
             email=egresado.email,
             telefono=egresado.telefono,
-            fechaNacimiento=egresado.fechaNacimiento,
             direccion=egresado.direccion,
             nacionalidad=egresado.nacionalidad,
+            fechaNacimiento=egresado.fechaNacimiento,
             habilidades=egresado.habilidades,
             logrosAcademicos=egresado.logrosAcademicos,
             certificados=egresado.certificados,
@@ -83,9 +86,9 @@ class EgresadoRepositorySQL(EgresadoRepository):
             numDoc=orm.numDoc,
             email=orm.email,
             telefono=orm.telefono,
-            fechaNacimiento=orm.fechaNacimiento,
             direccion=orm.direccion,
             nacionalidad=orm.nacionalidad,
+            fechaNacimiento=orm.fechaNacimiento,
             habilidades=orm.habilidades,
             logrosAcademicos=orm.logrosAcademicos,
             certificados=orm.certificados,

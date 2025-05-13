@@ -1,63 +1,62 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
+
 from app.domain.interfaces.internal.egresado_usecase import EgresadoUseCase
+from app.infrastructure.database.db_session_provider import DBSessionProvider
 from app.application.services.egresado_service import EgresadoService
 from app.infrastructure.repositories.egresado_repository_sql import EgresadoRepositorySQL
-from app.infrastructure.database.db_session_provider import DBSessionProvider
-from app.infrastructure.schemas.egresado_schema import EgresadoCreate, EgresadoUpdate, EgresadoOut
+
+from app.infrastructure.schemas.egresado_schema import (
+    EgresadoCreate,
+    EgresadoUpdate,
+    EgresadoOut,
+)
+from app.domain.models.egresado import Egresado
 
 router = APIRouter(prefix="/egresados", tags=["Egresados"])
 db_provider = DBSessionProvider()
 
+# 💉 Dependency Injection
 
-def get_egresado_usecase(db: Session = Depends(db_provider.get_db)) -> EgresadoUseCase:
-    return EgresadoService(EgresadoRepositorySQL(db))
+
+def get_service(db: Session = Depends(db_provider.get_db)) -> EgresadoUseCase:
+    repo = EgresadoRepositorySQL(db)
+    return EgresadoService(repo)
+
+# 🧠 Rutas
 
 
 @router.post("/", response_model=EgresadoOut)
-async def registrar_egresado_endpoint(
-    egresado: EgresadoCreate,
-    service: EgresadoUseCase = Depends(get_egresado_usecase)
+def registrar_egresado(
+    egresado_in: EgresadoCreate,
+    service: EgresadoUseCase = Depends(get_service)
 ):
-    egresado_data = service.registrar_egresado(egresado.to_domain())
-    return EgresadoOut.from_domain(egresado_data)
+    egresado = Egresado(**egresado_in.model_dump())
+    return service.registrar_egresado(egresado)
 
 
-@router.get("/", response_model=list[EgresadoOut])
-async def obtener_egresados_endpoint(
-    service: EgresadoUseCase = Depends(get_egresado_usecase)
-):
-    egresados = service.obtener_egresados()
-    return [EgresadoOut.from_domain(e) for e in egresados]
+@router.get("/", response_model=List[EgresadoOut])
+def obtener_egresados(service: EgresadoUseCase = Depends(get_service)):
+    return service.obtener_todos()
 
 
 @router.get("/{id}", response_model=EgresadoOut)
-async def obtener_egresado_por_id_endpoint(
-    id: int,
-    service: EgresadoUseCase = Depends(get_egresado_usecase)
-):
-    egresado = service.obtener_egresado_por_id(id)
-    if not egresado:
-        raise HTTPException(status_code=404, detail="Egresado no encontrado")
-    return EgresadoOut.from_domain(egresado)
+def obtener_egresado_por_id(id: int, service: EgresadoUseCase = Depends(get_service)):
+    return service.obtener_por_id(id)
 
 
 @router.put("/{id}", response_model=EgresadoOut)
-async def actualizar_egresado_endpoint(
+def actualizar_egresado(
     id: int,
-    egresado: EgresadoUpdate,
-    service: EgresadoUseCase = Depends(get_egresado_usecase)
+    egresado_in: EgresadoUpdate,
+    service: EgresadoUseCase = Depends(get_service)
 ):
-    egresado_actualizado = service.actualizar_egresado(
-        id, egresado.to_update_dict())
-    return EgresadoOut.from_domain(egresado_actualizado)
+    egresado = Egresado(id=id, **egresado_in.model_dump())
+    return service.actualizar_egresado(egresado)
 
 
 @router.delete("/{id}", response_model=dict)
-async def eliminar_egresado_endpoint(
-    id: int,
-    service: EgresadoUseCase = Depends(get_egresado_usecase)
-):
-    if not service.eliminar_egresado(id):
-        raise HTTPException(status_code=404, detail="Egresado no encontrado")
-    return {"message": "Egresado eliminado correctamente"}
+def eliminar_egresado(id: int, service: EgresadoUseCase = Depends(get_service)):
+    service.eliminar_egresado(id)
+    return {"mensaje": "Egresado eliminado correctamente"}

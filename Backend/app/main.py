@@ -27,7 +27,7 @@ app.include_router(auth_routes.router, prefix="/api")
 app.include_router(egresado_routes.router, prefix="/api")
 #app.include_router(oferta_routes.router, prefix="/api")
 #app.include_router(recomendacion_routes.router, prefix="/api")
-#app.include_router(recuperacion_routes.router, prefix="/api")
+app.include_router(recuperacion_routes.router, prefix="/api")
 
 @app.get("/")
 def read_root():

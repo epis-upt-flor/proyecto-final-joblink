@@ -1,10 +1,10 @@
 from app.infrastructure.strategies.recuperacion_email import RecuperacionEmail
-from app.infrastructure.strategies.email_strategy import EmailStrategy
+from app.domain.interfaces.external.email_sender import IEmailSender
 from app.infrastructure.strategies.bienvenida_empresa import BienvenidaEmpresaEmail
 
 class EmailFactory:
     @staticmethod
-    def get(tipo: str) -> EmailStrategy:
+    def get(tipo: str) -> IEmailSender:
         if tipo == "recuperacion":
             return RecuperacionEmail()
         elif tipo == "bienvenida":

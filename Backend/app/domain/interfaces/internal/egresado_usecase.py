@@ -5,26 +5,17 @@ from app.domain.models.egresado import Egresado
 
 class EgresadoUseCase(ABC):
     @abstractmethod
-    def registrar_egresado(self, egresado: Egresado) -> Egresado:
-        """Registra un nuevo egresado."""
-        pass
+    def registrar_egresado(self, egresado: Egresado) -> Egresado: ...
 
     @abstractmethod
-    def obtener_egresados(self) -> List[Egresado]:
-        """Devuelve una lista de todos los egresados."""
-        pass
+    def obtener_todos(self) -> List[Egresado]: ...
 
     @abstractmethod
-    def obtener_egresado_por_id(self, id: int) -> Optional[Egresado]:
-        """Devuelve un egresado por su ID, si existe."""
-        pass
+    def obtener_por_id(self, id: int) -> Optional[Egresado]: ...
 
     @abstractmethod
-    def actualizar_egresado(self, id: int, nuevos_datos: dict) -> Egresado:
-        """Actualiza los datos de un egresado existente."""
-        pass
+    def actualizar_egresado(
+        self, egresado: Egresado) -> Optional[Egresado]: ...
 
     @abstractmethod
-    def eliminar_egresado(self, id: int) -> bool:
-        """Elimina un egresado por ID."""
-        pass
+    def eliminar_egresado(self, id: int) -> bool: ...
