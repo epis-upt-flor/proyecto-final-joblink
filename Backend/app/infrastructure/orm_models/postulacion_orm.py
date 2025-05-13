@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, Date, ForeignKey, Enum
+from sqlalchemy import Column, Integer, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
 from app.infrastructure.database.base import Base
-from app.domain.models.enum import EstadoPostulacion
 
 class PostulacionORM(Base):
     __tablename__ = "oferta_egresado"
@@ -11,7 +10,7 @@ class PostulacionORM(Base):
     idEgresado = Column(Integer, ForeignKey("egresados.id"), nullable=False)
     fechaRecomendacion = Column(Date, nullable=False)
     posicionRanking = Column(Integer)
-    estado = Column(Enum(EstadoPostulacion), nullable=False)
+    estado = Column(String, nullable=False)
 
     oferta = relationship("OfertaORM", back_populates="postulaciones")
     egresado = relationship("EgresadoORM", back_populates="postulaciones")

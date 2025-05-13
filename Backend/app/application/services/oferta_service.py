@@ -1,111 +1,34 @@
-from sqlalchemy.orm import Session
+from typing import List, Optional
 from fastapi import HTTPException
-from app.infrastructure.orm_models.oferta_orm import OfertaORM
-from datetime import date
+from app.domain.models.oferta import Oferta
+from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
+from app.domain.interfaces.external.oferta_repository import OfertaRepository
 
 
-class OfertaService:
-    def registrar_oferta(self, db: Session, data: dict) -> OfertaORM:
-        requeridos = ["titulo", "tipo", "area", "modalidad", "horario",
-                      "vacantes", "experiencia", "locacion", "funciones", "requisitos",
-                      "beneficios", "fechaInicio", "tiempo", "idEmpresa"]
+class OfertaService(OfertaUseCase):
+    def __init__(self, repo: OfertaRepository):
+        self.repo = repo
 
-        faltantes = [campo for campo in requeridos if campo not in data]
-        if faltantes:
-            raise HTTPException(
-                status_code=400, detail=f"Faltan campos requeridos: {', '.join(faltantes)}")
+    def registrar(self, oferta: Oferta) -> Oferta:
+        
+        return self.repo.guardar(oferta)
 
-        estado = data.get("estado", "pendiente")
-        estado_publi = data.get("estadoPubli")
+    def obtener_todos(self) -> List[Oferta]:
+        return self.repo.obtener_todos()
 
-        fecha_publicacion = data.get("fechaPubli") or date.today()
-
-        oferta = OfertaORM(
-            titulo=data["titulo"],
-            tipo=data["tipo"],
-            fechaCierre=data.get("fechaCierre"),
-            area=data["area"],
-            modalidad=data["modalidad"],
-            horario=data["horario"],
-            vacantes=data["vacantes"],
-            experiencia=data["experiencia"],
-            locacion=data["locacion"],
-            salario=data.get("salario"),
-            funciones=data["funciones"],
-            requisitos=data["requisitos"],
-            estado=estado,
-            motivo=data.get("motivo"),
-            beneficios=data["beneficios"],
-            fechaInicio=data["fechaInicio"],
-            tiempo=data["tiempo"],
-            fechaPubli=fecha_publicacion,
-            estadoPubli=estado_publi,
-            idEmpresa=data["idEmpresa"]
-        )
-
-        db.add(oferta)
-        db.commit()
-        db.refresh(oferta)
+    def obtener_por_id(self, id: int) -> Optional[Oferta]:
+        oferta = self.repo.obtener_por_id(id)
+        if not oferta:
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
         return oferta
 
-    def listar_ofertas(self, db: Session) -> list:
-        ofertas = db.query(OfertaORM).all()
-        return [self._oferta_to_dict(o) for o in ofertas]
-
-    def obtener_oferta_por_id(self, db: Session, id: int) -> dict | None:
-        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
+    def actualizar(self, id: int, data: dict) -> Optional[Oferta]:
+        oferta = self.repo.actualizar(id, data)
         if not oferta:
-            return None
-
-        return self._oferta_to_dict(oferta)
-
-    def actualizar_oferta(self, db: Session, id: int, data: dict) -> OfertaORM | None:
-        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
-        if not oferta:
-            return None
-
-        for key, value in data.items():
-            if key == "estado":
-                value = value if isinstance(value, str) else "pendiente"
-            elif key == "estadoPubli":
-                value = value if isinstance(value, str) else None
-
-            if hasattr(oferta, key):
-                setattr(oferta, key, value)
-
-        db.commit()
-        db.refresh(oferta)
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
         return oferta
 
-    def eliminar_oferta(self, db: Session, id: int) -> bool:
-        oferta = db.query(OfertaORM).filter(OfertaORM.id == id).first()
-        if not oferta:
-            return False
-        db.delete(oferta)
-        db.commit()
+    def eliminar(self, id: int) -> bool:
+        if not self.repo.eliminar(id):
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
         return True
-
-    def _oferta_to_dict(self, o: OfertaORM) -> dict:
-        return {
-            "id": o.id,
-            "titulo": o.titulo,
-            "tipo": o.tipo,
-            "fechaCierre": o.fechaCierre.isoformat() if o.fechaCierre else None,
-            "area": o.area,
-            "modalidad": o.modalidad,
-            "horario": o.horario,
-            "vacantes": o.vacantes,
-            "experiencia": o.experiencia,
-            "locacion": o.locacion,
-            "salario": float(o.salario) if o.salario else None,
-            "funciones": o.funciones,
-            "requisitos": o.requisitos,
-            "estado": o.estado,
-            "motivo": o.motivo,
-            "beneficios": o.beneficios,
-            "fechaInicio": o.fechaInicio.isoformat() if o.fechaInicio else None,
-            "tiempo": o.tiempo,
-            "fechaPubli": o.fechaPubli.isoformat() if o.fechaPubli else None,
-            "estadoPubli": o.estadoPubli,
-            "idEmpresa": o.idEmpresa
-        }

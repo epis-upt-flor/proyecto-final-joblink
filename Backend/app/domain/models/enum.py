@@ -10,7 +10,7 @@ class TipoDocumento(str, Enum):
 class EstadoOferta(str, Enum):
     ACTIVA = "ACTIVA"
     CERRADA = "CERRADA"
-    PAUSADA = "PAUSADA"
+    PENDIENTE = "PENDIENTE"
 
 
 class EstadoPubli(str, Enum):

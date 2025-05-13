@@ -17,17 +17,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/favicon.ico", include_in_schema=False)
 async def ignore_favicon():
     return Response(status_code=204)
 
-#app.include_router(usuario_routes.router, prefix="/api")
+# app.include_router(usuario_routes.router, prefix="/api")
 app.include_router(auth_routes.router, prefix="/api")
-#app.include_router(empresa_routes.router, prefix="/api")
+# app.include_router(empresa_routes.router, prefix="/api")
 app.include_router(egresado_routes.router, prefix="/api")
-#app.include_router(oferta_routes.router, prefix="/api")
-#app.include_router(recomendacion_routes.router, prefix="/api")
+app.include_router(oferta_routes.router, prefix="/api")
+# app.include_router(recomendacion_routes.router, prefix="/api")
 app.include_router(recuperacion_routes.router, prefix="/api")
+
 
 @app.get("/")
 def read_root():

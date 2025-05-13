@@ -1,32 +1,32 @@
-from typing import Optional, List
 from datetime import date
+from typing import Optional, List
 from app.domain.models.enum import EstadoOferta, EstadoPubli
 
 
 class Oferta:
     def __init__(
         self,
-        id: Optional[int],
-        titulo: str,
-        tipo: str,
-        fechaCierre: Optional[date],
-        area: str,
-        modalidad: str,
-        horario: str,
-        vacantes: int,
-        experiencia: Optional[str],
-        locacion: str,
-        salario: Optional[float],
-        funciones: List[str],
-        requisitos: List[str],
-        estado: EstadoOferta,
-        motivo: Optional[str],
-        beneficios: List[str],
-        fechaInicio: date,
-        tiempo: int,
-        fechaPubli: Optional[date],
-        estadoPubli: Optional[EstadoPubli],
-        idEmpresa: int
+        id: Optional[int] = None,
+        titulo: str = "",
+        tipo: str = "",
+        fechaCierre: Optional[date] = None,
+        area: str = "",
+        modalidad: str = "",
+        horario: str = "",
+        vacantes: int = 0,
+        experiencia: Optional[str] = None,
+        locacion: str = "",
+        salario: Optional[float] = None,
+        funciones: Optional[List[str]] = None,
+        requisitos: Optional[List[str]] = None,
+        estado: EstadoOferta = EstadoOferta.PENDIENTE,
+        motivo: Optional[str] = None,
+        beneficios: Optional[List[str]] = None,
+        fechaInicio: date = None,
+        tiempo: int = 0,
+        fechaPubli: Optional[date] = None,
+        estadoPubli: Optional[EstadoPubli] = None,
+        idEmpresa: int = 0
     ):
         self.id = id
         self.titulo = titulo

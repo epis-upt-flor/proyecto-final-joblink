@@ -1,44 +1,59 @@
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
+
 from app.infrastructure.database.db_session_provider import DBSessionProvider
+from app.infrastructure.repositories.oferta_repository_sql import OfertaRepositorySQL
 from app.application.services.oferta_service import OfertaService
+from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
+from app.domain.models.oferta import Oferta as OfertaDomain
+
+from app.infrastructure.schemas.oferta_schema import (
+    OfertaCreate,
+    OfertaUpdate,
+    OfertaOut,
+)
 
 router = APIRouter(prefix="/ofertas", tags=["Ofertas"])
-oferta_service = OfertaService()
 db_provider = DBSessionProvider()
 
-@router.post("/")
-async def registrar_oferta_endpoint(request: Request, db: Session = Depends(db_provider.get_db)):
-    data = await request.json()
-    oferta = oferta_service.registrar_oferta(db, data)
-    if not oferta:
-        raise HTTPException(
-            status_code=400, detail="Error al registrar la oferta.")
-    return {"message": "Oferta registrada", "id": oferta.id}
 
-@router.get("/")
-async def listar_ofertas_endpoint(db: Session = Depends(db_provider.get_db)):
-    return oferta_service.listar_ofertas(db)
+# 💉 Inyección del servicio
+def get_oferta_service(db: Session = Depends(db_provider.get_db)) -> OfertaUseCase:
+    repo = OfertaRepositorySQL(db)
+    return OfertaService(repo)
 
-@router.get("/{id}")
-async def obtener_oferta_endpoint(id: int, db: Session = Depends(db_provider.get_db)):
-    oferta = oferta_service.obtener_oferta_por_id(db, id)
-    if not oferta:
-        raise HTTPException(status_code=404, detail="Oferta no encontrada")
-    return oferta
 
-@router.put("/{id}")
-async def actualizar_oferta_endpoint(id: int, request: Request, db: Session = Depends(db_provider.get_db)):
-    data = await request.json()
-    actualizada = oferta_service.actualizar_oferta(db, id, data)
-    if not actualizada:
-        raise HTTPException(
-            status_code=404, detail="Oferta no encontrada o error al actualizar")
-    return {"message": "Oferta actualizada", "id": actualizada.id}
 
-@router.delete("/{id}")
-async def eliminar_oferta_endpoint(id: int, db: Session = Depends(db_provider.get_db)):
-    ok = oferta_service.eliminar_oferta(db, id)
-    if not ok:
-        raise HTTPException(status_code=404, detail="Oferta no encontrada")
-    return {"message": "Oferta eliminada"}
+@router.post("/", response_model=OfertaOut)
+def crear_oferta(
+    payload: OfertaCreate,
+    service: OfertaUseCase = Depends(get_oferta_service)
+):
+    oferta_domain = OfertaDomain(**payload.model_dump())
+    return service.registrar(oferta_domain)
+
+
+@router.get("/", response_model=List[OfertaOut])
+def listar_ofertas(service: OfertaUseCase = Depends(get_oferta_service)):
+    return service.obtener_todos()
+
+
+@router.get("/{id}", response_model=OfertaOut)
+def obtener_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
+    return service.obtener_por_id(id)
+
+
+@router.put("/{id}", response_model=OfertaOut)
+def actualizar_oferta(
+    id: int,
+    payload: OfertaUpdate,
+    service: OfertaUseCase = Depends(get_oferta_service)
+):
+    return service.actualizar(id, payload)
+
+
+@router.delete("/{id}", response_model=dict)
+def eliminar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
+    service.eliminar(id)
+    return {"mensaje": "Oferta eliminada correctamente"}

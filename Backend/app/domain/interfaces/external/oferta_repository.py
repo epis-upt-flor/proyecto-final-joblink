@@ -1,30 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import List, Optional
+from app.domain.models.oferta import Oferta
 
 
 class OfertaRepository(ABC):
+    @abstractmethod
+    def guardar(self, oferta: Oferta) -> Oferta: ...
 
     @abstractmethod
-    def registrar_oferta(self, data: dict) -> Dict:
-        """Registra una nueva oferta en la base de datos."""
-        pass
+    def obtener_todos(self) -> List[Oferta]: ...
 
     @abstractmethod
-    def listar_ofertas(self) -> List[Dict]:
-        """Devuelve todas las ofertas registradas."""
-        pass
+    def obtener_por_id(self, id: int) -> Optional[Oferta]: ...
 
     @abstractmethod
-    def obtener_oferta_por_id(self, id: int) -> Optional[Dict]:
-        """Devuelve una oferta según su ID."""
-        pass
+    def actualizar(self, id: int, data: dict) -> Optional[Oferta]: ...
 
     @abstractmethod
-    def actualizar_oferta(self, id: int, data: dict) -> Optional[Dict]:
-        """Actualiza y devuelve la oferta actualizada."""
-        pass
-
-    @abstractmethod
-    def eliminar_oferta(self, id: int) -> bool:
-        """Elimina una oferta según su ID."""
-        pass
+    def eliminar(self, id: int) -> bool: ...

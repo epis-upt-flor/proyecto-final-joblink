@@ -1,29 +1,20 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import List, Optional
+from app.domain.models.oferta import Oferta
+
 
 class OfertaUseCase(ABC):
+    @abstractmethod
+    def registrar(self, oferta: Oferta) -> Oferta: ...
 
     @abstractmethod
-    def registrar_oferta(self, data: dict) -> Dict:
-        """Registra una nueva oferta de trabajo."""
-        pass
+    def obtener_todos(self) -> List[Oferta]: ...
 
     @abstractmethod
-    def listar_ofertas(self) -> list:
-        """Lista todas las ofertas de trabajo."""
-        pass
+    def obtener_por_id(self, id: int) -> Optional[Oferta]: ...
 
     @abstractmethod
-    def obtener_oferta_por_id(self, id: int) -> Dict | None:
-        """Obtiene una oferta de trabajo por su ID."""
-        pass
+    def actualizar(self, id: int, data: dict) -> Optional[Oferta]: ...
 
     @abstractmethod
-    def actualizar_oferta(self, id: int, data: dict) -> Dict | None:
-        """Actualiza una oferta de trabajo existente."""
-        pass
-
-    @abstractmethod
-    def eliminar_oferta(self, id: int) -> bool:
-        """Elimina una oferta de trabajo."""
-        pass
+    def eliminar(self, id: int) -> bool: ...
