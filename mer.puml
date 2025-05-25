@@ -1,0 +1,121 @@
+@startuml BD_Egresados
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam classFontName "Courier New"
+
+entity usuarios {
+  *id: int <<PK>>
+  --
+  username: string(50)
+  password: string
+  email: string(100)
+  estado: boolean
+  idRol: int <<FK>>
+}
+
+entity roles {
+  *id: int <<PK>>
+  --
+  nombre: string(100)
+  estado: boolean
+}
+
+entity empresas {
+  *id: int <<PK, FK -> usuarios.id>>
+  --
+  nombre: string(100)
+  ruc: string(11)
+  telefono: string(15)
+  logo: string
+  estado: boolean
+}
+
+entity administradores {
+  *id: int <<PK, FK -> usuarios.id>>
+  --
+  nombres: string(100)
+  apellidos: string(100)
+  telefono: string(15)
+  tipoDoc: string(20)
+  numDoc: string(15)
+}
+
+entity egresados {
+  *id: int <<PK>>
+  --
+  nombres: string(100)
+  apellidos: string(100)
+  tipoDoc: enum
+  numDoc: string(15)
+  email: string(100)
+  telefono: string(15)
+  direccion: string
+  nacionalidad: string(50)
+  fechaNacimiento: date
+  habilidades: json
+  logrosAcademicos: json
+  certificados: json
+  experienciaLaboral: json
+  idiomas: json
+  linkedin: string
+  github: string
+  cv: string(255)
+  disponibilidad: boolean
+}
+
+
+entity ofertas {
+  *id: int <<PK>>
+  --
+  titulo: string(150)
+  tipo: string(10)
+  fechaCierre: date
+  area: string(100)
+  modalidad: string(50)
+  horario: string(50)
+  vacantes: int
+  experiencia: string(100)
+  locacion: string(150)
+  salario: decimal(10,2)
+  funciones: json
+  requisitos: json
+  estado: enum
+  motivo: string
+  beneficios: json
+  fechaInicio: date
+  tiempo: int
+  fechaPubli: date
+  estadoPubli: enum
+  idEmpresa: int <<FK>>
+}
+
+
+entity oferta_egresado {
+  *id: int <<PK>>
+  --
+  idOferta: int <<FK>>
+  idEgresado: int <<FK>>
+  fechaRecomendacion: date
+  posicionRanking: int
+  estado: enum
+}
+
+entity contratos {
+  *id: int <<PK>>
+  --
+  idOfertaEgresado: int <<FK>>
+  fechaFin: date
+  estado: enum
+}
+
+usuarios ||--o{ empresas : "1"
+usuarios ||--o{ administradores : "1"
+usuarios }o--|| roles : "idRol"
+
+ofertas }o--|| empresas : "idEmpresa"
+oferta_egresado }o--|| ofertas : "idOferta"
+oferta_egresado }o--|| egresados : "idEgresado"
+contratos }o--|| oferta_egresado : "idOfertaEgresado"
+
+@enduml
