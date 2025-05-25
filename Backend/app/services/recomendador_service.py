@@ -7,7 +7,7 @@ from app.models.egresado import Egresado
 from app.utils.embeddings import GeneradorEmbeddings
 
 
-class Recomendador:
+class RecomendadorService:
     @staticmethod
     def _get_vector_db():
         load_dotenv()  # Asegura que se cargue el .env cada vez
