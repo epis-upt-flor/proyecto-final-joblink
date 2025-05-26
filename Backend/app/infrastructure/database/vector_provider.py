@@ -11,10 +11,7 @@ class VectorDBProvider:
             if not UPSTASH_VECTOR_URL or not UPSTASH_VECTOR_TOKEN:
                 raise ValueError(
                     "Faltan UPSTASH_VECTOR_URL o TOKEN desde config.py")
-
-            print("🌐 Vector URL:", UPSTASH_VECTOR_URL)
-            print("🔑 Vector Token:", UPSTASH_VECTOR_TOKEN[:6], "...")
-
+            
             cls._vector_db = Index(
                 url=UPSTASH_VECTOR_URL,
                 token=UPSTASH_VECTOR_TOKEN
