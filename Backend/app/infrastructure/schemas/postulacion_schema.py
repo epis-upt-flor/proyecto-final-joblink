@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 
 class PostulacionBase(BaseModel):
@@ -15,6 +16,7 @@ class PostulacionCreate(PostulacionBase):
 
 class PostulacionOut(PostulacionBase):
     id: int
+    fecha_recomendacion: datetime
 
     class Config:
         orm_mode = True
