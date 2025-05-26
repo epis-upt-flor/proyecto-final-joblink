@@ -1,4 +1,4 @@
-from app.domain.interfaces.external.email_sender import IEmailSender
+from app.domain.strategies.email_sender import IEmailSender
 from email.message import EmailMessage
 import smtplib
 import os

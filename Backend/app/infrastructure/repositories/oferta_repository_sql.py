@@ -1,6 +1,4 @@
-# app/infrastructure/repositories/oferta_repository_sql.py
-
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from app.domain.models.oferta import Oferta as OfertaDomain
 from app.infrastructure.orm_models.oferta_orm import OfertaORM
@@ -19,7 +17,8 @@ class OfertaRepositorySQL(OfertaRepository):
         return self._to_domain(orm)
 
     def obtener_todos(self) -> List[OfertaDomain]:
-        ofertas = self.db.query(OfertaORM).all()
+        ofertas = self.db.query(OfertaORM).options(
+            joinedload(OfertaORM.empresa)).all()
         return [self._to_domain(o) for o in ofertas]
 
     def obtener_por_id(self, id: int) -> Optional[OfertaDomain]:
@@ -73,8 +72,15 @@ class OfertaRepositorySQL(OfertaRepository):
             idEmpresa=domain.idEmpresa,
         )
 
-
     def _to_domain(self, orm: OfertaORM) -> OfertaDomain:
+        empresa_data = None
+        if orm.empresa:
+            empresa_data = {
+                "id": orm.empresa.id,
+                "nombre": orm.empresa.nombre,
+                "logo": orm.empresa.logo
+            }
+
         return OfertaDomain(
             id=orm.id,
             titulo=orm.titulo,
@@ -96,5 +102,6 @@ class OfertaRepositorySQL(OfertaRepository):
             tiempo=orm.tiempo,
             fechaPubli=orm.fechaPubli,
             estadoPubli=orm.estadoPubli,
-            idEmpresa=orm.idEmpresa
+            idEmpresa=orm.idEmpresa,
+            empresa=empresa_data
         )

@@ -3,15 +3,23 @@ from fastapi import HTTPException
 from app.domain.models.oferta import Oferta
 from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
 from app.domain.interfaces.external.oferta_repository import OfertaRepository
+from app.domain.interfaces.external.vector_db_repository import VectorDBRepository
+from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 
 
 class OfertaService(OfertaUseCase):
-    def __init__(self, repo: OfertaRepository):
+    def __init__(self, repo: OfertaRepository, vector_repo: VectorDBRepository):
         self.repo = repo
+        self.vector_repo = vector_repo
+        self.embeddings = GeneradorEmbeddings()
 
     def registrar(self, oferta: Oferta) -> Oferta:
-        
-        return self.repo.guardar(oferta)
+        oferta_guardada = self.repo.guardar(oferta)
+
+        embedding = self.embeddings.generar_embedding_oferta(oferta_guardada)
+        self.vector_repo.agregar_oferta(oferta_guardada, embedding)
+
+        return oferta_guardada
 
     def obtener_todos(self) -> List[Oferta]:
         return self.repo.obtener_todos()

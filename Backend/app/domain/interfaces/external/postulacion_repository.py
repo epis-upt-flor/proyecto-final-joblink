@@ -3,16 +3,16 @@ from typing import List, Optional
 from app.domain.models.postulacion import Postulacion
 
 
-class PostulacionUseCase(ABC):
+class PostulacionRepository(ABC):
     @abstractmethod
     def registrar_postulacion(
         self, postulacion: Postulacion) -> Postulacion: ...
 
     @abstractmethod
-    def obtener_todas(self) -> List[Postulacion]: ...
+    def obtener_postulaciones(self) -> List[Postulacion]: ...
 
     @abstractmethod
-    def obtener_por_id(self, id: int) -> Optional[Postulacion]: ...
+    def obtener_postulacion_por_id(self, id: int) -> Optional[Postulacion]: ...
 
     @abstractmethod
     def actualizar_postulacion(

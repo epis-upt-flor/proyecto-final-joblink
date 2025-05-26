@@ -6,12 +6,14 @@ from app.domain.interfaces.internal.egresado_usecase import EgresadoUseCase
 from app.infrastructure.database.db_session_provider import DBSessionProvider
 from app.application.services.egresado_service import EgresadoService
 from app.infrastructure.repositories.egresado_repository_sql import EgresadoRepositorySQL
+from app.infrastructure.repositories.vector_db_repository_upstash import VectorDBRepositoryUpstash
 
 from app.infrastructure.schemas.egresado_schema import (
     EgresadoCreate,
     EgresadoUpdate,
     EgresadoOut,
 )
+
 from app.domain.models.egresado import Egresado
 
 router = APIRouter(prefix="/egresados", tags=["Egresados"])
@@ -19,13 +21,12 @@ db_provider = DBSessionProvider()
 
 # 💉 Dependency Injection
 
-
 def get_service(db: Session = Depends(db_provider.get_db)) -> EgresadoUseCase:
-    repo = EgresadoRepositorySQL(db)
-    return EgresadoService(repo)
+    egresado_repo = EgresadoRepositorySQL(db)
+    vector_repo = VectorDBRepositoryUpstash()
+    return EgresadoService(egresado_repo, vector_repo)
 
 # 🧠 Rutas
-
 
 @router.post("/", response_model=EgresadoOut)
 def registrar_egresado(

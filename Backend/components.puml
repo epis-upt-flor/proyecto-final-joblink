@@ -1,0 +1,181 @@
+@startuml Componentes
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Application Services" {
+    component AuthService
+    component ContratoService
+    component EgresadoService
+    component EmpresaService
+    component OfertaService
+    component PostulacionService
+    component RecomendadorService
+    component UsuarioService
+}
+
+package "Dominio" {
+    package "Models"{
+        component Usuario
+        component Administrador
+        component Rol
+        component Postulacion
+        component Oferta
+        component Empresa
+        component Egresado
+        component Contrato
+    }
+    package "Factories" {
+        interface CreadorUsuario
+    }
+
+    package "Observers" {
+        interface UsuarioObserver
+    }
+    package "Interfaces" {
+        package "Internal"{
+            interface IAuthUseCase
+            interface IContratoUseCase
+            interface IEgresadoUseCase
+            interface IEmpresaUseCase
+            interface IOfertaUseCase
+            interface IPostulacionUseCase
+            interface IRecomendacionUseCase
+            interface IRecuperacionUseCase
+            interface IUsuarioUseCase
+        }
+        package "External"{
+            interface ICache
+            interface IContratoRepository
+            interface IEgresadoRepository
+            interface IEmpresaRepository
+            interface IOfertaRepository
+            interface ISecurity
+            interface IUsuarioRepository
+        }
+    }
+    package "Strategies" {
+        interface IEmailSender
+    }
+}
+
+
+package "Infraestructura" {
+    package "Cache" {
+        component RedisClient
+    }
+
+    package "Database" {
+        component DBSessionProvider
+        component DatabaseSingleton
+    }
+
+    package "Embeddings" {
+        component GeneradorEmbeddings
+    }
+
+    package "Factories" {
+        package "Usuarios"{
+            component AdminFactory
+            component EmpresaFactory
+            component Factory
+        }
+        component EmailFactory
+    }
+
+    package "Observers"{
+        component BienvenidoObserver
+    }
+
+    package "OrmModels"{
+        component AdministradorORM
+        component ContratoORM
+        component EgresadoORM
+        component EmpresaORM
+        component OfertaORM
+        component PostulacionORM
+        component RolORM
+        component UsuarioORM
+    }
+    package "Repositories" {
+        component OfertaRepositorySQL
+        component EgresadoRepositorySQL
+        component UsuarioRepositorySQL
+    }
+
+    package "Routes"{
+        component AuthRoutes
+        component ContratoRoutes
+        component EgresadoRoutes
+        component EmpresaRoutes
+        component OfertaRoutes
+        component RecomendadorRoutes
+        component RecuperacionRoutes
+        component PostulacionRoutes
+        component UsuarioRoutes
+    }
+
+    package "Schemas"{
+        component AdministradorSchema
+        component AuthSchema
+        component ContratoSchema
+        component EgresadoShema
+        component EmpresaSchema
+        component OfertaSchema
+        component PostulacionSchema
+        component RecuperacionSchema
+        component UsuarioSchema
+    }
+
+    package "SecurityModule"{
+        component Security
+    }
+
+    package "Strategies"{
+        component BienvenidaEmpresaEmail
+        component RecuperacionEmail
+    }
+}
+AuthRoutes --> IAuthUseCase
+ContratoRoutes --> IContratoUseCase
+EgresadoRoutes --> IEgresadoUseCase
+EmpresaRoutes --> IEmpresaUseCase
+OfertaRoutes --> IOfertaUseCase
+PostulacionRoutes --> IPostulacionUseCase
+RecomendadorRoutes --> IRecomendacionUseCase
+RecuperacionRoutes --> IRecuperacionUseCase
+UsuarioRoutes --> IUsuarioUseCase
+
+' ==== Servicios implementan UseCases ====
+AuthService ..|> IAuthUseCase
+ContratoService ..|> IContratoUseCase
+EgresadoService ..|> IEgresadoUseCase
+EmpresaService ..|> IEmpresaUseCase
+OfertaService ..|> IOfertaUseCase
+PostulacionService ..|> IPostulacionUseCase
+RecomendadorService ..|> IRecomendacionUseCase
+UsuarioService ..|> IUsuarioUseCase
+
+' ==== Servicios consumen interfaces externas ====
+AuthService --> ISecurity
+UsuarioService --> IUsuarioRepository
+UsuarioService --> IEmailSender
+OfertaService --> ICache
+
+' ==== Infraestructura implementa interfaces externas ====
+UsuarioRepositorySQL ..|> IUsuarioRepository
+OfertaRepositorySQL ..|> IOfertaRepository
+EgresadoRepositorySQL ..|> IEgresadoRepository
+Security ..|> ISecurity
+RedisClient ..|> ICache
+BienvenidaEmpresaEmail ..|> IEmailSender
+RecuperacionEmail ..|> IEmailSender
+
+' ==== Factories implementan CreadorUsuario ====
+AdminFactory ..|> CreadorUsuario
+EmpresaFactory ..|> CreadorUsuario
+UsuarioService --> CreadorUsuario
+
+' ==== Observers implementan UsuarioObserver ====
+BienvenidoObserver ..|> UsuarioObserver
+UsuarioService --> UsuarioObserver
+@enduml

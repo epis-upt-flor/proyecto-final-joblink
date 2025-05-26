@@ -11,7 +11,7 @@ class OfertaORM(Base):
     fechaCierre = Column(Date)
     area = Column(String(100), nullable=False)
     modalidad = Column(String(50), nullable=False)
-    horario = Column(String(50), nullable=False)
+    horario = Column(String(80), nullable=False)
     vacantes = Column(Integer, nullable=False)
     experiencia = Column(String(100))
     locacion = Column(String(150), nullable=False)

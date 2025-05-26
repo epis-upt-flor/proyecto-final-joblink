@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional, List
+from typing import Any, Dict, Optional, List
 from app.domain.models.enum import EstadoOferta, EstadoPubli
 
 
@@ -26,7 +26,8 @@ class Oferta:
         tiempo: int = 0,
         fechaPubli: Optional[date] = None,
         estadoPubli: Optional[EstadoPubli] = None,
-        idEmpresa: int = 0
+        idEmpresa: int = 0,
+        empresa: Optional[Dict[str, Any]] = None
     ):
         self.id = id
         self.titulo = titulo
@@ -49,3 +50,4 @@ class Oferta:
         self.fechaPubli = fechaPubli
         self.estadoPubli = estadoPubli
         self.idEmpresa = idEmpresa
+        self.empresa = empresa

@@ -7,6 +7,7 @@ from app.infrastructure.repositories.oferta_repository_sql import OfertaReposito
 from app.application.services.oferta_service import OfertaService
 from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
 from app.domain.models.oferta import Oferta as OfertaDomain
+from app.infrastructure.repositories.vector_db_repository_upstash import VectorDBRepositoryUpstash
 
 from app.infrastructure.schemas.oferta_schema import (
     OfertaCreate,
@@ -20,9 +21,9 @@ db_provider = DBSessionProvider()
 
 # 💉 Inyección del servicio
 def get_oferta_service(db: Session = Depends(db_provider.get_db)) -> OfertaUseCase:
-    repo = OfertaRepositorySQL(db)
-    return OfertaService(repo)
-
+    oferta_repo = OfertaRepositorySQL(db)
+    vector_repo = VectorDBRepositoryUpstash()
+    return OfertaService(oferta_repo, vector_repo)
 
 
 @router.post("/", response_model=OfertaOut)

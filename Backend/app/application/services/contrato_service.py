@@ -1,13 +1,36 @@
-from sqlalchemy.orm import Session
-from app.infrastructure.orm_models.contrato_orm import ContratoORM
+from typing import List, Optional
+from fastapi import HTTPException
+from app.domain.models.contrato import Contrato
+from app.domain.interfaces.external.contrato_repository import ContratoRepository
+from app.domain.interfaces.internal.contrato_usecase import ContratoUseCase
 
-def registrar_contratacion(db: Session, data: dict):
-    contratacion = ContratoORM(
-        egresado_id=data["egresado_id"],
-        empresa_id=data["empresa_id"]
-    )
-    
-    db.add(contratacion)
-    db.commit()
-    db.refresh(contratacion)
-    return contratacion
+
+class ContratoService(ContratoUseCase):
+    def __init__(self, repository: ContratoRepository):
+        self.repository = repository
+
+    def registrar_contrato(self, contrato: Contrato) -> Contrato:
+        return self.repository.registrar_contrato(contrato)
+
+    def obtener_todos(self) -> List[Contrato]:
+        return self.repository.obtener_contratos()
+
+    def obtener_por_id(self, id: int) -> Optional[Contrato]:
+        contrato = self.repository.obtener_contrato_por_id(id)
+        if not contrato:
+            raise HTTPException(
+                status_code=404, detail="Contrato no encontrado")
+        return contrato
+
+    def actualizar_contrato(self, contrato: Contrato) -> Optional[Contrato]:
+        actualizado = self.repository.actualizar_contrato(contrato)
+        if not actualizado:
+            raise HTTPException(
+                status_code=404, detail="Contrato no encontrado")
+        return actualizado
+
+    def eliminar_contrato(self, id: int) -> bool:
+        if not self.repository.eliminar_contrato(id):
+            raise HTTPException(
+                status_code=404, detail="Contrato no encontrado")
+        return True

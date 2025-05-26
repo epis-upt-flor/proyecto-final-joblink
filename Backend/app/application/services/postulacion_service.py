@@ -1,26 +1,36 @@
-from sqlalchemy.orm import Session
-from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+from typing import List, Optional
+from fastapi import HTTPException
+from app.domain.models.postulacion import Postulacion
+from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
+from app.domain.interfaces.internal.postulacion_usecase import PostulacionUseCase
 
 
-class PostulacionService:
+class PostulacionService(PostulacionUseCase):
+    def __init__(self, repository: PostulacionRepository):
+        self.repository = repository
 
-    def crear_postulacion(self, oferta_id: int, egresado_id: int, posicion: int, db: Session):
-        existe = db.query(PostulacionORM).filter_by(idOferta=oferta_id, idEgresado=egresado_id).first()
-        if existe:
-            print(f"⚠️ Ya existe una postulación para el egresado {egresado_id} en la oferta {oferta_id}.")
-            return None
+    def registrar_postulacion(self, postulacion: Postulacion) -> Postulacion:
+        return self.repository.registrar_postulacion(postulacion)
 
-        estado = "en_revision"
+    def obtener_todas(self) -> List[Postulacion]:
+        return self.repository.obtener_postulaciones()
 
-        nueva_postulacion = PostulacionORM(
-            idOferta=oferta_id,
-            idEgresado=egresado_id,
-            estado=estado,
-            posicionRanking=posicion
-        )
-        db.add(nueva_postulacion)
-        db.commit()
-        db.refresh(nueva_postulacion)
+    def obtener_por_id(self, id: int) -> Optional[Postulacion]:
+        postulacion = self.repository.obtener_postulacion_por_id(id)
+        if not postulacion:
+            raise HTTPException(
+                status_code=404, detail="Postulación no encontrada")
+        return postulacion
 
-        print(f"✅ Postulación creada para egresado {egresado_id} en oferta {oferta_id} (posición: {posicion})")
-        return nueva_postulacion
+    def actualizar_postulacion(self, postulacion: Postulacion) -> Optional[Postulacion]:
+        actualizado = self.repository.actualizar_postulacion(postulacion)
+        if not actualizado:
+            raise HTTPException(
+                status_code=404, detail="Postulación no encontrada")
+        return actualizado
+
+    def eliminar_postulacion(self, id: int) -> bool:
+        if not self.repository.eliminar_postulacion(id):
+            raise HTTPException(
+                status_code=404, detail="Postulación no encontrada")
+        return True

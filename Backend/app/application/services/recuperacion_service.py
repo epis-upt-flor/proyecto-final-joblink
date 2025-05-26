@@ -3,7 +3,7 @@ from uuid import uuid4
 from app.domain.interfaces.internal.recuperacion_usecase import RecuperacionUseCase
 from app.domain.interfaces.external.usuario_repository import IUsuarioRepository
 from app.domain.interfaces.external.security import ISecurity
-from app.domain.interfaces.external.email_sender import IEmailSender
+from app.domain.strategies.email_sender import IEmailSender
 from app.domain.interfaces.external.cache import ICache
 from fastapi import HTTPException
 

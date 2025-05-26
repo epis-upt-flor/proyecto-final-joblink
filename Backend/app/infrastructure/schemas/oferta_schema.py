@@ -3,6 +3,13 @@ from datetime import date
 from typing import Optional, List
 from app.domain.models.enum import EstadoOferta, EstadoPubli
 
+class EmpresaMiniOut(BaseModel):
+    id: int
+    nombre: str
+    logo: Optional[str]
+
+    class Config:
+        orm_mode = True
 
 class OfertaCreate(BaseModel):
     titulo: str
@@ -51,3 +58,8 @@ class OfertaUpdate(BaseModel):
 
 class OfertaOut(OfertaCreate):
     id: int
+    empresa: EmpresaMiniOut
+
+    class Config:
+        orm_mode = True
+

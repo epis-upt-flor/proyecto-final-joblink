@@ -1,5 +1,5 @@
 from app.infrastructure.strategies.recuperacion_email import RecuperacionEmail
-from app.domain.interfaces.external.email_sender import IEmailSender
+from app.domain.strategies.email_sender import IEmailSender
 from app.infrastructure.strategies.bienvenida_empresa import BienvenidaEmpresaEmail
 
 class EmailFactory:

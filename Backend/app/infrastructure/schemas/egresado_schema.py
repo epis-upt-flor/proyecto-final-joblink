@@ -1,9 +1,17 @@
-# app/infrastructure/schemas/egresado_schema.py
 from pydantic import BaseModel, EmailStr
 from datetime import date
 from typing import Optional, List
 from app.domain.models.egresado import Egresado
+class Idioma(BaseModel):
+    idioma: str
+    nivel: str
 
+
+class Experiencia(BaseModel):
+    empresa: str
+    puesto: str
+    periodo: str
+    responsabilidades: List[str]
 
 class EgresadoBase(BaseModel):
     nombres: str
@@ -18,12 +26,13 @@ class EgresadoBase(BaseModel):
     habilidades: Optional[List[str]] = []
     logrosAcademicos: Optional[List[str]] = []
     certificados: Optional[List[str]] = []
-    experienciaLaboral: Optional[List[str]] = []
-    idiomas: Optional[List[str]] = []
+    experienciaLaboral: Optional[List[Experiencia]] = []
+    idiomas: Optional[List[Idioma]] = []
     linkedin: Optional[str] = None
     github: Optional[str] = None
     cv: Optional[str] = None
     disponibilidad: bool = True
+
 
 
 class EgresadoCreate(EgresadoBase):
