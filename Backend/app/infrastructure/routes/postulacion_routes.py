@@ -2,7 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.application.services.contrato_service import ContratoService
+from app.domain.interfaces.internal.contrato_usecase import ContratoUseCase
 from app.infrastructure.database.db_session_provider import DBSessionProvider
+from app.infrastructure.repositories.contrato_repository_sql import ContratoRepositorySQL
 from app.infrastructure.repositories.postulacion_repository_sql import PostulacionRepositorySQL
 from app.application.services.postulacion_service import PostulacionService
 
@@ -21,9 +24,17 @@ db_provider = DBSessionProvider()
 # 💉 Dependency Injection
 
 
-def get_service(db: Session = Depends(db_provider.get_db)) -> PostulacionUseCase:
+def get_contrato_service(db: Session = Depends(db_provider.get_db)) -> ContratoUseCase:
+    repo = ContratoRepositorySQL(db)
+    return ContratoService(repo)
+
+
+def get_service(
+    db: Session = Depends(db_provider.get_db),
+    contrato_service: ContratoUseCase = Depends(get_contrato_service)
+) -> PostulacionUseCase:
     repo = PostulacionRepositorySQL(db)
-    return PostulacionService(repo)
+    return PostulacionService(repo, contrato_service)
 
 
 @router.post("/", response_model=PostulacionOut)
@@ -63,3 +74,27 @@ def actualizar_postulacion(
 def eliminar_postulacion(id: int, service: PostulacionUseCase = Depends(get_service)):
     service.eliminar_postulacion(id)
     return {"mensaje": "Postulación eliminada correctamente"}
+
+
+@router.post("/{id}/aprobar", response_model=PostulacionOut)
+def aprobar_postulacion(id: int, service: PostulacionUseCase = Depends(get_service)):
+    postulacion = service.aprobar_postulacion(id)
+    return PostulacionOut.from_domain(postulacion)
+
+
+@router.post("/{id}/rechazar", response_model=PostulacionOut)
+def rechazar_postulacion(id: int, service: PostulacionUseCase = Depends(get_service)):
+    postulacion = service.rechazar_postulacion(id)
+    return PostulacionOut.from_domain(postulacion)
+
+
+@router.get("/oferta/{id_oferta}", response_model=List[PostulacionOut])
+def obtener_postulaciones_por_oferta(id_oferta: int, service: PostulacionUseCase = Depends(get_service)):
+    postulaciones = service.obtener_por_oferta(id_oferta)
+    return [PostulacionOut.from_domain(p) for p in postulaciones]
+
+
+@router.get("/empresa/{id_empresa}", response_model=List[PostulacionOut])
+def obtener_postulaciones_por_empresa(id_empresa: int, service: PostulacionUseCase = Depends(get_service)):
+    postulaciones = service.obtener_por_empresa(id_empresa)
+    return [PostulacionOut.from_domain(p) for p in postulaciones]

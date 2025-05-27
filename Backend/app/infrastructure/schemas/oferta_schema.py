@@ -30,7 +30,7 @@ class OfertaCreate(BaseModel):
     fechaInicio: date
     tiempo: int
     fechaPubli: Optional[date]
-    estadoPubli: Optional[EstadoPubli]
+    estadoPubli: Optional[EstadoPubli] = EstadoPubli.NO_PUBLICADA
     idEmpresa: int
 
 

@@ -18,3 +18,9 @@ class OfertaUseCase(ABC):
 
     @abstractmethod
     def eliminar(self, id: int) -> bool: ...
+
+    @abstractmethod
+    def aprobar_oferta(self, id: int) -> Oferta: ...
+
+    @abstractmethod
+    def rechazar_oferta(self, id: int, motivo: str) -> Oferta: ...

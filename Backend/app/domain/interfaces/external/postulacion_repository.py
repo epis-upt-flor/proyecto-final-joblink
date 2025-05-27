@@ -20,3 +20,11 @@ class PostulacionRepository(ABC):
 
     @abstractmethod
     def eliminar_postulacion(self, id: int) -> bool: ...
+
+    @abstractmethod
+    def obtener_postulaciones_por_oferta(
+        self, id_oferta: int) -> List[Postulacion]: ...
+
+    @abstractmethod
+    def obtener_postulaciones_por_empresa(
+        self, id_empresa: int) -> List[Postulacion]: ...

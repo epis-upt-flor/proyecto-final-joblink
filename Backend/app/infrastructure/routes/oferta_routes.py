@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -58,3 +58,17 @@ def actualizar_oferta(
 def eliminar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
     service.eliminar(id)
     return {"mensaje": "Oferta eliminada correctamente"}
+
+
+@router.patch("/{id}/aprobar/")
+def aprobar_oferta(id: int, service: OfertaService = Depends(get_oferta_service)):
+    return service.aprobar_oferta(id)
+
+
+@router.patch("/{id}/rechazar/")
+def rechazar_oferta(id: int, payload: dict, service: OfertaService = Depends(get_oferta_service)):
+    motivo = payload.get("motivo")
+    if not motivo:
+        raise HTTPException(
+            status_code=400, detail="Motivo de rechazo requerido")
+    return service.rechazar_oferta(id, motivo)

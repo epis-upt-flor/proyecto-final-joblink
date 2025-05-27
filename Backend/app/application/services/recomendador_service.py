@@ -38,12 +38,9 @@ class RecomendadorService(RecomendadorUseCase):
         oferta = self.oferta_repo.obtener_por_id(oferta_id)
         if not oferta:
             return {"error": "Oferta no encontrada"}
-
-        # 🎯 Obtener vector de la oferta
         vector_oferta = self.embeddings.generar_embedding_oferta(oferta)
         similares = self.vector_repo.buscar_similares(vector_oferta, top_k=10)
 
-        # 🧠 Obtener egresados ya contratados por la empresa
         contratos = self.contrato_repo.obtener_contratos()
         egresados_contratados_ids = set()
 
@@ -57,7 +54,6 @@ class RecomendadorService(RecomendadorUseCase):
                     if oferta_rel and oferta_rel.idEmpresa == oferta.idEmpresa:
                         egresados_contratados_ids.add(postulacion.idEgresado)
 
-        # 📋 Preparar candidatos excluyendo contratados
         candidatos = []
         for item in similares:
             if item.id.startswith("oferta-"):
@@ -73,13 +69,11 @@ class RecomendadorService(RecomendadorUseCase):
                 "metadata": item.metadata
             })
 
-        # 🔁 Obtener egresados contratados para similitud
         egresados_contratados = [
             self.egresado_repo.obtener_egresado_por_id(eid)
             for eid in egresados_contratados_ids
         ]
 
-        # 📊 Calcular similitud a contratados previos
         for candidato in candidatos:
             egresado_actual = self.egresado_repo.obtener_egresado_por_id(
                 candidato["id"])
@@ -102,7 +96,6 @@ class RecomendadorService(RecomendadorUseCase):
             candidato["score_final"] = α * \
                 candidato["score_oferta"] + β * promedio
 
-        # ✅ Ordenar por score final
         candidatos = sorted(
             candidatos, key=lambda x: x["score_final"], reverse=True)[:3]
 

@@ -1,9 +1,11 @@
 from sentence_transformers import SentenceTransformer
+import torch
 
 
 class GeneradorEmbeddings:
     def __init__(self, modelo: str = "sentence-transformers/paraphrase-MiniLM-L6-v2"):
-        self.model = SentenceTransformer(modelo)
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model = SentenceTransformer(modelo, device=device)
 
     def generar_embedding_egresado(self, egresado):
         if isinstance(egresado, dict):

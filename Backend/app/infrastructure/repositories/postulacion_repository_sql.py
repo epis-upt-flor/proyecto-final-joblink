@@ -43,7 +43,18 @@ class PostulacionRepositorySQL(PostulacionRepository):
             self.db.delete(orm)
             self.db.commit()
             return True
-        return False
+        return 
+    def obtener_postulaciones_por_oferta(self, id_oferta: int) -> List[Postulacion]:
+        postulaciones = self.db.query(PostulacionORM).filter(PostulacionORM.idOferta == id_oferta).all()
+        return [self._to_domain(p) for p in postulaciones]
+
+    def obtener_postulaciones_por_empresa(self, id_empresa: int) -> List[Postulacion]:
+        from app.infrastructure.orm_models.oferta_orm import OfertaORM
+        ofertas_ids = self.db.query(OfertaORM.id).filter(OfertaORM.idEmpresa == id_empresa).all()
+        ids = [o[0] for o in ofertas_ids]
+        postulaciones = self.db.query(PostulacionORM).filter(PostulacionORM.idOferta.in_(ids)).all()
+        return [self._to_domain(p) for p in postulaciones]
+
 
     def _update_fields(self, target: PostulacionORM, source: PostulacionORM):
         for attr in vars(source):

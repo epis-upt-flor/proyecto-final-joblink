@@ -14,6 +14,11 @@ class OfertaService(OfertaUseCase):
         self.embeddings = GeneradorEmbeddings()
 
     def registrar(self, oferta: Oferta) -> Oferta:
+        if not oferta.estado:
+            oferta.estado = "PENDIENTE"
+        if not oferta.estadoPubli:
+            oferta.estadoPubli = "NO_PUBLICADA"
+
         oferta_guardada = self.repo.guardar(oferta)
 
         embedding = self.embeddings.generar_embedding_oferta(oferta_guardada)
@@ -40,3 +45,38 @@ class OfertaService(OfertaUseCase):
         if not self.repo.eliminar(id):
             raise HTTPException(status_code=404, detail="Oferta no encontrada")
         return True
+
+    def aprobar_oferta(self, id: int) -> Oferta:
+        oferta = self.repo.obtener_por_id(id)
+        if not oferta:
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
+
+        if oferta.estado != "PENDIENTE":
+            raise HTTPException(
+                status_code=400, detail="La oferta no está pendiente")
+
+        updated_data = {
+            "estado": "ACTIVA",
+            "estadoPubli": "PUBLICADA"
+        }
+
+        oferta_actualizada = self.repo.actualizar(id, updated_data)
+        return oferta_actualizada
+
+    def rechazar_oferta(self, id: int, motivo: str) -> Oferta:
+        oferta = self.repo.obtener_por_id(id)
+        if not oferta:
+            raise HTTPException(status_code=404, detail="Oferta no encontrada")
+
+        if oferta.estado != "PENDIENTE":
+            raise HTTPException(
+                status_code=400, detail="La oferta no está pendiente")
+
+        updated_data = {
+            "estado": "CERRADA",
+            "estadoPubli": "NO_PUBLICADA",
+            "motivo": motivo
+        }
+
+        oferta_actualizada = self.repo.actualizar(id, updated_data)
+        return oferta_actualizada
