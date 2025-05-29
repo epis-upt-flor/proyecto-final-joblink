@@ -9,3 +9,4 @@ class IEmpresaRepository(ABC):
     
     @abstractmethod
     def obtener_por_id(self, db: Session, id: int) -> Optional[Empresa]: ...
+

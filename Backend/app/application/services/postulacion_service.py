@@ -15,6 +15,17 @@ class PostulacionService(PostulacionUseCase):
         self.contrato_service = contrato_service
 
     def registrar_postulacion(self, postulacion: Postulacion) -> Postulacion:
+        existentes = self.repository.obtener_postulaciones_por_oferta(
+            postulacion.idOferta)
+        ya_existe = any(
+            p["idEgresado"] == postulacion.idEgresado for p in existentes)
+
+        if ya_existe:
+            raise HTTPException(
+                status_code=400,
+                detail="Ya existe una postulación para esta oferta por este egresado."
+            )
+
         return self.repository.registrar_postulacion(postulacion)
 
     def obtener_todas(self) -> List[Postulacion]:

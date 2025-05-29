@@ -13,6 +13,7 @@ from app.infrastructure.schemas.postulacion_schema import (
     PostulacionCreate,
     PostulacionUpdate,
     PostulacionOut,
+    PostulacionConEgresadoOut
 )
 
 from app.domain.models.postulacion import Postulacion
@@ -88,10 +89,9 @@ def rechazar_postulacion(id: int, service: PostulacionUseCase = Depends(get_serv
     return PostulacionOut.from_domain(postulacion)
 
 
-@router.get("/oferta/{id_oferta}", response_model=List[PostulacionOut])
+@router.get("/oferta/{id_oferta}", response_model=List[PostulacionConEgresadoOut])
 def obtener_postulaciones_por_oferta(id_oferta: int, service: PostulacionUseCase = Depends(get_service)):
-    postulaciones = service.obtener_por_oferta(id_oferta)
-    return [PostulacionOut.from_domain(p) for p in postulaciones]
+    return service.obtener_por_oferta(id_oferta)
 
 
 @router.get("/empresa/{id_empresa}", response_model=List[PostulacionOut])

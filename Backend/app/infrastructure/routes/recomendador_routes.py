@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from app.application.services.contrato_service import ContratoService
 from app.infrastructure.database.db_session_provider import DBSessionProvider
 
 from app.infrastructure.repositories.vector_db_repository_upstash import VectorDBRepositoryUpstash
@@ -17,6 +18,7 @@ db_provider = DBSessionProvider()
 
 # 💉 Dependency Injection
 
+
 def get_recomendador_service(
     db: Session = Depends(db_provider.get_db)
 ) -> RecomendadorUseCase:
@@ -25,7 +27,9 @@ def get_recomendador_service(
     contrato_repo = ContratoRepositorySQL(db)
     egresado_repo = EgresadoRepositorySQL(db)
     postulacion_repo = PostulacionRepositorySQL(db)
-    postulacion_service = PostulacionService(postulacion_repo)
+    contrato_service = ContratoService(contrato_repo)
+    postulacion_service = PostulacionService(
+        postulacion_repo, contrato_service)
 
     return RecomendadorService(
         vector_repo=vector_repo,

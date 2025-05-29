@@ -5,6 +5,11 @@ from app.domain.models.enum import EstadoPostulacion
 from app.domain.models.postulacion import Postulacion
 
 
+class EgresadoMini(BaseModel):
+    nombres: str
+    apellidos: str
+
+
 class PostulacionBase(BaseModel):
     idOferta: int
     idEgresado: int
@@ -36,3 +41,6 @@ class PostulacionOut(PostulacionBase):
 
     class Config:
         from_attributes = True
+
+class PostulacionConEgresadoOut(PostulacionOut):
+    egresado: Optional[EgresadoMini]
