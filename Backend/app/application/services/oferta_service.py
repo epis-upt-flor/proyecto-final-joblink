@@ -4,14 +4,14 @@ from app.domain.models.oferta import Oferta
 from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
 from app.domain.interfaces.external.oferta_repository import OfertaRepository
 from app.domain.interfaces.external.vector_db_repository import VectorDBRepository
-from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
+from app.domain.interfaces.external.iembeddings import IEmbeddings
 
 
 class OfertaService(OfertaUseCase):
-    def __init__(self, repo: OfertaRepository, vector_repo: VectorDBRepository):
+    def __init__(self, repo: OfertaRepository, vector_repo: VectorDBRepository, embeddings: IEmbeddings):
         self.repo = repo
         self.vector_repo = vector_repo
-        self.embeddings = GeneradorEmbeddings()
+        self.embeddings = embeddings
 
     def registrar(self, oferta: Oferta) -> Oferta:
         if not oferta.estado:

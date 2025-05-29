@@ -3,9 +3,21 @@ import torch
 
 
 class GeneradorEmbeddings:
-    def __init__(self, modelo: str = "sentence-transformers/paraphrase-MiniLM-L6-v2"):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.model = SentenceTransformer(modelo, device=device)
+    _instance = None
+
+    def __new__(cls, modelo: str = "sentence-transformers/paraphrase-MiniLM-L6-v2"):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._init_model(modelo)
+        return cls._instance
+
+    def _init_model(self, modelo):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = SentenceTransformer(modelo)
+        try:
+            self.model = self.model.to(device)
+        except NotImplementedError:
+            print("[WARNING] Modelo contiene tensores meta. No se pudo mover a dispositivo. Usando configuración por defecto.")
 
     def generar_embedding_egresado(self, egresado):
         if isinstance(egresado, dict):
