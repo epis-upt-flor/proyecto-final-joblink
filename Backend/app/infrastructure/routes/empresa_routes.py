@@ -11,17 +11,15 @@ db_provider = DBSessionProvider()
 
 
 def get_empresa_service(db: Session = Depends(db_provider.get_db)):
-    repo = EmpresaRepositorySQL()
-    return EmpresaService(repo), db
+    repo = EmpresaRepositorySQL(db)
+    return EmpresaService(repo)
 
 
 @router.get("/", response_model=List[EmpresaOut])
-def listar_empresas(service_db=Depends(get_empresa_service)):
-    service, db = service_db
-    return service.obtener_todas(db)
+def listar_empresas(service=Depends(get_empresa_service)):
+    return service.obtener_todas()
 
 
 @router.get("/{id}", response_model=EmpresaOut)
-def obtener_empresa(id: int, service_db=Depends(get_empresa_service)):
-    service, db = service_db
-    return service.obtener_por_id(db, id)
+def obtener_empresa(id: int, service=Depends(get_empresa_service)):
+    return service.obtener_por_id(id)

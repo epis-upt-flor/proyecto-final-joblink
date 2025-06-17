@@ -8,6 +8,7 @@ from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddin
 
 
 class EgresadoService(EgresadoUseCase):
+    EGRESADO_NOT_FOUND = "Egresado no encontrado"
     def __init__(self, repository: EgresadoRepository, vector_repo: VectorDBRepository):
         self.repository = repository
         self.vector_repo = vector_repo
@@ -33,18 +34,18 @@ class EgresadoService(EgresadoUseCase):
         egresado = self.repository.obtener_egresado_por_id(id)
         if not egresado:
             raise HTTPException(
-                status_code=404, detail="Egresado no encontrado")
+                status_code=404, detail=self.EGRESADO_NOT_FOUND)
         return egresado
 
     def actualizar_egresado(self, egresado: Egresado) -> Optional[Egresado]:
         actualizado = self.repository.actualizar_egresado(egresado)
         if not actualizado:
             raise HTTPException(
-                status_code=404, detail="Egresado no encontrado")
+                status_code=404, detail=self.EGRESADO_NOT_FOUND)
         return actualizado
 
     def eliminar_egresado(self, id: int) -> bool:
         if not self.repository.eliminar_egresado(id):
             raise HTTPException(
-                status_code=404, detail="Egresado no encontrado")
+                status_code=404, detail=self.EGRESADO_NOT_FOUND)
         return True

@@ -10,6 +10,8 @@ from app.domain.interfaces.internal.postulacion_usecase import PostulacionUseCas
 
 
 class PostulacionService(PostulacionUseCase):
+    POSTULACION_NOT_FOUND = "Postulación no encontrada"
+
     def __init__(self, repository: PostulacionRepository, contrato_service: ContratoUseCase):
         self.repository = repository
         self.contrato_service = contrato_service
@@ -35,20 +37,20 @@ class PostulacionService(PostulacionUseCase):
         postulacion = self.repository.obtener_postulacion_por_id(id)
         if not postulacion:
             raise HTTPException(
-                status_code=404, detail="Postulación no encontrada")
+                status_code=404, detail=self.POSTULACION_NOT_FOUND)
         return postulacion
 
     def actualizar_postulacion(self, postulacion: Postulacion) -> Optional[Postulacion]:
         actualizado = self.repository.actualizar_postulacion(postulacion)
         if not actualizado:
             raise HTTPException(
-                status_code=404, detail="Postulación no encontrada")
+                status_code=404, detail=self.POSTULACION_NOT_FOUND)
         return actualizado
 
     def eliminar_postulacion(self, id: int) -> bool:
         if not self.repository.eliminar_postulacion(id):
             raise HTTPException(
-                status_code=404, detail="Postulación no encontrada")
+                status_code=404, detail=self.POSTULACION_NOT_FOUND)
         return True
 
     def aprobar_postulacion(self, id: int) -> Postulacion:

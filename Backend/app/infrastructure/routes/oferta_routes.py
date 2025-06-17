@@ -63,12 +63,12 @@ def eliminar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service
 
 
 @router.patch("/{id}/aprobar/")
-def aprobar_oferta(id: int, service: OfertaService = Depends(get_oferta_service)):
+def aprobar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
     return service.aprobar_oferta(id)
 
 
 @router.patch("/{id}/rechazar/")
-def rechazar_oferta(id: int, payload: dict, service: OfertaService = Depends(get_oferta_service)):
+def rechazar_oferta(id: int, payload: dict, service: OfertaUseCase = Depends(get_oferta_service)):
     motivo = payload.get("motivo")
     if not motivo:
         raise HTTPException(

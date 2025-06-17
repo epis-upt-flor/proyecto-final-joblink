@@ -20,7 +20,7 @@ class PostulacionBase(BaseModel):
 
 class PostulacionCreate(PostulacionBase):
     def to_domain(self) -> Postulacion:
-        return Postulacion(id=None, **self.dict())
+        return Postulacion(id=None, **self.model_dump())
 
 
 class PostulacionUpdate(BaseModel):
@@ -29,7 +29,7 @@ class PostulacionUpdate(BaseModel):
     estado: Optional[EstadoPostulacion] = None
 
     def to_update_dict(self) -> dict:
-        return self.dict(exclude_unset=True)
+        return self.model_dump(exclude_unset=True)
 
 
 class PostulacionOut(PostulacionBase):

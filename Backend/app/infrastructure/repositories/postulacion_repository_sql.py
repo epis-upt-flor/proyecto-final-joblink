@@ -30,8 +30,11 @@ class PostulacionRepositorySQL(PostulacionRepository):
             PostulacionORM.id == postulacion.id).first()
         if not orm:
             return None
-        updated = self._to_orm(postulacion)
-        self._update_fields(orm, updated)
+        orm.idOferta          = postulacion.idOferta
+        orm.idEgresado        = postulacion.idEgresado
+        orm.fechaRecomendacion= postulacion.fechaRecomendacion
+        orm.posicionRanking   = postulacion.posicionRanking
+        orm.estado            = postulacion.estado.value
         self.db.commit()
         self.db.refresh(orm)
         return self._to_domain(orm)
@@ -43,7 +46,7 @@ class PostulacionRepositorySQL(PostulacionRepository):
             self.db.delete(orm)
             self.db.commit()
             return True
-        return
+        return False
 
     def obtener_postulaciones_por_oferta(self, id_oferta: int) -> List[dict]:
         postulaciones = (
@@ -78,11 +81,6 @@ class PostulacionRepositorySQL(PostulacionRepository):
         postulaciones = self.db.query(PostulacionORM).filter(
             PostulacionORM.idOferta.in_(ids)).all()
         return [self._to_domain(p) for p in postulaciones]
-
-    def _update_fields(self, target: PostulacionORM, source: PostulacionORM):
-        for attr in vars(source):
-            if not attr.startswith("_") and hasattr(target, attr) and attr != "id":
-                setattr(target, attr, getattr(source, attr))
 
     def _to_orm(self, postulacion: Postulacion) -> PostulacionORM:
         return PostulacionORM(

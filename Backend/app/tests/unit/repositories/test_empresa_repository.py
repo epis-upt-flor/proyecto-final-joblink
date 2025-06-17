@@ -31,20 +31,20 @@ def mock_empresa_orm(db_session):
     return empresa
 
 def test_obtener_todas(db_session, mock_empresa_orm):
-    repo = EmpresaRepositorySQL()
-    empresas = repo.obtener_todas(db_session)
+    repo = EmpresaRepositorySQL(db_session)
+    empresas = repo.obtener_todas()
     assert len(empresas) == 1
     assert empresas[0].nombre == "Empresa X"
 
 
 def test_obtener_por_id(db_session, mock_empresa_orm):
-    repo = EmpresaRepositorySQL()
-    empresa = repo.obtener_por_id(db_session, mock_empresa_orm.id)
+    repo = EmpresaRepositorySQL(db_session)
+    empresa = repo.obtener_por_id(mock_empresa_orm.id)
     assert empresa is not None
     assert empresa.nombre == "Empresa X"
 
 
 def test_obtener_por_id_no_existente(db_session):
-    repo = EmpresaRepositorySQL()
-    empresa = repo.obtener_por_id(db_session, id=999)
+    repo = EmpresaRepositorySQL(db_session)
+    empresa = repo.obtener_por_id(id=999)
     assert empresa is None

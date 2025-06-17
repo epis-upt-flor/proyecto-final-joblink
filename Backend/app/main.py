@@ -1,7 +1,6 @@
 from app.infrastructure.routes import auth_routes, egresado_routes, empresa_routes, oferta_routes, recuperacion_routes, postulacion_routes, contrato_routes, recomendador_routes
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from app.infrastructure.routes import usuario_routes
 
 app = FastAPI()
 

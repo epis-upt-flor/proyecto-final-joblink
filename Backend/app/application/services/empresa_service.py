@@ -9,11 +9,11 @@ class EmpresaService:
     def __init__(self, repo: IEmpresaRepository):
         self.repo = repo
 
-    def obtener_todas(self, db: Session) -> List[Empresa]:
-        return self.repo.obtener_todas(db)
+    def obtener_todas(self) -> List[Empresa]:
+        return self.repo.obtener_todas()
 
-    def obtener_por_id(self, db: Session, id: int) -> Empresa:
-        empresa = self.repo.obtener_por_id(db, id)
+    def obtener_por_id(self, id: int) -> Empresa:
+        empresa = self.repo.obtener_por_id(id)
         if not empresa:
             raise HTTPException(
                 status_code=404, detail="Empresa no encontrada")
