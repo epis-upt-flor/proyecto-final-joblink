@@ -30,7 +30,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 export type EgresadoInput = Omit<Egresado, "id">
 
 export async function fetchEgresados(): Promise<Egresado[]> {
-  const res = await fetch(`${API_URL}/egresados/`)
+  const res = await fetch(`${API_URL}/egresados`)
   if (!res.ok) throw new Error("Error al cargar egresados")
   return res.json()
 }

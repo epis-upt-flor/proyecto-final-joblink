@@ -42,7 +42,7 @@ export async function fetchEmpresa(id: number): Promise<Empresa> {
 }
 
 export async function crearEmpresa(data: EmpresaInput): Promise<any> {
-  const res = await fetch(`${API_URL}/auth/register/empresa/`, {
+  const res = await fetch(`${API_URL}/auth/register/empresa`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
