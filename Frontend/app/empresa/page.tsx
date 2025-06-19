@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Bell, Briefcase, Filter, MoreHorizontal, PlusCircle, Search } from 'lucide-react'
+import { Moon, Briefcase, Filter, MoreHorizontal, PlusCircle, Search } from 'lucide-react'
 import { useEmpresa } from "@/hooks/useEmpresas"
 import { useOfertas, useOfertasPorEmpresa } from "@/hooks/useOfertas"
 import { usePostulacionesEmpresa } from "@/hooks/usePostulaciones"
@@ -64,6 +64,14 @@ export default function EmpresaPortal() {
     }
     const empresaActual = empresa
     const plazasEmpresa = plazas?.filter((plaza) => plaza.empresa?.id === empresaId) || []
+    const toggleTheme = () => {
+        const current = localStorage.getItem("theme")
+        const newTheme = current === "dark" ? "light" : "dark"
+        localStorage.setItem("theme", newTheme)
+        window.location.reload()
+    }
+
+    console.log("postulaciones", postulaciones)
 
     return (
         <div className="min-h-screen bg-muted/40">
@@ -74,9 +82,10 @@ export default function EmpresaPortal() {
                     <span className="text-muted-foreground">Portal Empresarial</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" onClick={toggleTheme}>
+                        <Moon className="h-5 w-5" />
                     </Button>
+
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Avatar className="cursor-pointer">
@@ -180,7 +189,6 @@ export default function EmpresaPortal() {
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem>Ver detalles</DropdownMenuItem>
                                                         <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                        <DropdownMenuItem>Ver postulantes</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
@@ -206,10 +214,12 @@ export default function EmpresaPortal() {
                                     <TableHead>Egresado</TableHead>
                                     <TableHead>Plaza</TableHead>
                                     <TableHead>Fecha</TableHead>
+                                    <TableHead>Ranking</TableHead>
                                     <TableHead>Habilidades</TableHead>
                                     <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
+
                             <TableBody>
                                 {postulacionesLoading ? (
                                     <TableRow>
@@ -243,6 +253,7 @@ export default function EmpresaPortal() {
                                             </TableCell>
                                             <TableCell>{p.oferta.titulo}</TableCell>
                                             <TableCell>{new Date(p.fechaRecomendacion).toLocaleDateString()}</TableCell>
+                                            <TableCell>{p.posicionRanking ?? "—"}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {(p.egresado.habilidades || []).slice(0, 3).map((h, i) => (
@@ -256,15 +267,31 @@ export default function EmpresaPortal() {
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => router.push(`/egresado/${p.egresado.id}`)}
-                                                >
-                                                    Ver perfil
-                                                </Button>
-
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => router.push(`/egresado/${p.egresado.id}`)}
+                                                    >
+                                                        Ver perfil
+                                                    </Button>
+                                                    <Button
+                                                        variant="default"
+                                                        size="sm"
+                                                        onClick={() => alert(`Aceptar postulación ${p.id}`)}
+                                                    >
+                                                        Aceptar
+                                                    </Button>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={() => alert(`Rechazar postulación ${p.id}`)}
+                                                    >
+                                                        Rechazar
+                                                    </Button>
+                                                </div>
                                             </TableCell>
+
                                         </TableRow>
                                     ))
                                 )}

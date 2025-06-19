@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import { QueryClientProvider } from "@/components/providers/query-client-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import "@/app/globals.css"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -24,6 +25,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </QueryClientProvider>
+        <Toaster />
       </body>
     </html>
   )

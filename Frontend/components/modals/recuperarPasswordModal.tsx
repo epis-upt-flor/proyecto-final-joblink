@@ -14,15 +14,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { useToast } from "@/components/ui/use-toast"
-
+import { toast } from "sonner"
 interface RecuperarPasswordModalProps {
     isOpen: boolean
     onClose: () => void
 }
 
 export function RecuperarPasswordModal({ isOpen, onClose }: RecuperarPasswordModalProps) {
-    const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState("")
     const [isSubmitted, setIsSubmitted] = useState(false)
@@ -46,15 +44,14 @@ export function RecuperarPasswordModal({ isOpen, onClose }: RecuperarPasswordMod
             }
 
             setIsSubmitted(true)
-            toast({
-                title: "Solicitud enviada",
+            toast(
+                "Solicitud enviada", {
                 description: "Se ha enviado un enlace de recuperación a su correo electrónico",
             })
         } catch (error) {
-            toast({
-                title: "Error",
+            toast(
+                "Error", {
                 description: "No se pudo procesar su solicitud. Verifique su correo e intente nuevamente.",
-                variant: "destructive",
             })
         } finally {
             setIsLoading(false)

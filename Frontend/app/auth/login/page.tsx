@@ -11,14 +11,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { RecuperarPasswordModal } from "@/components/modals/recuperarPasswordModal"
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function LoginPage() {
     const router = useRouter()
-    const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [isRecuperarModalOpen, setIsRecuperarModalOpen] = useState(false)
@@ -52,11 +51,7 @@ export default function LoginPage() {
 
             const decoded: { sub: string; role: string } = jwtDecode(data.access_token)
 
-            toast({
-                title: "Inicio de sesión exitoso",
-                description: "Redirigiendo al panel...",
-            })
-
+            toast("Inicio de sesión exitoso")
             const role = parseInt(decoded.role)
 
             if (role === 1) {
@@ -68,11 +63,7 @@ export default function LoginPage() {
             }
 
         } catch (error) {
-            toast({
-                title: "Error al iniciar sesión",
-                description: "Credenciales incorrectas. Inténtelo nuevamente.",
-                variant: "destructive",
-            })
+            toast("Credenciales incorrectas. Inténtelo nuevamente.")
         } finally {
             setIsLoading(false)
         }

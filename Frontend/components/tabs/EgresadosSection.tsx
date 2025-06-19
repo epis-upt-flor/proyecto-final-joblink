@@ -115,19 +115,10 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
                                                 <DropdownMenuItem asChild>
                                                     <a href={egresado.cv} target="_blank" rel="noopener noreferrer">Ver CV</a>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <a href={egresado.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem asChild>
-                                                    <a href={egresado.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-                                                </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleVerDetalle(egresado.id)}>
                                                     Ver perfil completo
                                                 </DropdownMenuItem>
-
                                                 <DropdownMenuItem>Editar información</DropdownMenuItem>
-                                                <DropdownMenuItem>Recomendar plazas</DropdownMenuItem>
-                                                <DropdownMenuItem>Ver historial</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

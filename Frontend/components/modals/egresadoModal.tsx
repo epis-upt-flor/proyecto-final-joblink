@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { crearEgresado, EgresadoInput } from "@/api/egresadoApi";
 import { InformacionTab } from "@/components/egresado-form/InformacionTab";
 import { HabilidadesTab } from "@/components/egresado-form/HabilidadesTab";
@@ -53,7 +53,6 @@ interface AgregarEgresadoModalProps {
 }
 
 export function AgregarEgresadoModal({ open, onOpenChange, onSuccess }: AgregarEgresadoModalProps) {
-    const { toast } = useToast();
     const form = useForm<EgresadoFormValues>({
         resolver: zodResolver(egresadoSchema),
         defaultValues: {
@@ -119,8 +118,7 @@ export function AgregarEgresadoModal({ open, onOpenChange, onSuccess }: AgregarE
             });
 
 
-            toast({
-                title: "Egresado agregado",
+            toast("Egresado agregado", {
                 description: "El egresado ha sido registrado exitosamente",
             });
 
@@ -135,10 +133,8 @@ export function AgregarEgresadoModal({ open, onOpenChange, onSuccess }: AgregarE
 
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Error",
+            toast("Error", {
                 description: "No se pudo registrar el egresado",
-                variant: "destructive",
             });
         } finally {
             setIsSubmitting(false);

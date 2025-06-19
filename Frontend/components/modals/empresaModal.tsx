@@ -35,7 +35,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { crearEmpresa } from "@/api/empresaApi"
 import {
     Tabs,
@@ -69,7 +69,6 @@ interface AgregarEmpresaModalProps {
 }
 
 export function AgregarEmpresaModal({ open, onOpenChange, onSuccess }: AgregarEmpresaModalProps) {
-    const { toast } = useToast()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [activeTab, setActiveTab] = useState("informacion")
     const [showPassword, setShowPassword] = useState(false)
@@ -113,8 +112,7 @@ export function AgregarEmpresaModal({ open, onOpenChange, onSuccess }: AgregarEm
 
             await crearEmpresa(empresaData)
 
-            toast({
-                title: "Empresa agregada",
+            toast("Empresa agregada", {
                 description: "La empresa ha sido creada exitosamente",
             })
 
@@ -123,10 +121,8 @@ export function AgregarEmpresaModal({ open, onOpenChange, onSuccess }: AgregarEm
             onSuccess?.()
         } catch (error) {
             console.error("Error al crear empresa:", error)
-            toast({
-                title: "Error",
+            toast("Error", {
                 description: "Ocurrió un error al agregar la empresa",
-                variant: "destructive",
             })
         } finally {
             setIsSubmitting(false)
@@ -154,8 +150,7 @@ export function AgregarEmpresaModal({ open, onOpenChange, onSuccess }: AgregarEm
 
             await crearEmpresa(empresaData)
 
-            toast({
-                title: "Empresa agregada",
+            toast("Empresa agregada", {
                 description: "La empresa ha sido creada exitosamente",
             })
 
@@ -164,10 +159,8 @@ export function AgregarEmpresaModal({ open, onOpenChange, onSuccess }: AgregarEm
             onSuccess?.()
         } catch (error) {
             console.error("Error al crear empresa:", error)
-            toast({
-                title: "Error",
+            toast("Error", {
                 description: "Ocurrió un error al agregar la empresa",
-                variant: "destructive",
             })
         } finally {
             setIsSubmitting(false)

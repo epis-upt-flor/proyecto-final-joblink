@@ -115,7 +115,6 @@ export function PlazasSection({ plazas = [], loading, onAddPlaza }: any) {
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                <DropdownMenuItem>Recomendar egresados</DropdownMenuItem>
                                                 <DropdownMenuItem>Desactivar</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>

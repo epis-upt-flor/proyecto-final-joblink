@@ -11,12 +11,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 export default function RecuperarPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { toast } = useToast()
 
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -28,10 +27,8 @@ export default function RecuperarPage() {
   useEffect(() => {
     const tokenParam = searchParams.get("token")
     if (!tokenParam) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Token de recuperación no válido o expirado",
-        variant: "destructive",
       })
       router.push("/auth/login")
     } else {
@@ -43,10 +40,8 @@ export default function RecuperarPage() {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Las contraseñas no coinciden",
-        variant: "destructive",
       })
       return
     }
@@ -71,15 +66,12 @@ export default function RecuperarPage() {
       }
 
       setIsSuccess(true)
-      toast({
-        title: "Contraseña actualizada",
+      toast("Contraseña actualizada", {
         description: "Su contraseña ha sido actualizada correctamente",
       })
     } catch (error) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "No se pudo actualizar la contraseña. El token puede ser inválido o haber expirado.",
-        variant: "destructive",
       })
     } finally {
       setIsLoading(false)

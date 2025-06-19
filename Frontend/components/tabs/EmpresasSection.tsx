@@ -96,7 +96,6 @@ export function EmpresasSection({ empresas = [], loading, onAddEmpresa }: any) {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem>Editar información</DropdownMenuItem>
-                        <DropdownMenuItem>Ver plazas</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

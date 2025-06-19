@@ -1,4 +1,3 @@
-// components/oferta-form/AgregarOfertaModal.tsx
 "use client";
 
 import { useState } from "react";
@@ -8,7 +7,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Form } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner"
 import { crearOferta, Oferta } from "@/api/ofertaApi";
 import { useEmpresas } from "@/hooks/useEmpresas";
 
@@ -30,7 +29,6 @@ export function AgregarOfertaModal({
   onSuccess,
   empresaId,
 }: AgregarOfertaModalProps) {
-  const { toast } = useToast();
   const { data: empresas, isLoading: empresasLoading } = useEmpresas();
 
   const [activeTab, setActiveTab] = useState("informacion");
@@ -78,7 +76,7 @@ export function AgregarOfertaModal({
       };
 
       await crearOferta(payload);
-      toast({ title: "Oferta agregada", description: "Oferta registrada exitosamente" });
+      toast("Oferta agregada", { description: "Oferta registrada exitosamente" });
 
       form.reset();
       setFunciones([]);
@@ -88,7 +86,7 @@ export function AgregarOfertaModal({
       onSuccess?.();
     } catch (error) {
       console.error("Error al crear oferta:", error);
-      toast({ title: "Error", description: "No se pudo crear la oferta", variant: "destructive" });
+      toast("Error", { description: "No se pudo crear la oferta" });
     } finally {
       setIsSubmitting(false);
     }

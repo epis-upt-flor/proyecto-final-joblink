@@ -1,4 +1,5 @@
 "use client"
+import { useRouter } from "next/navigation"
 
 import {
     Card,
@@ -23,6 +24,7 @@ import { useState } from "react"
 
 export function AprobacionesSection({ ofertas = [], onAprobar, onRechazar }: any) {
     const [rechazoMotivo, setRechazoMotivo] = useState("")
+    const router = useRouter();
 
     return (
         <Card>
@@ -64,9 +66,14 @@ export function AprobacionesSection({ ofertas = [], onAprobar, onRechazar }: any
                                                 : "—"}
                                         </TableCell>
                                         <TableCell>
-                                            <Button variant="ghost" size="sm">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => router.push(`/oferta/${oferta.id}`)}
+                                            >
                                                 <FileText className="h-4 w-4 mr-2" /> Ver requisitos
                                             </Button>
+
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant="outline">Pendiente</Badge>

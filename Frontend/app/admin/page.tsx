@@ -1,7 +1,7 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Filter, Bell } from "lucide-react"
+import { Filter, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -21,14 +21,13 @@ import { ReportesSection } from "@/components/tabs/ReportesSection"
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 import { AgregarEgresadoModal } from "@/components/modals/egresadoModal"
 import { AgregarEmpresaModal } from "@/components/modals/empresaModal"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 
 export default function AdminDashboard() {
   const { data: egresados, isLoading: egresadosLoading } = useEgresados()
   const { data: plazas, isLoading: plazasLoading, error } = useOfertas()
 
   const { data: empresas, isLoading: empresasLoading } = useEmpresas()
-  const { toast } = useToast()
 
   const [egresadoModalOpen, setEgresadoModalOpen] = useState(false)
   const [empresaModalOpen, setEmpresaModalOpen] = useState(false)
@@ -44,16 +43,11 @@ export default function AdminDashboard() {
   const aprobar = (id: number) => {
     aprobarMutation.mutate(id, {
       onSuccess: () => {
-        toast({
-          title: "Oferta aprobada exitosamente",
-          description: "La empresa ya puede recibir postulaciones",
-        })
+        toast("Oferta aprobada exitosamente")
       },
       onError: (error) => {
-        toast({
-          title: "Error al aprobar",
+        toast("Error al aprobar", {
           description: String(error),
-          variant: "destructive",
         })
       },
     })
@@ -76,6 +70,12 @@ export default function AdminDashboard() {
     { iniciales: "PR", nombre: "Pedro Ramírez", empresa: "TechSolutions", puesto: "Desarrollador Frontend", fecha: "05/12/2024", recomendado: true },
     { iniciales: "MG", nombre: "María Gómez", empresa: "CloudServices", puesto: "Ingeniera DevOps", fecha: "15/11/2024", recomendado: false },
   ]
+  const toggleTheme = () => {
+    const current = localStorage.getItem("theme")
+    const newTheme = current === "dark" ? "light" : "dark"
+    localStorage.setItem("theme", newTheme)
+    window.location.reload()
+  }
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -85,9 +85,10 @@ export default function AdminDashboard() {
             <h1 className="text-xl font-bold">LinkJob</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={toggleTheme}>
+              <Moon className="h-5 w-5" />
             </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
@@ -120,9 +121,6 @@ export default function AdminDashboard() {
                 <TabsTrigger value="historial">Historial</TabsTrigger>
                 <TabsTrigger value="reportes">Reportes</TabsTrigger>
               </TabsList>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" /> Filtrar
-              </Button>
             </div>
 
             <TabsContent value="plazas">
