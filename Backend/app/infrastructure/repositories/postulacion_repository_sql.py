@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from app.domain.models.postulacion import Postulacion
 from app.domain.models.enum import EstadoPostulacion
@@ -73,14 +73,27 @@ class PostulacionRepositorySQL(PostulacionRepository):
 
         return resultado
 
-    def obtener_postulaciones_por_empresa(self, id_empresa: int) -> List[Postulacion]:
+
+    def obtener_postulaciones_por_empresa(self, id_empresa: int) -> List[PostulacionORM]:
         from app.infrastructure.orm_models.oferta_orm import OfertaORM
+
         ofertas_ids = self.db.query(OfertaORM.id).filter(
-            OfertaORM.idEmpresa == id_empresa).all()
+            OfertaORM.idEmpresa == id_empresa
+        ).all()
         ids = [o[0] for o in ofertas_ids]
-        postulaciones = self.db.query(PostulacionORM).filter(
-            PostulacionORM.idOferta.in_(ids)).all()
-        return [self._to_domain(p) for p in postulaciones]
+
+        postulaciones = (
+            self.db.query(PostulacionORM)
+            .options(
+                joinedload(PostulacionORM.egresado),
+                joinedload(PostulacionORM.oferta).joinedload(OfertaORM.empresa)
+            )
+            .filter(PostulacionORM.idOferta.in_(ids))
+            .all()
+        )
+
+        return postulaciones
+
 
     def _to_orm(self, postulacion: Postulacion) -> PostulacionORM:
         return PostulacionORM(

@@ -24,3 +24,6 @@ class OfertaUseCase(ABC):
 
     @abstractmethod
     def rechazar_oferta(self, id: int, motivo: str) -> Oferta: ...
+
+    @abstractmethod
+    def obtener_ofertas_por_empresa(self, id_empresa: int) -> List[Oferta]: ...

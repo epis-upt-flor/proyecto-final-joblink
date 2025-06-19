@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query"
 import {
   fetchEmpresas,
   fetchEmpresa,
@@ -16,11 +16,12 @@ export function useEmpresas() {
   })
 }
 
-export function useEmpresa(id: number) {
+export function useEmpresa(id: number, options?: UseQueryOptions) {
   return useQuery({
     queryKey: ["empresas", id],
     queryFn: () => fetchEmpresa(id),
     enabled: !!id,
+    ...options,
   })
 }
 

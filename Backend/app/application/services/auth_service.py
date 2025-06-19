@@ -55,7 +55,7 @@ class AuthService(AuthUseCase):
                 status_code=401, detail="Credenciales inválidas")
 
         token = self.security.crear_token(
-            {"sub": usuario.username, "role": str(usuario.idRol)}
+            {"sub": usuario.username, "role": str(usuario.idRol), "id": usuario.id}
         )
 
         return {

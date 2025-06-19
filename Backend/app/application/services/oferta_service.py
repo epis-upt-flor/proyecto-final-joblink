@@ -83,3 +83,9 @@ class OfertaService(OfertaUseCase):
 
         oferta_actualizada = self.repo.actualizar(id, updated_data)
         return oferta_actualizada
+
+    def obtener_ofertas_por_empresa(self, id_empresa: int) -> List[Oferta]:
+        ofertas = self.repo.obtener_ofertas_por_empresa(id_empresa)
+        if not ofertas:
+            raise HTTPException(status_code=404, detail="No se encontraron ofertas para esta empresa")
+        return ofertas

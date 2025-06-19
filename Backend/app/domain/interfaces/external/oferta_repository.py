@@ -18,3 +18,6 @@ class OfertaRepository(ABC):
 
     @abstractmethod
     def eliminar(self, id: int) -> bool: ...
+
+    @abstractmethod
+    def obtener_ofertas_por_empresa(self, id_empresa: int) -> List[Oferta]: ...

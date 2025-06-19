@@ -1,8 +1,12 @@
 "use client"
-import { useState } from "react"
+
+import { useEffect, useState } from "react"
 import { Bell, Briefcase, Filter, MoreHorizontal, PlusCircle, Search } from 'lucide-react'
-import { useEmpresas } from "@/hooks/useEmpresas"
-import { useOfertas } from "@/hooks/useOfertas"
+import { useEmpresa } from "@/hooks/useEmpresas"
+import { useOfertas, useOfertasPorEmpresa } from "@/hooks/useOfertas"
+import { usePostulacionesEmpresa } from "@/hooks/usePostulaciones"
+import { jwtDecode } from "jwt-decode"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,18 +18,52 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 
 export default function EmpresaPortal() {
-    const { data: empresa } = useEmpresas()
-    const { data: plazas, isLoading: plazasLoading } = useOfertas()
+    const router = useRouter()
+
+    const [empresaId, setEmpresaId] = useState<number | null>(null)
+    const [ready, setReady] = useState(false)
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("token")
+            if (token) {
+                try {
+                    const decoded = jwtDecode<{ id: number }>(token)
+                    setEmpresaId(decoded.id)
+                } catch (err) {
+                    console.error("Token inválido", err)
+                }
+            }
+            setReady(true)
+        }
+    }, [])
+
+    type Empresa = {
+        id: number
+        nombre: string
+        logo?: string
+    }
+
+    const { data: empresa } = useEmpresa(empresaId!) as { data: Empresa | undefined }
+
+    const { data: plazas, isLoading: plazasLoading } = useOfertasPorEmpresa(empresaId!)
+
+    const {
+        data: postulaciones,
+        isLoading: postulacionesLoading,
+        error: postulacionesError,
+    } = usePostulacionesEmpresa(empresaId ?? 0, {
+        enabled: ready && empresaId !== null,
+    })
+
     const [plazaModalOpen, setPlazaModalOpen] = useState(false)
+
     const handleLogout = () => {
         localStorage.removeItem("token")
         window.location.href = "/auth/login"
     }
-
-    const empresaActual = empresa?.[0] // Simulamos que estamos viendo la primera empresa
-
-    // Filtramos las plazas de la empresa actual
-    const plazasEmpresa = plazas?.filter((plaza) => plaza.empresa.id === empresaActual?.id) || []
+    const empresaActual = empresa
+    const plazasEmpresa = plazas?.filter((plaza) => plaza.empresa?.id === empresaId) || []
 
     return (
         <div className="min-h-screen bg-muted/40">
@@ -42,24 +80,30 @@ export default function EmpresaPortal() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Avatar className="cursor-pointer">
-                                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Empresa" />
-                                <AvatarFallback>{empresaActual?.nombre?.substring(0, 2).toUpperCase() || "EM"}</AvatarFallback>
+                                <AvatarImage
+                                    src={empresaActual?.logo || "/placeholder.svg"}
+                                    alt={empresaActual?.nombre || "Empresa"}
+                                />
+                                <AvatarFallback>
+                                    {empresaActual?.nombre?.substring(0, 2).toUpperCase() || "EM"}
+                                </AvatarFallback>
                             </Avatar>
+
+
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={handleLogout}>Cerrar sesión</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
-
                 </div>
             </header>
 
             <main className="p-4 md:p-6 space-y-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <section className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold">Portal Empresarial</h1>
                         <p className="text-muted-foreground">
-                            Bienvenido, {empresaActual?.nombre || "Empresa"}. Gestione sus plazas y vea los egresados postulados.
+                            Bienvenido, {empresaActual?.nombre || "Empresa"}.
                         </p>
                     </div>
                     <div className="flex items-center gap-2 w-full md:w-auto">
@@ -72,75 +116,60 @@ export default function EmpresaPortal() {
                             Publicar Plaza
                         </Button>
                     </div>
-                </div>
+                </section>
 
-                {/* Mis Plazas */}
+                {/* Plazas de la empresa */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Mis Plazas de Trabajo</CardTitle>
-                        <CardDescription>Gestione las plazas de trabajo publicadas por su empresa.</CardDescription>
+                        <CardDescription>Gestione las plazas publicadas por su empresa.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-end mb-4">
-                            <Button variant="outline" size="sm" className="mr-2">
-                                <Filter className="h-4 w-4 mr-2" />
-                                Filtrar
-                            </Button>
-                            <Button size="sm" onClick={() => setPlazaModalOpen(true)}>
-                                <PlusCircle className="h-4 w-4 mr-2" />
-                                Publicar Plaza
-                            </Button>
-                        </div>
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Título</TableHead>
                                     <TableHead>Área</TableHead>
-                                    <TableHead>Publicada</TableHead>
-                                    <TableHead>Expira</TableHead>
+                                    <TableHead>Modalidad</TableHead>
+                                    <TableHead>Locación</TableHead>
+                                    <TableHead>Salario</TableHead>
+                                    <TableHead>Vacantes</TableHead>
                                     <TableHead>Estado</TableHead>
-                                    <TableHead>Postulaciones</TableHead>
                                     <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
+
                             <TableBody>
                                 {plazasLoading ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center">
-                                            Cargando plazas...
-                                        </TableCell>
+                                        <TableCell colSpan={8} className="text-center">Cargando plazas...</TableCell>
                                     </TableRow>
                                 ) : plazasEmpresa.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center">
-                                            No hay plazas disponibles
-                                        </TableCell>
+                                        <TableCell colSpan={8} className="text-center">No hay plazas disponibles</TableCell>
                                     </TableRow>
                                 ) : (
                                     plazasEmpresa.map((plaza) => (
                                         <TableRow key={plaza.id}>
                                             <TableCell className="font-medium">{plaza.titulo}</TableCell>
                                             <TableCell>{plaza.area}</TableCell>
-                                            <TableCell>{new Date(plaza.fechaPublicacion).toLocaleDateString()}</TableCell>
-                                            <TableCell>{new Date(plaza.fechaExpiracion).toLocaleDateString()}</TableCell>
+                                            <TableCell>{plaza.modalidad}</TableCell>
+                                            <TableCell>{plaza.locacion}</TableCell>
                                             <TableCell>
-                                                <Badge
-                                                    variant={
-                                                        plaza.estado === "activa"
-                                                            ? "default"
-                                                            : plaza.estado === "pendiente"
-                                                                ? "outline"
-                                                                : "secondary"
-                                                    }
-                                                >
-                                                    {plaza.estado === "activa"
-                                                        ? "Activa"
-                                                        : plaza.estado === "pendiente"
-                                                            ? "Pendiente"
-                                                            : "Cerrada"}
+                                                {plaza.salario ? `S./${Number(plaza.salario).toLocaleString()}` : "-"}
+                                            </TableCell>
+                                            <TableCell>{plaza.vacantes}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={
+                                                    plaza.estadoPubli === "PUBLICADA"
+                                                        ? "default"
+                                                        : plaza.estadoPubli === "NO_PUBLICADA"
+                                                            ? "destructive"
+                                                            : "outline"
+                                                }>
+                                                    {plaza.estadoPubli}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell>{plaza.aplicaciones}</TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
@@ -152,9 +181,6 @@ export default function EmpresaPortal() {
                                                         <DropdownMenuItem>Ver detalles</DropdownMenuItem>
                                                         <DropdownMenuItem>Editar</DropdownMenuItem>
                                                         <DropdownMenuItem>Ver postulantes</DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            {plaza.estado === "activa" ? "Cerrar plaza" : "Reactivar"}
-                                                        </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>
@@ -162,121 +188,90 @@ export default function EmpresaPortal() {
                                     ))
                                 )}
                             </TableBody>
+
                         </Table>
                     </CardContent>
-                    <CardFooter className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">
-                            Mostrando {plazasEmpresa.length} de {plazasEmpresa.length} plazas
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
-                                Anterior
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Siguiente
-                            </Button>
-                        </div>
-                    </CardFooter>
                 </Card>
 
-                {/* Egresados Postulados */}
+                {/* Postulaciones */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Egresados Postulados</CardTitle>
-                        <CardDescription>Visualice los egresados que han postulado a sus plazas de trabajo.</CardDescription>
+                        <CardDescription>Lista de egresados postulados a sus plazas.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-end mb-4">
-                            <Button variant="outline" size="sm">
-                                <Filter className="h-4 w-4 mr-2" />
-                                Filtrar
-                            </Button>
-                        </div>
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Egresado</TableHead>
                                     <TableHead>Plaza</TableHead>
-                                    <TableHead>Fecha de Postulación</TableHead>
+                                    <TableHead>Fecha</TableHead>
                                     <TableHead>Habilidades</TableHead>
                                     <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback>JD</AvatarFallback>
-                                            </Avatar>
-                                            Juan Díaz
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>Desarrollador Frontend</TableCell>
-                                    <TableCell>12/03/2025</TableCell>
-                                    <TableCell>
-                                        <div className="flex flex-wrap gap-1">
-                                            <Badge variant="outline" className="text-xs">
-                                                React
-                                            </Badge>
-                                            <Badge variant="outline" className="text-xs">
-                                                TypeScript
-                                            </Badge>
-                                            <Badge variant="outline" className="text-xs">
-                                                +3 más
-                                            </Badge>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm">
-                                            Ver perfil
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarFallback>MR</AvatarFallback>
-                                            </Avatar>
-                                            María Rodríguez
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>Analista de Datos</TableCell>
-                                    <TableCell>10/03/2025</TableCell>
-                                    <TableCell>
-                                        <div className="flex flex-wrap gap-1">
-                                            <Badge variant="outline" className="text-xs">
-                                                Python
-                                            </Badge>
-                                            <Badge variant="outline" className="text-xs">
-                                                SQL
-                                            </Badge>
-                                            <Badge variant="outline" className="text-xs">
-                                                +2 más
-                                            </Badge>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm">
-                                            Ver perfil
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
+                                {postulacionesLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center">Cargando postulaciones...</TableCell>
+                                    </TableRow>
+                                ) : postulacionesError ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center text-red-500">Error al cargar postulaciones</TableCell>
+                                    </TableRow>
+                                ) : postulaciones && postulaciones.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center">No hay postulaciones</TableCell>
+                                    </TableRow>
+                                ) : (
+                                    postulaciones?.map((p) => (
+                                        <TableRow key={p.id}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Avatar className="h-8 w-8">
+                                                        {p.egresado.avatar ? (
+                                                            <AvatarImage src={p.egresado.avatar} />
+                                                        ) : (
+                                                            <AvatarFallback>
+                                                                {p.egresado.nombres?.[0]}
+                                                                {p.egresado.apellidos?.[0]}
+                                                            </AvatarFallback>
+                                                        )}
+                                                    </Avatar>
+                                                    {p.egresado.nombres} {p.egresado.apellidos}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>{p.oferta.titulo}</TableCell>
+                                            <TableCell>{new Date(p.fechaRecomendacion).toLocaleDateString()}</TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {(p.egresado.habilidades || []).slice(0, 3).map((h, i) => (
+                                                        <Badge key={i} variant="outline" className="text-xs">{h}</Badge>
+                                                    ))}
+                                                    {(p.egresado.habilidades?.length || 0) > 3 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            +{p.egresado.habilidades.length - 3} más
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => router.push(`/egresado/${p.egresado.id}`)}
+                                                >
+                                                    Ver perfil
+                                                </Button>
+
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
                             </TableBody>
+
                         </Table>
                     </CardContent>
-                    <CardFooter className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">Mostrando 2 de 2 postulantes</p>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
-                                Anterior
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Siguiente
-                            </Button>
-                        </div>
-                    </CardFooter>
                 </Card>
             </main>
 

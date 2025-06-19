@@ -45,6 +45,10 @@ class OfertaRepositorySQL(OfertaRepository):
             self.db.commit()
             return True
         return False
+    
+    def obtener_ofertas_por_empresa(self, id_empresa: int) -> List[OfertaDomain]:
+        ofertas = self.db.query(OfertaORM).filter(OfertaORM.idEmpresa == id_empresa).all()
+        return [self._to_domain(o) for o in ofertas] if ofertas else []
 
     # -------------------- 🔄 Mappers --------------------
 

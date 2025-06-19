@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
+import { jwtDecode } from "jwt-decode"
 
 export default function EgresadoDetallePage() {
     const params = useParams()
@@ -23,10 +24,28 @@ export default function EgresadoDetallePage() {
     const [loading, setLoading] = useState(true)
     const [egresado, setEgresado] = useState<any | null>(null)
 
+    const [rol, setRol] = useState<number | null>(null)
+
     useEffect(() => {
         const load = async () => {
             const id = Number(params.id)
             if (isNaN(id)) return router.push("/not-found")
+
+            if (typeof window !== "undefined") {
+                const token = localStorage.getItem("token")
+                if (token) {
+                    try {
+                        interface DecodedToken {
+                            role: number
+                            [key: string]: any
+                        }
+                        const decoded = jwtDecode<DecodedToken>(token)
+                        setRol(decoded.role)
+                    } catch (err) {
+                        console.error("Error decodificando token:", err)
+                    }
+                }
+            }
 
             try {
                 const data = await fetchEgresado(id)
@@ -39,6 +58,8 @@ export default function EgresadoDetallePage() {
         }
         load()
     }, [params.id, router])
+
+    console.log(rol)
 
     const formatDate = (str: string) => format(new Date(str), "dd 'de' MMMM 'de' yyyy", { locale: es })
     const getInitials = () => `${egresado?.nombres[0]}${egresado?.apellidos[0]}`
@@ -199,10 +220,14 @@ export default function EgresadoDetallePage() {
                     </Tabs>
 
                     <div className="mt-6">
-                        <Button variant="outline" onClick={() => router.push("/admin")}>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push(rol == 2 ? "/empresa" : "/admin")}
+                        >
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Volver
                         </Button>
+
                     </div>
                 </div>
             </div>
