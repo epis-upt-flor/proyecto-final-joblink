@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import not_
 from typing import List, Optional
 from app.domain.models.postulacion import Postulacion
 from app.domain.models.enum import EstadoPostulacion
 from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
 from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
-
+from app.infrastructure.orm_models.oferta_orm import OfertaORM
 
 class PostulacionRepositorySQL(PostulacionRepository):
     def __init__(self, db: Session):
@@ -30,11 +31,11 @@ class PostulacionRepositorySQL(PostulacionRepository):
             PostulacionORM.id == postulacion.id).first()
         if not orm:
             return None
-        orm.idOferta          = postulacion.idOferta
-        orm.idEgresado        = postulacion.idEgresado
-        orm.fechaRecomendacion= postulacion.fechaRecomendacion
-        orm.posicionRanking   = postulacion.posicionRanking
-        orm.estado            = postulacion.estado.value
+        orm.idOferta = postulacion.idOferta
+        orm.idEgresado = postulacion.idEgresado
+        orm.fechaRecomendacion = postulacion.fechaRecomendacion
+        orm.posicionRanking = postulacion.posicionRanking
+        orm.estado = postulacion.estado.value
         self.db.commit()
         self.db.refresh(orm)
         return self._to_domain(orm)
@@ -73,9 +74,7 @@ class PostulacionRepositorySQL(PostulacionRepository):
 
         return resultado
 
-
     def obtener_postulaciones_por_empresa(self, id_empresa: int) -> List[PostulacionORM]:
-        from app.infrastructure.orm_models.oferta_orm import OfertaORM
 
         ofertas_ids = self.db.query(OfertaORM.id).filter(
             OfertaORM.idEmpresa == id_empresa
@@ -88,12 +87,15 @@ class PostulacionRepositorySQL(PostulacionRepository):
                 joinedload(PostulacionORM.egresado),
                 joinedload(PostulacionORM.oferta).joinedload(OfertaORM.empresa)
             )
-            .filter(PostulacionORM.idOferta.in_(ids))
+            .filter(
+                PostulacionORM.idOferta.in_(ids),
+                PostulacionORM.estado.notin_(
+                    ["APROBADA", "RECHAZADA", "DESCARTADO"])
+            )
             .all()
         )
 
         return postulaciones
-
 
     def _to_orm(self, postulacion: Postulacion) -> PostulacionORM:
         return PostulacionORM(

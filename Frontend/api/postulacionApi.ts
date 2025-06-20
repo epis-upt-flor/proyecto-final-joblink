@@ -24,8 +24,8 @@ export interface Postulacion {
 
     egresado: {
         id: number
-        nombre: string
-        apellido: string
+        nombres: string
+        apellidos: string
         correo: string
         telefono?: string
         habilidades: string[]

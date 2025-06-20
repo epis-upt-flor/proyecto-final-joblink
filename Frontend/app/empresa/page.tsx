@@ -7,6 +7,8 @@ import { useOfertas, useOfertasPorEmpresa } from "@/hooks/useOfertas"
 import { usePostulacionesEmpresa } from "@/hooks/usePostulaciones"
 import { jwtDecode } from "jwt-decode"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { usePostulacionActions } from "@/hooks/usePostulacionesActions"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,9 +21,9 @@ import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 
 export default function EmpresaPortal() {
     const router = useRouter()
-
     const [empresaId, setEmpresaId] = useState<number | null>(null)
     const [ready, setReady] = useState(false)
+
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -71,7 +73,7 @@ export default function EmpresaPortal() {
         window.location.reload()
     }
 
-    console.log("postulaciones", postulaciones)
+    const { aprobar, rechazar } = usePostulacionActions(empresaId ?? 0)
 
     return (
         <div className="min-h-screen bg-muted/40">
@@ -278,17 +280,21 @@ export default function EmpresaPortal() {
                                                     <Button
                                                         variant="default"
                                                         size="sm"
-                                                        onClick={() => alert(`Aceptar postulación ${p.id}`)}
+                                                        onClick={() => aprobar.mutate(p.id)}
+                                                        disabled={aprobar.isPending}
                                                     >
-                                                        Aceptar
+                                                        {aprobar.isPending ? "Aceptando..." : "Aceptar"}
                                                     </Button>
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        onClick={() => alert(`Rechazar postulación ${p.id}`)}
+                                                        onClick={() => rechazar.mutate(p.id)}
+                                                        disabled={rechazar.isPending}
                                                     >
-                                                        Rechazar
+                                                        {rechazar.isPending ? "Rechazando..." : "Rechazar"}
                                                     </Button>
+
+
                                                 </div>
                                             </TableCell>
 

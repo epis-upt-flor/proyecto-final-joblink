@@ -22,6 +22,8 @@ class EstadoPostulacion(str, Enum):
     RECOMENDADO = "RECOMENDADO"
     POSTULADO = "POSTULADO"
     DESCARTADO = "DESCARTADO"
+    APROBADA = "APROBADA"
+    RECHAZADA = "RECHAZADA"
 
 
 class EstadoContrato(str, Enum):

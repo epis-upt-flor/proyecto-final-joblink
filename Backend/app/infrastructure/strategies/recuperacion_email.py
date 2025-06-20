@@ -7,7 +7,7 @@ import os
 class RecuperacionEmail(IEmailSender):
     def send(self, to: str, token: str):
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
-        recovery_link = f"{frontend_url}/recuperar?token={token}"
+        recovery_link = f"{frontend_url}/auth/recuperar?token={token}"
 
         msg = EmailMessage()
         msg["Subject"] = "Recuperación de contraseña - LinkJob"

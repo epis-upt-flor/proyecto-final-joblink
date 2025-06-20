@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import HTTPException
 from app.domain.interfaces.internal.contrato_usecase import ContratoUseCase
 from app.domain.models.contrato import Contrato
-from app.domain.models.enum import EstadoPostulacion
+from app.domain.models.enum import EstadoContrato, EstadoPostulacion
 from app.domain.models.postulacion import Postulacion
 from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
 from app.domain.interfaces.internal.postulacion_usecase import PostulacionUseCase
@@ -62,7 +62,7 @@ class PostulacionService(PostulacionUseCase):
             id=None,
             idOfertaEgresado=id,
             fechaFin=date.today().replace(year=date.today().year + 1),
-            estado="VIGENTE"
+            estado=EstadoContrato.VIGENTE
         )
         self.contrato_service.registrar_contrato(contrato)
 
