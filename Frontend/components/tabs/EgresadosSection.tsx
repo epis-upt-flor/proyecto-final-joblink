@@ -112,9 +112,7 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem asChild>
-                                                    <a href={egresado.cv} target="_blank" rel="noopener noreferrer">Ver CV</a>
-                                                </DropdownMenuItem>
+                                               
                                                 <DropdownMenuItem onClick={() => handleVerDetalle(egresado.id)}>
                                                     Ver perfil completo
                                                 </DropdownMenuItem>

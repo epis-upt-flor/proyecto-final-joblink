@@ -24,14 +24,11 @@ export default function EmpresaDetallePage() {
         const getEmpresa = async () => {
             try {
                 const id = Number(params.id)
-                console.log("ID a buscar:", id)
 
                 const data = await fetchEmpresa(id)
-                console.log("Empresa encontrada:", data)
 
                 setEmpresa(data)
             } catch (error) {
-                console.error("Error en fetchEmpresa:", error)
                 toast({
                     title: "Error",
                     description: "Empresa no encontrada",

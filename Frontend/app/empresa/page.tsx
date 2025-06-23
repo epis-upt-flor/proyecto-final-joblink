@@ -9,6 +9,7 @@ import { jwtDecode } from "jwt-decode"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { usePostulacionActions } from "@/hooks/usePostulacionesActions"
+import { EditarEmpresaModal } from "@/components/modals/editarEmpresaModal"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,8 +24,12 @@ export default function EmpresaPortal() {
     const router = useRouter()
     const [empresaId, setEmpresaId] = useState<number | null>(null)
     const [ready, setReady] = useState(false)
+    const [editarModalOpen, setEditarModalOpen] = useState(false)
 
 
+    const handleVerDetalle = (id: number) => {
+        router.push(`/oferta/${id}`);
+    };
     useEffect(() => {
         if (typeof window !== "undefined") {
             const token = localStorage.getItem("token")
@@ -43,7 +48,10 @@ export default function EmpresaPortal() {
     type Empresa = {
         id: number
         nombre: string
+        ruc: string
+        telefono: string
         logo?: string
+        estado: boolean
     }
 
     const { data: empresa } = useEmpresa(empresaId!) as { data: Empresa | undefined }
@@ -103,8 +111,14 @@ export default function EmpresaPortal() {
 
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={handleLogout}>Cerrar sesión</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setEditarModalOpen(true)}>
+                                Editar empresa
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleLogout}>
+                                Cerrar sesión
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
+
                     </DropdownMenu>
                 </div>
             </header>
@@ -118,10 +132,6 @@ export default function EmpresaPortal() {
                         </p>
                     </div>
                     <div className="flex items-center gap-2 w-full md:w-auto">
-                        <div className="relative w-full md:w-auto">
-                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input type="search" placeholder="Buscar..." className="pl-8 w-full md:w-[250px]" />
-                        </div>
                         <Button onClick={() => setPlazaModalOpen(true)}>
                             <PlusCircle className="h-4 w-4 mr-2" />
                             Publicar Plaza
@@ -182,17 +192,9 @@ export default function EmpresaPortal() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-                                                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <Button variant="outline" onClick={() => handleVerDetalle(plaza.id)}>
+                                                    Ver detalle
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -314,6 +316,18 @@ export default function EmpresaPortal() {
                 onOpenChange={setPlazaModalOpen}
                 onSuccess={() => console.log("Plaza agregada exitosamente")}
             />
+            {empresaActual && (
+                <EditarEmpresaModal
+                    open={editarModalOpen}
+                    onOpenChange={setEditarModalOpen}
+                    empresa={empresaActual}
+                    onSuccess={() => {
+                        toast.success("Empresa actualizada")
+                        window.location.reload()
+                    }}
+                />
+            )}
+
         </div>
     )
 }

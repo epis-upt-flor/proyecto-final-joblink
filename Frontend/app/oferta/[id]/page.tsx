@@ -1,5 +1,5 @@
 "use client"
-
+import { jwtDecode } from "jwt-decode"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { format } from "date-fns"
@@ -26,12 +26,28 @@ export default function OfertaDetallePage() {
     const [yaRecomendado, setYaRecomendado] = useState(false)
     const [mostrarPostulados, setMostrarPostulados] = useState(false)
     const [postulados, setPostulados] = useState<any[]>([])
+    const [rol, setRol] = useState<number | null>(null)
+
     useEffect(() => {
         const getData = async () => {
             try {
                 const id = Number(params.id)
                 if (isNaN(id)) return
-
+                if (typeof window !== "undefined") {
+                    const token = localStorage.getItem("token")
+                    if (token) {
+                        try {
+                            interface DecodedToken {
+                                role: number
+                                [key: string]: any
+                            }
+                            const decoded = jwtDecode<DecodedToken>(token)
+                            setRol(decoded.role)
+                        } catch (err) {
+                            console.error("Error al decodificar token:", err)
+                        }
+                    }
+                }
                 const fetchedOferta = await obtenerOferta(id)
                 setOferta(fetchedOferta)
 
@@ -129,7 +145,7 @@ export default function OfertaDetallePage() {
                     <Card><CardHeader><CardTitle>Beneficios</CardTitle></CardHeader><CardContent>{renderText(oferta.beneficios)}</CardContent></Card>
 
                     <div className="mt-6">
-                        <Button variant="outline" onClick={() => router.push("/admin")}>
+                        <Button variant="outline" onClick={() => router.push(rol == 2 ? "/empresa" : "/admin")}>
                             <ArrowLeft className="mr-2 h-4 w-4" /> Volver
                         </Button>
                     </div>

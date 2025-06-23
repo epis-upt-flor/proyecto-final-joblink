@@ -16,6 +16,31 @@ class EmpresaRepositorySQL(IEmpresaRepository):
         orm = self.db.query(EmpresaORM).filter(EmpresaORM.id == id).first()
         return self._to_domain(orm) if orm else None
 
+    def editar(self, empresa: Empresa) -> Optional[Empresa]:
+        orm = self.db.query(EmpresaORM).filter(EmpresaORM.id == empresa.id).first()
+        if not orm:
+            return None
+
+        ruc_existente = (
+            self.db.query(EmpresaORM)
+            .filter(EmpresaORM.ruc == empresa.ruc, EmpresaORM.id != empresa.id)
+            .first()
+        )
+        if ruc_existente:
+            raise ValueError("El RUC ya está registrado por otra empresa.")
+
+        orm.nombre = empresa.nombre
+        orm.ruc = empresa.ruc
+        orm.telefono = empresa.telefono
+        orm.logo = empresa.logo
+        orm.estado = empresa.estado
+
+        self.db.commit()
+        self.db.refresh(orm)
+
+        return self._to_domain(orm)
+
+
     def _to_domain(self, orm: EmpresaORM) -> Empresa:
         return Empresa(
             id=orm.id,

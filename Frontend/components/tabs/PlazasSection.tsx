@@ -44,9 +44,7 @@ export function PlazasSection({ plazas = [], loading, onAddPlaza }: any) {
                         </CardDescription>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                            <FileUp className="h-4 w-4 mr-2" /> Importar
-                        </Button>
+                       
                         <Button size="sm" onClick={onAddPlaza}>
                             <PlusCircle className="h-4 w-4 mr-2" /> Agregar Plaza
                         </Button>
@@ -115,7 +113,6 @@ export function PlazasSection({ plazas = [], loading, onAddPlaza }: any) {
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem>Editar</DropdownMenuItem>
-                                                <DropdownMenuItem>Desactivar</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
