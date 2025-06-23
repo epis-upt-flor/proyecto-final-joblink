@@ -18,11 +18,7 @@ export function HistorialSection({ contrataciones }: any) {
                 <CardDescription>Registro histórico de egresados contratados por empresas.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex justify-end mb-4">
-                    <Button variant="outline" size="sm">
-                        <FileText className="h-4 w-4 mr-2" /> Exportar Historial
-                    </Button>
-                </div>
+
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -31,7 +27,6 @@ export function HistorialSection({ contrataciones }: any) {
                             <TableHead>Puesto</TableHead>
                             <TableHead>Fecha de Contratación</TableHead>
                             <TableHead>Recomendado por Sistema</TableHead>
-                            <TableHead>Acciones</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -58,9 +53,7 @@ export function HistorialSection({ contrataciones }: any) {
                                             {item.recomendado ? "Sí" : "No"}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>
-                                        <Button variant="ghost" size="sm">Ver detalles</Button>
-                                    </TableCell>
+
                                 </TableRow>
                             ))
                         )}

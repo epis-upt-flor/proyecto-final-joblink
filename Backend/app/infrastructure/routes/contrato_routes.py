@@ -8,6 +8,7 @@ from app.application.services.contrato_service import ContratoService
 
 from app.infrastructure.schemas.contrato_schema import (
     ContratoCreate,
+    ContratoHistorialOut,
     ContratoUpdate,
     ContratoOut,
 )
@@ -34,9 +35,9 @@ def registrar_contrato(
     return service.registrar_contrato(contrato)
 
 
-@router.get("/", response_model=List[ContratoOut])
+@router.get("/", response_model=List[ContratoHistorialOut])
 def obtener_contratos(service: ContratoUseCase = Depends(get_service)):
-    return [ContratoOut.from_domain(c) for c in service.obtener_todos()]
+    return service.obtener_todos()
 
 
 @router.get("/{id}", response_model=ContratoOut)

@@ -4,6 +4,15 @@ from typing import Optional
 from app.domain.models.enum import EstadoContrato
 from app.domain.models.contrato import Contrato
 
+class ContratoHistorialOut(BaseModel):
+    id: int
+    fechaFin: date
+    estado: str
+    nombreEgresado: str
+    iniciales: str
+    empresa: str
+    puesto: str
+    recomendado: bool
 
 class ContratoBase(BaseModel):
     idOfertaEgresado: int

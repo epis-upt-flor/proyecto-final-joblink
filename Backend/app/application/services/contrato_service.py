@@ -13,7 +13,7 @@ class ContratoService(ContratoUseCase):
     def registrar_contrato(self, contrato: Contrato) -> Contrato:
         return self.repository.registrar_contrato(contrato)
 
-    def obtener_todos(self) -> List[Contrato]:
+    def obtener_todos(self) -> List[dict]:
         return self.repository.obtener_contratos()
 
     def obtener_por_id(self, id: int) -> Optional[Contrato]:

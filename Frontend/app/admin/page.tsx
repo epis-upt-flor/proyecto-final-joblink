@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
+import { useContrataciones } from "@/hooks/useHistorial"
 import { useEgresados } from "@/hooks/useEgresados"
 import { useOfertas } from "@/hooks/useOfertas"
 import { useEmpresas } from "@/hooks/useEmpresas"
@@ -26,7 +26,7 @@ import { toast } from "sonner"
 export default function AdminDashboard() {
   const { data: egresados, isLoading: egresadosLoading } = useEgresados()
   const { data: plazas, isLoading: plazasLoading, error } = useOfertas()
-
+  const { data: contratacionesRaw, isLoading: historialLoading } = useContrataciones()
   const { data: empresas, isLoading: empresasLoading } = useEmpresas()
 
   const [egresadoModalOpen, setEgresadoModalOpen] = useState(false)
@@ -65,17 +65,23 @@ export default function AdminDashboard() {
     })
   }
 
-  const contrataciones = [
-    { iniciales: "AM", nombre: "Ana Martínez", empresa: "DataInsights", puesto: "Científica de Datos", fecha: "10/01/2025", recomendado: true },
-    { iniciales: "PR", nombre: "Pedro Ramírez", empresa: "TechSolutions", puesto: "Desarrollador Frontend", fecha: "05/12/2024", recomendado: true },
-    { iniciales: "MG", nombre: "María Gómez", empresa: "CloudServices", puesto: "Ingeniera DevOps", fecha: "15/11/2024", recomendado: false },
-  ]
+  const contrataciones = (contratacionesRaw || []).map((c: any) => ({
+    iniciales: c.nombreEgresado?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "EG",
+    nombre: c.nombreEgresado || "Egresado",
+    empresa: c.nombreEmpresa || "Empresa",
+    puesto: c.puesto || "Puesto no definido",
+    fecha: new Date(c.fechaFin).toLocaleDateString("es-PE"),
+    recomendado: c.recomendado ?? true,
+  }))
+
   const toggleTheme = () => {
     const current = localStorage.getItem("theme")
     const newTheme = current === "dark" ? "light" : "dark"
     localStorage.setItem("theme", newTheme)
     window.location.reload()
   }
+
+  console.log(contratacionesRaw)
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -146,8 +152,13 @@ export default function AdminDashboard() {
 
 
             <TabsContent value="historial">
-              <HistorialSection contrataciones={contrataciones} />
+              {historialLoading ? (
+                <p className="text-muted-foreground">Cargando historial...</p>
+              ) : (
+                <HistorialSection contrataciones={contrataciones} />
+              )}
             </TabsContent>
+
 
             <TabsContent value="reportes">
               <ReportesSection />

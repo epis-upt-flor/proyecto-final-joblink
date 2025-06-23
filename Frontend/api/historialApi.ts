@@ -18,7 +18,7 @@ export type ContratacionInput = Omit<Contratacion, "id" | "egresado" | "empresa"
 }
 
 export async function fetchContrataciones(): Promise<Contratacion[]> {
-  const res = await fetch(`${API_URL}/contrataciones/`)
+  const res = await fetch(`${API_URL}/contratos`)
   if (!res.ok) throw new Error("Error al cargar contrataciones")
   return res.json()
 }
@@ -39,14 +39,12 @@ export async function crearContratacion(data: ContratacionInput): Promise<Contra
   return res.json()
 }
 
-// Obtener estadísticas de contrataciones
 export async function fetchEstadisticasContrataciones(): Promise<any> {
   const res = await fetch(`${API_URL}/contrataciones/estadisticas`)
   if (!res.ok) throw new Error("Error al cargar estadísticas")
   return res.json()
 }
 
-// Exportar historial de contrataciones
 export async function exportarHistorialContrataciones(): Promise<Blob> {
   const res = await fetch(`${API_URL}/contrataciones/exportar`)
   if (!res.ok) throw new Error("Error al exportar historial")

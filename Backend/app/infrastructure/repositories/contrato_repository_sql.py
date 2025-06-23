@@ -1,4 +1,6 @@
-from sqlalchemy.orm import Session
+from app.infrastructure.orm_models.oferta_orm import OfertaORM
+from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+from sqlalchemy.orm import Session,joinedload
 from typing import List, Optional
 from app.domain.models.contrato import Contrato
 from app.domain.interfaces.external.contrato_repository import ContratoRepository
@@ -16,9 +18,38 @@ class ContratoRepositorySQL(ContratoRepository):
         self.db.refresh(orm)
         return self._to_domain(orm)
 
-    def obtener_contratos(self) -> List[Contrato]:
-        contratos = self.db.query(ContratoORM).all()
-        return [self._to_domain(c) for c in contratos]
+    def obtener_contratos(self) -> List[dict]:
+        contratos = (
+            self.db.query(ContratoORM)
+            .options(
+                joinedload(ContratoORM.postulacion)
+                .joinedload(PostulacionORM.egresado),
+                
+                joinedload(ContratoORM.postulacion)
+                .joinedload(PostulacionORM.oferta)
+                .joinedload(OfertaORM.empresa)
+            )
+            .all()
+        )
+
+        resultado = []
+        for contrato in contratos:
+            postulacion = contrato.postulacion
+            egresado = postulacion.egresado if postulacion else None
+            oferta = postulacion.oferta if postulacion else None
+            empresa = oferta.empresa if oferta else None
+
+            resultado.append({
+                "id": contrato.id,
+                "fechaFin": contrato.fechaFin,
+                "estado": contrato.estado,
+                "nombreEgresado": f"{egresado.nombres} {egresado.apellidos}" if egresado else None,
+                "iniciales": f"{egresado.nombres[0]}{egresado.apellidos[0]}" if egresado else "",
+                "empresa": empresa.nombre if empresa else None,
+                "puesto": oferta.titulo if oferta else None,
+                "recomendado": True
+            })
+        return resultado
 
     def obtener_contrato_por_id(self, id: int) -> Optional[Contrato]:
         orm = self.db.query(ContratoORM).filter(ContratoORM.id == id).first()
