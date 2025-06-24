@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
@@ -53,8 +54,17 @@ def actualizar_egresado(
     egresado_in: EgresadoUpdate,
     service: EgresadoUseCase = Depends(get_service)
 ):
-    egresado = Egresado(id=id, **egresado_in.model_dump())
-    return service.actualizar_egresado(egresado)
+    update_data = egresado_in.to_update_dict()
+
+    campos_prohibidos = {
+        "nombres", "habilidades", "logrosAcademicos",
+        "certificados", "experienciaLaboral", "idiomas"
+    }
+    for campo in update_data:
+        if campo in campos_prohibidos:
+            raise HTTPException(status_code=400, detail=f"No se permite editar el campo '{campo}'")
+
+    return service.actualizar_egresado(id=id, cambios=update_data)
 
 
 @router.delete("/{id}", response_model=dict)

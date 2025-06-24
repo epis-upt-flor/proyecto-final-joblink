@@ -18,7 +18,7 @@ export type ContratacionInput = Omit<Contratacion, "id" | "egresado" | "empresa"
 }
 
 export async function fetchContrataciones(): Promise<Contratacion[]> {
-  const res = await fetch(`${API_URL}/contratos`)
+  const res = await fetch(`${API_URL}/contratos/`)
   if (!res.ok) throw new Error("Error al cargar contrataciones")
   return res.json()
 }

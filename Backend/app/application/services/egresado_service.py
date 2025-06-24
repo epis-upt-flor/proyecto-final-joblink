@@ -37,11 +37,26 @@ class EgresadoService(EgresadoUseCase):
                 status_code=404, detail=self.EGRESADO_NOT_FOUND)
         return egresado
 
-    def actualizar_egresado(self, egresado: Egresado) -> Optional[Egresado]:
+    def actualizar_egresado(self, id: int, cambios: dict) -> Optional[Egresado]:
+        egresado = self.repository.obtener_egresado_por_id(id)
+        if not egresado:
+            raise HTTPException(status_code=404, detail=self.EGRESADO_NOT_FOUND)
+
+        campos_prohibidos = {
+            "nombres", "habilidades", "logrosAcademicos",
+            "certificados", "experienciaLaboral", "idiomas"
+        }
+        for campo in cambios:
+            if campo in campos_prohibidos:
+                raise HTTPException(
+                    status_code=400, detail=f"No se permite editar el campo '{campo}'")
+
+        for campo, valor in cambios.items():
+            setattr(egresado, campo, valor)
+
         actualizado = self.repository.actualizar_egresado(egresado)
         if not actualizado:
-            raise HTTPException(
-                status_code=404, detail=self.EGRESADO_NOT_FOUND)
+            raise HTTPException(status_code=404, detail=self.EGRESADO_NOT_FOUND)
         return actualizado
 
     def eliminar_egresado(self, id: int) -> bool:

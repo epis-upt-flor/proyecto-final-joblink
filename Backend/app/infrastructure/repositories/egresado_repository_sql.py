@@ -25,12 +25,20 @@ class EgresadoRepositorySQL(EgresadoRepository):
         return self._to_domain(orm) if orm else None
 
     def actualizar_egresado(self, egresado: EgresadoDomain) -> Optional[EgresadoDomain]:
-        orm = self.db.query(EgresadoORM).filter(
-            EgresadoORM.id == egresado.id).first()
+        orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == egresado.id).first()
         if not orm:
             return None
-        updated = self._to_orm(egresado)
-        self._update_fields(orm, updated)
+        
+        campos_editables = [
+            "apellidos", "tipoDoc", "numDoc", "email", "telefono",
+            "direccion", "nacionalidad", "fechaNacimiento",
+            "linkedin", "github", "cv", "disponibilidad"
+        ]
+
+        for campo in campos_editables:
+            if hasattr(egresado, campo):
+                setattr(orm, campo, getattr(egresado, campo))
+
         self.db.commit()
         self.db.refresh(orm)
         return self._to_domain(orm)

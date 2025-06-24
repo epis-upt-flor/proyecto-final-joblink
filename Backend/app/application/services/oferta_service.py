@@ -39,6 +39,15 @@ class OfertaService(OfertaUseCase):
         return oferta
 
     def actualizar(self, id: int, data: dict) -> Optional[Oferta]:
+        CAMPOS_PROHIBIDOS = {"titulo", "funciones", "requisitos", "area", "experiencia"}
+    
+        campos_modificados = set(data.keys()) & CAMPOS_PROHIBIDOS
+        if campos_modificados:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No se permite modificar los campos: {', '.join(campos_modificados)}"
+            )
+
         oferta = self.repo.actualizar(id, data)
         if not oferta:
             raise HTTPException(status_code=404, detail=self.OFERTA_NOT_FOUND)

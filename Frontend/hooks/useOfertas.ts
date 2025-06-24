@@ -9,6 +9,7 @@ import {
   aprobarOferta,
   rechazarOferta,
   type Oferta,
+  type OfertaUpdate,
 } from "@/api/ofertaApi"
 
 export const useOfertas = () => {
@@ -49,7 +50,7 @@ export const useActualizarOferta = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, oferta }: { id: number; oferta: Partial<Oferta> }) => actualizarOferta(id, oferta),
+    mutationFn: ({ id, oferta }: { id: number; oferta: OfertaUpdate }) => actualizarOferta(id, oferta),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["ofertas"] })
       queryClient.invalidateQueries({ queryKey: ["ofertas", variables.id] })

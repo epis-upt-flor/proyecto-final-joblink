@@ -28,6 +28,22 @@ export interface Oferta {
     logo?: string
   }
 }
+export interface OfertaUpdate {
+  tipo?: string
+  fechaCierre?: string
+  modalidad?: string
+  horario?: string
+  vacantes?: number
+  locacion?: string
+  salario?: number
+  estado?: "ACTIVA" | "CERRADA" | "PENDIENTE"
+  motivo?: string
+  beneficios?: string[]
+  fechaInicio?: string
+  tiempo?: number
+  fechaPubli?: string
+  estadoPubli?: "PUBLICADA" | "NO_PUBLICADA"
+}
 
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("token")
@@ -72,7 +88,7 @@ export async function crearOferta(oferta: Partial<Oferta>): Promise<Oferta> {
 }
 
 export async function actualizarOferta(id: number, oferta: Partial<Oferta>): Promise<Oferta> {
-  const res = await fetch(`${API_URL}/ofertas/${id}/`, {
+  const res = await fetch(`${API_URL}/ofertas/${id}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(oferta),

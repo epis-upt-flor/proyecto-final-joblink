@@ -54,7 +54,22 @@ class OfertaUpdate(BaseModel):
     tiempo: Optional[int]
     fechaPubli: Optional[date]
     estadoPubli: Optional[EstadoPubli]
-
+    
+class OfertaUpdateSegura(BaseModel):
+    tipo: Optional[str]
+    fechaCierre: Optional[date]
+    modalidad: Optional[str]
+    horario: Optional[str]
+    vacantes: Optional[int]
+    locacion: Optional[str]
+    salario: Optional[float]
+    estado: Optional[EstadoOferta]
+    motivo: Optional[str]
+    beneficios: Optional[List[str]]
+    fechaInicio: Optional[date]
+    tiempo: Optional[int]
+    fechaPubli: Optional[date]
+    estadoPubli: Optional[EstadoPubli]
 
 class OfertaOut(OfertaCreate):
     id: int

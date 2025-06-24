@@ -13,6 +13,7 @@ from app.infrastructure.schemas.oferta_schema import (
     OfertaCreate,
     OfertaUpdate,
     OfertaOut,
+    OfertaUpdateSegura
 )
 
 router = APIRouter(prefix="/ofertas", tags=["Ofertas"])
@@ -50,10 +51,11 @@ def obtener_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)
 @router.put("/{id}", response_model=OfertaOut)
 def actualizar_oferta(
     id: int,
-    payload: OfertaUpdate,
+    payload: OfertaUpdateSegura,
     service: OfertaUseCase = Depends(get_oferta_service)
 ):
-    return service.actualizar(id, payload)
+    return service.actualizar(id, payload.model_dump(exclude_unset=True))
+
 
 
 @router.delete("/{id}", response_model=dict)
