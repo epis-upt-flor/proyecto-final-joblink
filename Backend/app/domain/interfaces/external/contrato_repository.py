@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.domain.models.contrato import Contrato
 
 class ContratoRepository(ABC):
@@ -17,3 +17,7 @@ class ContratoRepository(ABC):
 
     @abstractmethod
     def eliminar_contrato(self, id: int) -> bool: ...
+
+    @abstractmethod
+    def obtener_contratos_por_egresado(self) -> List[Dict]:
+        pass

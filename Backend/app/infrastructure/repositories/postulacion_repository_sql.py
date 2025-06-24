@@ -6,6 +6,8 @@ from app.domain.models.enum import EstadoPostulacion
 from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
 from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
 from app.infrastructure.orm_models.oferta_orm import OfertaORM
+from sqlalchemy import func
+
 
 class PostulacionRepositorySQL(PostulacionRepository):
     def __init__(self, db: Session):
@@ -96,7 +98,15 @@ class PostulacionRepositorySQL(PostulacionRepository):
         )
 
         return postulaciones
-
+    
+    def obtener_postulaciones_por_egresado(self):
+        resultados = (
+            self.db.query(PostulacionORM.idEgresado, func.count().label("total"))
+            .group_by(PostulacionORM.idEgresado)
+            .all()
+        )
+        return [{"egresado_id": r[0], "total": r[1]} for r in resultados]
+    
     def _to_orm(self, postulacion: Postulacion) -> PostulacionORM:
         return PostulacionORM(
             id=postulacion.id,

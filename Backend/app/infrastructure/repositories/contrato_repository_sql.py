@@ -5,6 +5,7 @@ from typing import List, Optional
 from app.domain.models.contrato import Contrato
 from app.domain.interfaces.external.contrato_repository import ContratoRepository
 from app.infrastructure.orm_models.contrato_orm import ContratoORM
+from sqlalchemy import func
 
 
 class ContratoRepositorySQL(ContratoRepository):
@@ -73,7 +74,16 @@ class ContratoRepositorySQL(ContratoRepository):
             self.db.commit()
             return True
         return False
-
+    
+    def obtener_contratos_por_egresado(self):
+        resultados = (
+            self.db.query(PostulacionORM.idEgresado, func.count().label("total"))
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .group_by(PostulacionORM.idEgresado)
+            .all()
+        )
+        return [{"egresado_id": r[0], "total": r[1]} for r in resultados]
+    
     def _update_fields(self, target: ContratoORM, source: ContratoORM):
         for attr in vars(source):
             if not attr.startswith("_") and hasattr(target, attr) and attr != "id":

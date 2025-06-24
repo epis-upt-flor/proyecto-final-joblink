@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.domain.models.egresado import Egresado as EgresadoDomain
 from app.domain.interfaces.external.egresado_repository import EgresadoRepository
 from app.infrastructure.orm_models.egresado_orm import EgresadoORM
@@ -23,6 +23,14 @@ class EgresadoRepositorySQL(EgresadoRepository):
     def obtener_egresado_por_id(self, id: int) -> Optional[EgresadoDomain]:
         orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == id).first()
         return self._to_domain(orm) if orm else None
+    
+    def obtener_nombres_por_ids(self, ids: List[int]) -> List[Dict]:
+        egresados = (
+            self.db.query(EgresadoORM.id, EgresadoORM.nombres, EgresadoORM.apellidos)
+            .filter(EgresadoORM.id.in_(ids))
+            .all()
+        )
+        return [{"id": e.id, "nombres": e.nombres, "apellidos": e.apellidos} for e in egresados]
 
     def actualizar_egresado(self, egresado: EgresadoDomain) -> Optional[EgresadoDomain]:
         orm = self.db.query(EgresadoORM).filter(EgresadoORM.id == egresado.id).first()

@@ -1,4 +1,4 @@
-from app.infrastructure.routes import auth_routes, egresado_routes, empresa_routes, oferta_routes, recuperacion_routes, postulacion_routes, contrato_routes, recomendador_routes
+from app.infrastructure.routes import reporte_routes, auth_routes, egresado_routes, empresa_routes, oferta_routes, recuperacion_routes, postulacion_routes, contrato_routes, recomendador_routes
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,7 +20,7 @@ app.add_middleware(
 async def ignore_favicon():
     return Response(status_code=204)
 
-# app.include_router(usuario_routes.router, prefix="/api")
+app.include_router(reporte_routes.router, prefix="/api")
 app.include_router(auth_routes.router, prefix="/api")
 app.include_router(empresa_routes.router, prefix="/api")
 app.include_router(egresado_routes.router, prefix="/api")

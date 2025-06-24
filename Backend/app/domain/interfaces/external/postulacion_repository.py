@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.domain.models.postulacion import Postulacion
 
 
@@ -28,3 +28,7 @@ class PostulacionRepository(ABC):
     @abstractmethod
     def obtener_postulaciones_por_empresa(
         self, id_empresa: int) -> List[Postulacion]: ...
+
+    @abstractmethod
+    def obtener_postulaciones_por_egresado(self) -> List[Dict]:
+        pass
