@@ -11,8 +11,12 @@ import {
   useRankingEgresados
 } from "@/hooks/useReportes"
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  PieChart, Pie, Cell,
+  LineChart, Line
 } from 'recharts'
+
+const COLORS = ["#22c55e", "#3b82f6", "#a855f7", "#f59e0b", "#10b981", "#6366f1"]
 
 export function ReportesSection() {
   const { data: tasaExito, isLoading: loadingExito } = useTasaExito()
@@ -30,9 +34,9 @@ export function ReportesSection() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        {/* Reporte 2: Tasa de Éxito */}
-        <div className="mt-6">
+          {/* Reporte 2: Tasa de Éxito */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Tasa de Éxito de Egresados</CardTitle>
@@ -53,10 +57,8 @@ export function ReportesSection() {
               )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* Reporte 8: Habilidades Más Comunes */}
-        <div className="mt-6">
+          {/* Reporte 8: Habilidades Más Comunes */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Habilidades Más Comunes en Egresados Contratados</CardTitle>
@@ -66,42 +68,46 @@ export function ReportesSection() {
                 <p className="text-sm text-muted-foreground">Cargando...</p>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={perfilContratados?.habilidades_top.map(([name, value]) => ({ name, value }))}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis allowDecimals={false} />
+                  <PieChart>
+                    <Pie
+                      data={perfilContratados?.habilidades_top.map(([name, value]) => ({ name, value }))}
+                      dataKey="value"
+                      nameKey="name"
+                      outerRadius={100}
+                      fill="#3b82f6"
+                      label
+                    >
+                      {perfilContratados?.habilidades_top.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
                     <Tooltip />
-                    <Bar dataKey="value" fill="#3b82f6" name="Frecuencia" />
-                  </BarChart>
+                  </PieChart>
                 </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* Reporte 10: Ranking de Egresados */}
-        <div className="mt-6">
+          {/* Reporte 10: Ranking de Egresados */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Ranking de Egresados</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ranking} layout="vertical">
+                <LineChart data={ranking}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey={(e) => `${e.nombres} ${e.apellidos}`} type="category" />
+                  <XAxis dataKey={(e) => `${e.nombres} ${e.apellidos}`} />
+                  <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="ranking_promedio" fill="#a855f7" name="Ranking" />
-                </BarChart>
+                  <Line type="monotone" dataKey="ranking_promedio" stroke="#a855f7" name="Ranking Prom." />
+                </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Reporte 6: Contrataciones por Área */}
-        <div className="mt-6">
+          {/* Reporte 6: Contrataciones por Área */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Contrataciones por Área</CardTitle>
@@ -118,10 +124,8 @@ export function ReportesSection() {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Reporte 4: Empresas con Mayor Contratación */}
-        <div className="mt-6">
+          {/* Reporte 4: Empresas con Mayor Contratación */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Empresas con Mayor Contratación</CardTitle>
@@ -144,8 +148,8 @@ export function ReportesSection() {
               )}
             </CardContent>
           </Card>
-        </div>
 
+        </div>
       </CardContent>
     </Card>
   )
