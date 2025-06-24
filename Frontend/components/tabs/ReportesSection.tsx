@@ -1,14 +1,8 @@
 "use client"
 
 import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter
+  Card, CardHeader, CardTitle, CardDescription, CardContent
 } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import {
-  Table, TableHeader, TableRow, TableHead, TableBody, TableCell
-} from "@/components/ui/table"
-import { FileText, TrendingUp } from "lucide-react"
-
 import {
   useTasaExito,
   useEmpresasConMasContratos,
@@ -16,6 +10,9 @@ import {
   usePerfilEgresadosContratados,
   useRankingEgresados
 } from "@/hooks/useReportes"
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend
+} from 'recharts'
 
 export function ReportesSection() {
   const { data: tasaExito, isLoading: loadingExito } = useTasaExito()
@@ -44,32 +41,21 @@ export function ReportesSection() {
               {loadingExito ? (
                 <p className="text-sm text-muted-foreground">Cargando...</p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nombre</TableHead>
-                      <TableHead>Postulaciones</TableHead>
-                      <TableHead>Contratos</TableHead>
-                      <TableHead>Tasa de Éxito (%)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tasaExito?.map((item) => (
-                      <TableRow key={item.egresado_id}>
-                        <TableCell>{item.nombres} {item.apellidos}</TableCell>
-                        <TableCell>{item.postulaciones}</TableCell>
-                        <TableCell>{item.contratos}</TableCell>
-                        <TableCell>{item.tasa_exito}%</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={tasaExito} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" domain={[0, 100]} />
+                    <YAxis dataKey={(e) => `${e.nombres} ${e.apellidos}`} type="category" />
+                    <Tooltip />
+                    <Bar dataKey="tasa_exito" fill="#22c55e" name="Tasa de Éxito (%)" />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Reporte 8: Perfil de Egresados Contratados */}
+        {/* Reporte 8: Habilidades Más Comunes */}
         <div className="mt-6">
           <Card>
             <CardHeader>
@@ -79,22 +65,15 @@ export function ReportesSection() {
               {cargandoPerfil ? (
                 <p className="text-sm text-muted-foreground">Cargando...</p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Habilidad</TableHead>
-                      <TableHead>Frecuencia</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {perfilContratados?.habilidades_top?.map(([habilidad, frecuencia], index) => (
-                      <TableRow key={index}>
-                        <TableCell>{habilidad}</TableCell>
-                        <TableCell>{frecuencia}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={perfilContratados?.habilidades_top.map(([name, value]) => ({ name, value }))}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#3b82f6" name="Frecuencia" />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
             </CardContent>
           </Card>
@@ -107,24 +86,16 @@ export function ReportesSection() {
               <CardTitle className="text-sm">Ranking de Egresados</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nombre</TableHead>
-                    <TableHead>Ranking Promedio</TableHead>
-                    <TableHead>Contratos</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {ranking?.map((item) => (
-                    <TableRow key={item.egresado_id}>
-                      <TableCell>{item.nombres} {item.apellidos}</TableCell>
-                      <TableCell>{item.ranking_promedio.toFixed(2)}</TableCell>
-                      <TableCell>{item.total_contratos}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={ranking} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey={(e) => `${e.nombres} ${e.apellidos}`} type="category" />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="ranking_promedio" fill="#a855f7" name="Ranking" />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
@@ -136,22 +107,15 @@ export function ReportesSection() {
               <CardTitle className="text-sm">Contrataciones por Área</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Área</TableHead>
-                    <TableHead>Total Contratos</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contratacionesArea?.map((item) => (
-                    <TableRow key={item.area}>
-                      <TableCell>{item.area}</TableCell>
-                      <TableCell>{item.total_contratos}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={contratacionesArea}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="area" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="total_contratos" fill="#f59e0b" name="Contratos" />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
@@ -166,26 +130,17 @@ export function ReportesSection() {
               {loadingEmpresas ? (
                 <p className="text-sm text-muted-foreground">Cargando...</p>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Empresa</TableHead>
-                      <TableHead>Total Contratos</TableHead>
-                      <TableHead>Promedio de Duración</TableHead>
-                      <TableHead>¿Reincide?</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {empresas?.map((e) => (
-                      <TableRow key={e.empresa_id}>
-                        <TableCell>{e.nombre}</TableCell>
-                        <TableCell>{e.total_contratos}</TableCell>
-                        <TableCell>{e.promedio_dias} días</TableCell>
-                        <TableCell>{e.reincidencia ? "Sí" : "No"}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={empresas}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="nombre" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="total_contratos" fill="#10b981" name="Contratos" />
+                    <Bar dataKey="promedio_dias" fill="#6366f1" name="Prom. Días" />
+                  </BarChart>
+                </ResponsiveContainer>
               )}
             </CardContent>
           </Card>

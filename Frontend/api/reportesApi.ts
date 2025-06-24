@@ -55,7 +55,7 @@ export async function fetchContratacionesPorArea(): Promise<any[]> {
 }
 
 export async function fetchPerfilEgresadosContratados(): Promise<PerfilEgresadoContratado> {
-  const res = await fetch("/api/reportes/perfil-egresados-contratados")
+  const res = await fetch(`${API_URL}/reportes/perfil-egresados-contratados`)
   if (!res.ok) {
     throw new Error("Error al obtener el perfil de egresados contratados")
   }

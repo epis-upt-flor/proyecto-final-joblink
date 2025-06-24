@@ -71,24 +71,43 @@ class ReporteService(ReporteUseCase):
     def perfil_egresados_contratados(self) -> Dict:
         contratados = self.contrato_repo.obtener_egresados_con_contrato()
 
+        print(f"🟡 Egresados contratados encontrados: {len(contratados)}")
+        print(f"🔍 Ejemplo de uno: {contratados[0] if contratados else 'Ninguno'}")
+
         todas_habilidades = []
         todos_idiomas = []
 
         for egresado in contratados:
-            todas_habilidades.extend([
-                h["nombre"] for h in egresado.get("habilidades", []) if isinstance(h, dict) and "nombre" in h
-            ])
-            todos_idiomas.extend([
-                i["idioma"] for i in egresado.get("idiomas", []) if isinstance(i, dict) and "idioma" in i
-            ])
+            habilidades = egresado.get("habilidades", [])
+            idiomas = egresado.get("idiomas", [])
+            
+            print(f"➡️ Habilidades crudas: {habilidades}")
+            print(f"➡️ Idiomas crudos: {idiomas}")
 
+            for h in habilidades:
+                if isinstance(h, dict) and "nombre" in h:
+                    todas_habilidades.append(h["nombre"])
+                elif isinstance(h, str):
+                    todas_habilidades.append(h)
+
+            for i in idiomas:
+                if isinstance(i, dict) and "idioma" in i:
+                    todos_idiomas.append(i["idioma"])
+                elif isinstance(i, str):
+                    todos_idiomas.append(i)
+
+        from collections import Counter
         habilidades_comunes = Counter(todas_habilidades).most_common(5)
         idiomas_comunes = Counter(todos_idiomas).most_common(5)
+
+        print(f"✅ Habilidades contadas: {habilidades_comunes}")
+        print(f"✅ Idiomas contados: {idiomas_comunes}")
 
         return {
             "habilidades_top": habilidades_comunes,
             "idiomas_top": idiomas_comunes
         }
+
 
     def ranking_egresados(self) -> List[Dict]:
         datos_ranking = self.postulacion_repo.obtener_ranking_promedio_egresados()

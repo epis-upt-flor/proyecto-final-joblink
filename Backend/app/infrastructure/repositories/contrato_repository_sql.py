@@ -111,8 +111,9 @@ class ContratoRepositorySQL(ContratoRepository):
             .all()
         )
 
+        print(f"🔍 Contratos encontrados: {len(resultados)}")
         return [{"habilidades": r.habilidades or [], "idiomas": r.idiomas or []} for r in resultados]
-    
+
     def obtener_contratos(self) -> List[dict]:
         contratos = (
             self.db.query(ContratoORM)
