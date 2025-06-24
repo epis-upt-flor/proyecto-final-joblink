@@ -2,7 +2,7 @@ from app.infrastructure.orm_models.empresa_orm import EmpresaORM
 from app.domain.models.empresa import Empresa
 from app.domain.interfaces.external.empresa_repository import IEmpresaRepository
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 class EmpresaRepositorySQL(IEmpresaRepository):
 
@@ -40,7 +40,14 @@ class EmpresaRepositorySQL(IEmpresaRepository):
 
         return self._to_domain(orm)
 
-
+    def obtener_nombres_por_ids(self, ids: List[int]) -> List[Dict]:
+        empresas = (
+            self.db.query(EmpresaORM.id, EmpresaORM.nombre)
+            .filter(EmpresaORM.id.in_(ids))
+            .all()
+        )
+        return [{"id": e.id, "nombre": e.nombre} for e in empresas]
+    
     def _to_domain(self, orm: EmpresaORM) -> Empresa:
         return Empresa(
             id=orm.id,

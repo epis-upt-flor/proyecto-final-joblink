@@ -1,7 +1,7 @@
 from app.infrastructure.orm_models.oferta_orm import OfertaORM
 from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
 from sqlalchemy.orm import Session,joinedload
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.domain.models.contrato import Contrato
 from app.domain.interfaces.external.contrato_repository import ContratoRepository
 from app.infrastructure.orm_models.contrato_orm import ContratoORM
@@ -18,7 +18,36 @@ class ContratoRepositorySQL(ContratoRepository):
         self.db.commit()
         self.db.refresh(orm)
         return self._to_domain(orm)
+    
+    def obtener_contratos_agrupados_por_empresa(self) -> List[Dict]:
+        from sqlalchemy import func, distinct
+        from app.infrastructure.orm_models.oferta_orm import OfertaORM
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
 
+        resultados = (
+            self.db.query(
+                OfertaORM.idEmpresa.label("empresa_id"),
+                func.count(ContratoORM.id).label("total_contratos"),
+                func.avg(ContratoORM.fechaFin - OfertaORM.fechaInicio).label("promedio_dias"),
+                func.count(distinct(PostulacionORM.idEgresado)).label("egresados_distintos")
+            )
+            .join(PostulacionORM, PostulacionORM.idOferta == OfertaORM.id)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .group_by(OfertaORM.idEmpresa)
+            .all()
+        )
+
+        return [
+            {
+                "empresa_id": r.empresa_id,
+                "total_contratos": r.total_contratos,
+                "promedio_dias": int(r.promedio_dias) if r.promedio_dias else 0,
+                "egresados_distintos": r.egresados_distintos
+            }
+            for r in resultados
+        ]
+        
     def obtener_contratos(self) -> List[dict]:
         contratos = (
             self.db.query(ContratoORM)

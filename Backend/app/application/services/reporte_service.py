@@ -3,6 +3,7 @@ from app.domain.interfaces.internal.reporte_usecase import ReporteUseCase
 from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
 from app.domain.interfaces.external.contrato_repository import ContratoRepository
 from app.domain.interfaces.external.egresado_repository import EgresadoRepository
+from app.domain.interfaces.external.empresa_repository import IEmpresaRepository
 
 class ReporteService(ReporteUseCase):
     def __init__(
@@ -10,10 +11,12 @@ class ReporteService(ReporteUseCase):
         postulacion_repo: PostulacionRepository,
         contrato_repo: ContratoRepository,
         egresado_repo: EgresadoRepository,
+        empresa_repo: IEmpresaRepository,
     ):
         self.postulacion_repo = postulacion_repo
         self.contrato_repo = contrato_repo
         self.egresado_repo = egresado_repo
+        self.empresa_repo = empresa_repo
 
     def tasa_exito_egresados(self) -> List[Dict]:
         postulaciones = self.postulacion_repo.obtener_postulaciones_por_egresado()
@@ -43,3 +46,20 @@ class ReporteService(ReporteUseCase):
             })
 
         return resultado
+    
+    def empresas_con_mas_contrataciones(self) -> List[Dict]:
+        datos = self.contrato_repo.obtener_contratos_agrupados_por_empresa()
+        empresa_ids = [d["empresa_id"] for d in datos]
+        nombres = self.empresa_repo.obtener_nombres_por_ids(empresa_ids)
+        nombres_dict = {e["id"]: e["nombre"] for e in nombres}
+
+        return [
+            {
+                "empresa_id": d["empresa_id"],
+                "nombre": nombres_dict.get(d["empresa_id"], "Desconocido"),
+                "total_contratos": d["total_contratos"],
+                "promedio_dias": d["promedio_dias"],
+                "reincidencia": d["egresados_distintos"] > 1
+            }
+            for d in datos
+        ]

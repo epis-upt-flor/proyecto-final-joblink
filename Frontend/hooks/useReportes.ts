@@ -7,3 +7,12 @@ export function useTasaExito() {
     queryFn: fetchTasaExito,
   })
 }
+
+import { fetchEmpresasConMasContratos, EmpresaContratacion } from "@/api/reportesApi"
+
+export function useEmpresasConMasContratos() {
+  return useQuery<EmpresaContratacion[]>({
+    queryKey: ["reportes", "empresas"],
+    queryFn: fetchEmpresasConMasContratos,
+  })
+}

@@ -24,3 +24,19 @@ export async function fetchTasaExito(): Promise<TasaExitoItem[]> {
   if (!res.ok) throw new Error("Error al obtener tasa de éxito")
   return res.json()
 }
+
+export interface EmpresaContratacion {
+  empresa_id: number
+  nombre: string
+  total_contratos: number
+  promedio_dias: number
+  reincidencia: boolean
+}
+
+export async function fetchEmpresasConMasContratos(): Promise<EmpresaContratacion[]> {
+  const res = await fetch(`${API_URL}/reportes/empresas-contrataciones`, {
+    headers: getAuthHeaders(),
+  })
+  if (!res.ok) throw new Error("Error al obtener reporte de empresas")
+  return res.json()
+}
