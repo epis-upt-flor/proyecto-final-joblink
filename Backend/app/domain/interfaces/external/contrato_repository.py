@@ -25,3 +25,11 @@ class ContratoRepository(ABC):
     @abstractmethod
     def obtener_contratos_agrupados_por_empresa(self) -> List[Dict]:
         pass
+    
+    @abstractmethod
+    def obtener_contratos_por_area_y_fecha(self) -> List[Dict]:
+        pass
+
+    @abstractmethod
+    def obtener_egresados_con_contrato(self) -> List[Dict]:
+        pass

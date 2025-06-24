@@ -32,3 +32,11 @@ class PostulacionRepository(ABC):
     @abstractmethod
     def obtener_postulaciones_por_egresado(self) -> List[Dict]:
         pass
+    
+    @abstractmethod
+    def obtener_ranking_promedio_egresados(self) -> List[Dict]:
+        pass
+    
+    @abstractmethod
+    def obtener_egresados_con_contrato(self) -> List[Dict]:
+        pass

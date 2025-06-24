@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import not_
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.domain.models.postulacion import Postulacion
 from app.domain.models.enum import EstadoPostulacion
 from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
 from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
 from app.infrastructure.orm_models.oferta_orm import OfertaORM
+from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
 from sqlalchemy import func
 
 
@@ -50,6 +52,47 @@ class PostulacionRepositorySQL(PostulacionRepository):
             self.db.commit()
             return True
         return False
+    
+    def obtener_egresados_con_contrato(self) -> List[int]:
+        from sqlalchemy import distinct
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+
+        subquery = (
+            self.db.query(PostulacionORM.idEgresado)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .distinct()
+            .all()
+        )
+        return [row[0] for row in subquery]
+
+    def obtener_ranking_promedio_egresados(self) -> List[Dict]:
+        from sqlalchemy import func
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+        resultados = (
+            self.db.query(
+                PostulacionORM.idEgresado.label("egresado_id"),
+                func.avg(PostulacionORM.posicionRanking).label("ranking_promedio"),
+                func.count(ContratoORM.id).label("total_contratos")
+            )
+            .outerjoin(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .filter(PostulacionORM.posicionRanking != None)
+            .group_by(PostulacionORM.idEgresado)
+            .order_by(func.avg(PostulacionORM.posicionRanking))
+            .all()
+        )
+
+        return [
+            {
+                "egresado_id": r.egresado_id,
+                "ranking_promedio": round(r.ranking_promedio, 2),
+                "total_contratos": r.total_contratos
+            }
+            for r in resultados
+        ]
+
 
     def obtener_postulaciones_por_oferta(self, id_oferta: int) -> List[dict]:
         postulaciones = (

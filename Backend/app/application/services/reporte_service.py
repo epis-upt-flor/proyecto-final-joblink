@@ -4,6 +4,7 @@ from app.domain.interfaces.external.postulacion_repository import PostulacionRep
 from app.domain.interfaces.external.contrato_repository import ContratoRepository
 from app.domain.interfaces.external.egresado_repository import EgresadoRepository
 from app.domain.interfaces.external.empresa_repository import IEmpresaRepository
+from collections import Counter
 
 class ReporteService(ReporteUseCase):
     def __init__(
@@ -46,7 +47,7 @@ class ReporteService(ReporteUseCase):
             })
 
         return resultado
-    
+
     def empresas_con_mas_contrataciones(self) -> List[Dict]:
         datos = self.contrato_repo.obtener_contratos_agrupados_por_empresa()
         empresa_ids = [d["empresa_id"] for d in datos]
@@ -63,3 +64,51 @@ class ReporteService(ReporteUseCase):
             }
             for d in datos
         ]
+        
+    def tendencias_contratacion_por_area(self) -> List[Dict]:
+        return self.contrato_repo.obtener_contratos_por_area_y_fecha()
+
+    def perfil_egresados_contratados(self) -> Dict:
+        contratados = self.contrato_repo.obtener_egresados_con_contrato()
+
+        todas_habilidades = []
+        todos_idiomas = []
+
+        for egresado in contratados:
+            todas_habilidades.extend([
+                h["nombre"] for h in egresado.get("habilidades", []) if isinstance(h, dict) and "nombre" in h
+            ])
+            todos_idiomas.extend([
+                i["idioma"] for i in egresado.get("idiomas", []) if isinstance(i, dict) and "idioma" in i
+            ])
+
+        habilidades_comunes = Counter(todas_habilidades).most_common(5)
+        idiomas_comunes = Counter(todos_idiomas).most_common(5)
+
+        return {
+            "habilidades_top": habilidades_comunes,
+            "idiomas_top": idiomas_comunes
+        }
+
+    def ranking_egresados(self) -> List[Dict]:
+        datos_ranking = self.postulacion_repo.obtener_ranking_promedio_egresados()
+        egresados = {e.id: e for e in self.egresado_repo.obtener_egresados()}
+        
+        contratos_lista = self.contrato_repo.obtener_contratos_por_egresado()
+        contratos_por_egresado = {c["egresado_id"]: c["total"] for c in contratos_lista}
+
+
+        resultado = []
+        for item in datos_ranking:
+            egresado = egresados.get(item["egresado_id"])
+            if egresado:
+                resultado.append({
+                    "egresado_id": item["egresado_id"],
+                    "nombres": egresado.nombres,
+                    "apellidos": egresado.apellidos,
+                    "ranking_promedio": item["ranking_promedio"],
+                    "total_contratos": contratos_por_egresado.get(item["egresado_id"], 0)
+                })
+        return resultado
+
+

@@ -48,6 +48,71 @@ class ContratoRepositorySQL(ContratoRepository):
             for r in resultados
         ]
         
+    def obtener_contratos_por_area(self) -> List[Dict]:
+        from app.infrastructure.orm_models.oferta_orm import OfertaORM
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+        resultados = (
+            self.db.query(
+                OfertaORM.area,
+                func.count(ContratoORM.id).label("total_contratos")
+            )
+            .join(PostulacionORM, PostulacionORM.idOferta == OfertaORM.id)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .group_by(OfertaORM.area)
+            .all()
+        )
+
+        return [
+            {
+                "area": r.area,
+                "total_contratos": r.total_contratos
+            }
+            for r in resultados
+        ]
+        
+    def obtener_contratos_por_area_y_fecha(self) -> List[Dict]:
+        from app.infrastructure.orm_models.oferta_orm import OfertaORM
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+        resultados = (
+            self.db.query(
+                OfertaORM.area,
+                func.date_trunc('month', ContratoORM.fechaFin).label('mes'),
+                func.count(ContratoORM.id).label("total_contratos")
+            )
+            .join(PostulacionORM, PostulacionORM.idOferta == OfertaORM.id)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .group_by(OfertaORM.area, func.date_trunc('month', ContratoORM.fechaFin))
+            .order_by(func.date_trunc('month', ContratoORM.fechaFin))
+            .all()
+        )
+
+        return [
+            {
+                "area": r.area,
+                "mes": r.mes.strftime("%Y-%m"),
+                "total_contratos": r.total_contratos
+            }
+            for r in resultados
+        ]
+
+    def obtener_egresados_con_contrato(self) -> List[Dict]:
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.egresado_orm import EgresadoORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+        resultados = (
+            self.db.query(EgresadoORM.habilidades, EgresadoORM.idiomas)
+            .join(PostulacionORM, PostulacionORM.idEgresado == EgresadoORM.id)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .all()
+        )
+
+        return [{"habilidades": r.habilidades or [], "idiomas": r.idiomas or []} for r in resultados]
+    
     def obtener_contratos(self) -> List[dict]:
         contratos = (
             self.db.query(ContratoORM)

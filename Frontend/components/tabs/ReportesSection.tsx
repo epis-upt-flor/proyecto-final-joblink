@@ -9,11 +9,20 @@ import {
 } from "@/components/ui/table"
 import { FileText, TrendingUp } from "lucide-react"
 
-import { useTasaExito, useEmpresasConMasContratos } from "@/hooks/useReportes"
+import {
+  useTasaExito,
+  useEmpresasConMasContratos,
+  useContratacionesPorArea,
+  usePerfilEgresadosContratados,
+  useRankingEgresados
+} from "@/hooks/useReportes"
 
 export function ReportesSection() {
   const { data: tasaExito, isLoading: loadingExito } = useTasaExito()
   const { data: empresas, isLoading: loadingEmpresas } = useEmpresasConMasContratos()
+  const { data: contratacionesArea } = useContratacionesPorArea()
+  const { data: perfilContratados, isLoading: cargandoPerfil } = usePerfilEgresadosContratados()
+  const { data: ranking } = useRankingEgresados()
 
   return (
     <Card>
@@ -60,6 +69,93 @@ export function ReportesSection() {
           </Card>
         </div>
 
+        {/* Reporte 8: Perfil de Egresados Contratados */}
+        <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Habilidades Más Comunes en Egresados Contratados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {cargandoPerfil ? (
+                <p className="text-sm text-muted-foreground">Cargando...</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Habilidad</TableHead>
+                      <TableHead>Frecuencia</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {perfilContratados?.habilidades_top?.map(([habilidad, frecuencia], index) => (
+                      <TableRow key={index}>
+                        <TableCell>{habilidad}</TableCell>
+                        <TableCell>{frecuencia}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Reporte 10: Ranking de Egresados */}
+        <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Ranking de Egresados</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Ranking Promedio</TableHead>
+                    <TableHead>Contratos</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {ranking?.map((item) => (
+                    <TableRow key={item.egresado_id}>
+                      <TableCell>{item.nombres} {item.apellidos}</TableCell>
+                      <TableCell>{item.ranking_promedio.toFixed(2)}</TableCell>
+                      <TableCell>{item.total_contratos}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Reporte 6: Contrataciones por Área */}
+        <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Contrataciones por Área</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Área</TableHead>
+                    <TableHead>Total Contratos</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contratacionesArea?.map((item) => (
+                    <TableRow key={item.area}>
+                      <TableCell>{item.area}</TableCell>
+                      <TableCell>{item.total_contratos}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Reporte 4: Empresas con Mayor Contratación */}
         <div className="mt-6">
           <Card>
@@ -92,66 +188,6 @@ export function ReportesSection() {
                 </Table>
               )}
             </CardContent>
-          </Card>
-        </div>
-
-        {/* Métricas Falsas (placeholder) */}
-        <div className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Resumen de Métricas (Mock)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Métrica</TableHead>
-                    <TableHead>Valor Actual</TableHead>
-                    <TableHead>Cambio</TableHead>
-                    <TableHead>Tendencia</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">Tasa de Recomendación Exitosa</TableCell>
-                    <TableCell>78%</TableCell>
-                    <TableCell className="text-green-500">+15%</TableCell>
-                    <TableCell>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Tiempo Promedio de Colocación</TableCell>
-                    <TableCell>45 días</TableCell>
-                    <TableCell className="text-green-500">-12 días</TableCell>
-                    <TableCell>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Empresas con Mayor Demanda</TableCell>
-                    <TableCell>TechSolutions</TableCell>
-                    <TableCell>+4 plazas</TableCell>
-                    <TableCell>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Habilidades Más Solicitadas</TableCell>
-                    <TableCell>React, Python, AWS</TableCell>
-                    <TableCell>+25% demanda</TableCell>
-                    <TableCell>
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter>
-              <Button className="ml-auto">
-                <FileText className="h-4 w-4 mr-2" /> Generar Reporte Completo
-              </Button>
-            </CardFooter>
           </Card>
         </div>
 
