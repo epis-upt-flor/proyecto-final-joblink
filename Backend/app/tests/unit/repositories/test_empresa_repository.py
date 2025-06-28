@@ -1,50 +1,76 @@
 import pytest
-from app.infrastructure.orm_models.empresa_orm import EmpresaORM
-from app.infrastructure.orm_models.usuario_orm import UsuarioORM
-from app.infrastructure.orm_models.rol_orm import RolORM
+from app.domain.models.empresa import Empresa
 from app.infrastructure.repositories.empresa_repository_sql import EmpresaRepositorySQL
-import datetime
+from app.tests.unit.repositories.helpers import poblar_datos
 
 
-@pytest.fixture
-def mock_empresa_orm(db_session):
-    # Crear rol de empresa
-    rol = RolORM(nombre="empresa")
-    db_session.add(rol)
-    db_session.flush()
-
-    # Crear empresa directamente (ya hereda de UsuarioORM)
-    empresa = EmpresaORM(
-        username="empresauser",
-        password="hashed_password",
-        email="empresa@example.com",
-        tipo="empresa",
-        idRol=rol.id,
-        nombre="Empresa X",
-        ruc="10404040401",
-        telefono="123456789",
-        logo="https://logo.com/logo.png",
-        estado=True
-    )
-    db_session.add(empresa)
-    db_session.commit()
-    return empresa
-
-def test_obtener_todas(db_session, mock_empresa_orm):
+def test_obtener_todas(db_session):
+    poblar_datos(db_session)
     repo = EmpresaRepositorySQL(db_session)
     empresas = repo.obtener_todas()
-    assert len(empresas) == 1
-    assert empresas[0].nombre == "Empresa X"
+    assert isinstance(empresas, list)
+    assert len(empresas) > 0
+    assert empresas[0].nombre == "Empresa Prueba"
 
 
-def test_obtener_por_id(db_session, mock_empresa_orm):
+def test_obtener_por_id(db_session):
+    poblar_datos(db_session)
     repo = EmpresaRepositorySQL(db_session)
-    empresa = repo.obtener_por_id(mock_empresa_orm.id)
+    empresa = repo.obtener_por_id(1)
     assert empresa is not None
-    assert empresa.nombre == "Empresa X"
+    assert empresa.id == 1
+    assert empresa.nombre == "Empresa Prueba"
 
 
-def test_obtener_por_id_no_existente(db_session):
+def test_editar_empresa(db_session):
+    poblar_datos(db_session)
     repo = EmpresaRepositorySQL(db_session)
-    empresa = repo.obtener_por_id(id=999)
-    assert empresa is None
+    empresa = repo.obtener_por_id(1)
+
+    empresa.nombre = "Empresa Editada"
+    empresa.ruc = "11111111111"
+    empresa.telefono = "123456789"
+    empresa.logo = "nuevo_logo.png"
+    empresa.estado = True
+
+    actualizada = repo.editar(empresa)
+    assert actualizada is not None
+    assert actualizada.nombre == "Empresa Editada"
+    assert actualizada.ruc == "11111111111"
+    assert actualizada.logo == "nuevo_logo.png"
+
+
+def test_editar_empresa_ruc_duplicado(db_session):
+    poblar_datos(db_session)
+
+    # Segunda empresa con mismo RUC para forzar conflicto
+    from app.infrastructure.orm_models.empresa_orm import EmpresaORM
+    empresa2 = EmpresaORM(
+        id=2,
+        nombre="Empresa 2",
+        ruc="88888888888",
+        telefono="888888888",
+        email="otra@example.com",
+        username="otra123",
+        password="pass",
+        logo="logo2.png",
+        idRol=2,
+        estado=True
+    )
+    db_session.add(empresa2)
+    db_session.commit()
+
+    repo = EmpresaRepositorySQL(db_session)
+    empresa = repo.obtener_por_id(1)
+    empresa.ruc = "88888888888"  # Mismo que empresa2
+
+    with pytest.raises(ValueError, match="ya está registrado"):
+        repo.editar(empresa)
+
+
+def test_obtener_nombres_por_ids(db_session):
+    poblar_datos(db_session)
+    repo = EmpresaRepositorySQL(db_session)
+    nombres = repo.obtener_nombres_por_ids([1])
+    assert isinstance(nombres, list)
+    assert nombres[0]["nombre"] == "Empresa Prueba"

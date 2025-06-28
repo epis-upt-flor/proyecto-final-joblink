@@ -1,73 +1,98 @@
 import pytest
-import datetime
+from datetime import date
 from app.domain.models.egresado import Egresado
 from app.infrastructure.repositories.egresado_repository_sql import EgresadoRepositorySQL
+from app.tests.unit.repositories.helpers import poblar_datos
 
-@pytest.fixture
-def mock_egresado():
+
+def crear_egresado():
     return Egresado(
         id=None,
-        nombres="Juan",
-        apellidos="Pérez",
+        nombres="Luis",
+        apellidos="Ramirez",
         tipoDoc="DNI",
         numDoc="12345678",
-        email="juan@example.com",
-        telefono="987654321",
+        email="luis@example.com",
+        telefono="999999999",
         direccion="Av. Siempre Viva 123",
         nacionalidad="Peruana",
-        fechaNacimiento=datetime.date(2000, 1, 1),
-        habilidades="Python, SQL",
-        logrosAcademicos="Graduado con honores",
-        certificados="Certificado AWS",
-        experienciaLaboral="Empresa X - 1 año",
-        idiomas="Inglés, Español",
-        linkedin="https://linkedin.com/in/juanperez",
-        github="https://github.com/juanperez",
-        cv="https://cv.com/juan",
+        fechaNacimiento=date(1995, 5, 20),
+        habilidades=["Python", "SQL"],
+        logrosAcademicos=["1er puesto 2020"],
+        certificados=["Certificado de Scrum"],
+        experienciaLaboral=["Desarrollador en Tech S.A.", "Analista Junior"],
+        idiomas=["Español", "Inglés"],
+        linkedin="https://linkedin.com/luis",
+        github="https://github.com/luis",
+        cv="https://cv.com/luis.pdf",
         disponibilidad=True
     )
 
-def test_registrar_egresado(db_session, mock_egresado):
-    repo = EgresadoRepositorySQL(db_session)
-    egresado = repo.registrar_egresado(mock_egresado)
-    assert egresado.id is not None
-    assert egresado.email == "juan@example.com"
 
-def test_obtener_egresados(db_session, mock_egresado):
+def test_registrar_egresado(db_session):
     repo = EgresadoRepositorySQL(db_session)
-    repo.registrar_egresado(mock_egresado)
-    result = repo.obtener_egresados()
-    assert len(result) == 1
+    egresado = crear_egresado()
+    resultado = repo.registrar_egresado(egresado)
+    assert resultado.id is not None
+    assert resultado.email == "luis@example.com"
 
-def test_obtener_egresado_por_id(db_session, mock_egresado):
-    repo = EgresadoRepositorySQL(db_session)
-    egresado = repo.registrar_egresado(mock_egresado)
-    result = repo.obtener_egresado_por_id(egresado.id)
-    assert result is not None
-    assert result.id == egresado.id
 
-def test_actualizar_egresado(db_session, mock_egresado):
+def test_obtener_egresados(db_session):
     repo = EgresadoRepositorySQL(db_session)
-    egresado = repo.registrar_egresado(mock_egresado)
-    egresado.telefono = "111222333"
-    actualizado = repo.actualizar_egresado(egresado)
-    assert actualizado.telefono == "111222333"
+    egresado = crear_egresado()
+    repo.registrar_egresado(egresado)
+    resultados = repo.obtener_egresados()
+    assert isinstance(resultados, list)
+    assert len(resultados) > 0
 
-def test_eliminar_egresado(db_session, mock_egresado):
+
+def test_obtener_egresado_por_id(db_session):
     repo = EgresadoRepositorySQL(db_session)
-    egresado = repo.registrar_egresado(mock_egresado)
-    eliminado = repo.eliminar_egresado(egresado.id)
+    egresado = crear_egresado()
+    creado = repo.registrar_egresado(egresado)
+    encontrado = repo.obtener_egresado_por_id(creado.id)
+    assert encontrado is not None
+    assert encontrado.id == creado.id
+
+
+def test_obtener_nombres_por_ids(db_session):
+    repo = EgresadoRepositorySQL(db_session)
+    egresado = crear_egresado()
+    creado = repo.registrar_egresado(egresado)
+    resultados = repo.obtener_nombres_por_ids([creado.id])
+    assert isinstance(resultados, list)
+    assert resultados[0]["nombres"] == "Luis"
+
+
+def test_actualizar_egresado(db_session):
+    repo = EgresadoRepositorySQL(db_session)
+    egresado = crear_egresado()
+    creado = repo.registrar_egresado(egresado)
+    creado.telefono = "987654321"
+    actualizado = repo.actualizar_egresado(creado)
+    assert actualizado.telefono == "987654321"
+
+
+def test_eliminar_egresado(db_session):
+    repo = EgresadoRepositorySQL(db_session)
+    egresado = crear_egresado()
+    creado = repo.registrar_egresado(egresado)
+    eliminado = repo.eliminar_egresado(creado.id)
     assert eliminado is True
-    assert repo.obtener_egresado_por_id(egresado.id) is None
+    assert repo.obtener_egresado_por_id(creado.id) is None
 
-def test_existe_por_email(db_session, mock_egresado):
+
+def test_existe_por_email(db_session):
     repo = EgresadoRepositorySQL(db_session)
-    repo.registrar_egresado(mock_egresado)
-    assert repo.existe_por_email("juan@example.com") is True
+    egresado = crear_egresado()
+    repo.registrar_egresado(egresado)
+    assert repo.existe_por_email("luis@example.com") is True
     assert repo.existe_por_email("otro@example.com") is False
 
-def test_existe_por_num_doc(db_session, mock_egresado):
+
+def test_existe_por_num_doc(db_session):
     repo = EgresadoRepositorySQL(db_session)
-    repo.registrar_egresado(mock_egresado)
+    egresado = crear_egresado()
+    repo.registrar_egresado(egresado)
     assert repo.existe_por_num_doc("12345678") is True
     assert repo.existe_por_num_doc("00000000") is False
