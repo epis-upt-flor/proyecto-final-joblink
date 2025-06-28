@@ -1,0 +1,171 @@
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import not_
+from typing import List, Optional, Dict
+from app.domain.models.postulacion import Postulacion
+from app.domain.models.enum import EstadoPostulacion
+from app.domain.interfaces.external.postulacion_repository import PostulacionRepository
+from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+from app.infrastructure.orm_models.oferta_orm import OfertaORM
+from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+from sqlalchemy import func
+
+
+class PostulacionRepositorySQL(PostulacionRepository):
+    def __init__(self, db: Session):
+        self.db = db
+
+    def registrar_postulacion(self, postulacion: Postulacion) -> Postulacion:
+        orm = self._to_orm(postulacion)
+        self.db.add(orm)
+        self.db.commit()
+        self.db.refresh(orm)
+        return self._to_domain(orm)
+
+    def obtener_postulaciones(self) -> List[Postulacion]:
+        return [self._to_domain(p) for p in self.db.query(PostulacionORM).all()]
+
+    def obtener_postulacion_por_id(self, id: int) -> Optional[Postulacion]:
+        orm = self.db.query(PostulacionORM).filter(
+            PostulacionORM.id == id).first()
+        return self._to_domain(orm) if orm else None
+
+    def actualizar_postulacion(self, postulacion: Postulacion) -> Optional[Postulacion]:
+        orm = self.db.query(PostulacionORM).filter(
+            PostulacionORM.id == postulacion.id).first()
+        if not orm:
+            return None
+        orm.idOferta = postulacion.idOferta
+        orm.idEgresado = postulacion.idEgresado
+        orm.fechaRecomendacion = postulacion.fechaRecomendacion
+        orm.posicionRanking = postulacion.posicionRanking
+        orm.estado = postulacion.estado.value
+        self.db.commit()
+        self.db.refresh(orm)
+        return self._to_domain(orm)
+
+    def eliminar_postulacion(self, id: int) -> bool:
+        orm = self.db.query(PostulacionORM).filter(
+            PostulacionORM.id == id).first()
+        if orm:
+            self.db.delete(orm)
+            self.db.commit()
+            return True
+        return False
+    
+    def obtener_egresados_con_contrato(self) -> List[int]:
+        from sqlalchemy import distinct
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+
+        subquery = (
+            self.db.query(PostulacionORM.idEgresado)
+            .join(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .distinct()
+            .all()
+        )
+        return [row[0] for row in subquery]
+
+    def obtener_ranking_promedio_egresados(self) -> List[Dict]:
+        from sqlalchemy import func
+        from app.infrastructure.orm_models.postulacion_orm import PostulacionORM
+        from app.infrastructure.orm_models.contrato_orm import ContratoORM
+
+        resultados = (
+            self.db.query(
+                PostulacionORM.idEgresado.label("egresado_id"),
+                func.avg(PostulacionORM.posicionRanking).label("ranking_promedio"),
+                func.count(ContratoORM.id).label("total_contratos")
+            )
+            .outerjoin(ContratoORM, ContratoORM.idOfertaEgresado == PostulacionORM.id)
+            .filter(PostulacionORM.posicionRanking != None)
+            .group_by(PostulacionORM.idEgresado)
+            .order_by(func.avg(PostulacionORM.posicionRanking))
+            .all()
+        )
+
+        return [
+            {
+                "egresado_id": r.egresado_id,
+                "ranking_promedio": round(r.ranking_promedio, 2),
+                "total_contratos": r.total_contratos
+            }
+            for r in resultados
+        ]
+
+
+    def obtener_postulaciones_por_oferta(self, id_oferta: int) -> List[dict]:
+        postulaciones = (
+            self.db.query(PostulacionORM)
+            .join(PostulacionORM.egresado)
+            .filter(PostulacionORM.idOferta == id_oferta)
+            .all()
+        )
+
+        resultado = []
+        for p in postulaciones:
+            resultado.append({
+                "id": p.id,
+                "idOferta": p.idOferta,
+                "idEgresado": p.idEgresado,
+                "fechaRecomendacion": p.fechaRecomendacion,
+                "posicionRanking": p.posicionRanking,
+                "estado": p.estado,
+                "egresado": {
+                    "nombres": p.egresado.nombres,
+                    "apellidos": p.egresado.apellidos,
+                }
+            })
+
+        return resultado
+
+    def obtener_postulaciones_por_empresa(self, id_empresa: int) -> List[PostulacionORM]:
+
+        ofertas_ids = self.db.query(OfertaORM.id).filter(
+            OfertaORM.idEmpresa == id_empresa
+        ).all()
+        ids = [o[0] for o in ofertas_ids]
+
+        postulaciones = (
+            self.db.query(PostulacionORM)
+            .options(
+                joinedload(PostulacionORM.egresado),
+                joinedload(PostulacionORM.oferta).joinedload(OfertaORM.empresa)
+            )
+            .filter(
+                PostulacionORM.idOferta.in_(ids),
+                PostulacionORM.estado.notin_(
+                    ["APROBADA", "RECHAZADA", "DESCARTADO"])
+            )
+            .all()
+        )
+
+        return postulaciones
+    
+    def obtener_postulaciones_por_egresado(self):
+        resultados = (
+            self.db.query(PostulacionORM.idEgresado, func.count().label("total"))
+            .group_by(PostulacionORM.idEgresado)
+            .all()
+        )
+        return [{"egresado_id": r[0], "total": r[1]} for r in resultados]
+    
+    def _to_orm(self, postulacion: Postulacion) -> PostulacionORM:
+        return PostulacionORM(
+            id=postulacion.id,
+            idOferta=postulacion.idOferta,
+            idEgresado=postulacion.idEgresado,
+            fechaRecomendacion=postulacion.fechaRecomendacion,
+            posicionRanking=postulacion.posicionRanking,
+            estado=postulacion.estado.value
+        )
+
+    def _to_domain(self, orm: PostulacionORM) -> Postulacion:
+        return Postulacion(
+            id=orm.id,
+            idOferta=orm.idOferta,
+            idEgresado=orm.idEgresado,
+            fechaRecomendacion=orm.fechaRecomendacion,
+            posicionRanking=orm.posicionRanking,
+            estado=EstadoPostulacion(orm.estado)
+        )
