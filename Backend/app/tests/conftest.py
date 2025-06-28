@@ -5,20 +5,22 @@ from app.infrastructure.schemas.auth_schema import EmpresaCreate
 from app.infrastructure.database.base import Base
 from app.infrastructure.orm_models import *
 
+
 @pytest.fixture(scope="function")
 def db_session():
-    engine = create_engine("sqlite:///:memory:")
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
     TestingSessionLocal = sessionmaker(bind=engine)
 
     Base.metadata.create_all(bind=engine)
 
     db = TestingSessionLocal()
+    db.execute("PRAGMA foreign_keys = ON")
     try:
         yield db
     finally:
         db.close()
 
-# Mock solo para la prueba unitaria del servicio
+
 @pytest.fixture
 def mock_empresa_create():
     return EmpresaCreate(
