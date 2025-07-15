@@ -11,7 +11,13 @@ class DatabaseSingleton:
     @classmethod
     def get_engine(cls) -> Engine:
         if cls._engine is None:
-            cls._engine = create_engine(DATABASE_URL)
+            cls._engine = create_engine(
+                DATABASE_URL,
+                pool_pre_ping=True,
+                pool_size=5,
+                max_overflow=10,
+                future=True
+            )
         return cls._engine
 
     @classmethod

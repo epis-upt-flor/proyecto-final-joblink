@@ -6,6 +6,7 @@ SQLAlchemy==2.0.40
 psycopg2-binary==2.9.10
 python-dotenv==1.1.0
 passlib[bcrypt]==1.7.4
+bcrypt==3.2.2
 python-jose==3.4.0
 redis==6.0.0
 pydantic==2.11.4

@@ -8,9 +8,11 @@ class EmpresaOut(BaseModel):
     telefono: str
     logo: Optional[str]
     estado: bool
-
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
+        
+        
 class EmpresaIn(BaseModel):
     nombre: str
     ruc: str

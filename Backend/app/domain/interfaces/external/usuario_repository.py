@@ -12,7 +12,9 @@ class IUsuarioRepository(ABC):
 
     @abstractmethod
     def guardar(self, usuario: Usuario) -> Usuario: ...
+    
     @abstractmethod
     def obtener_por_id(self, id: int) -> Optional[Usuario]: ...
+    
     @abstractmethod
     def actualizar(self, usuario: Usuario) -> Usuario: ...

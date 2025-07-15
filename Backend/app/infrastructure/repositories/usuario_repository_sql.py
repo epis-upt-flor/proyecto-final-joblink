@@ -26,6 +26,7 @@ class UsuarioRepositorySQL(IUsuarioRepository):
         self.db.commit()
         self.db.refresh(usuario)
         return self._to_domain(usuario)
+    
     def actualizar(self, usuario: UsuarioDomain) -> UsuarioDomain:
         orm = self.db.query(UsuarioORM).filter(UsuarioORM.id == usuario.id).first()
         if not orm:

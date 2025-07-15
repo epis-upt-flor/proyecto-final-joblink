@@ -7,9 +7,10 @@ class EmpresaMiniOut(BaseModel):
     id: int
     nombre: str
     logo: Optional[str]
-
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 class OfertaCreate(BaseModel):
     titulo: str
@@ -76,5 +77,5 @@ class OfertaOut(OfertaCreate):
     empresa: EmpresaMiniOut
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 

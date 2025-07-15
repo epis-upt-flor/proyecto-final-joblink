@@ -2,6 +2,8 @@ from pydantic import BaseModel, EmailStr
 from datetime import date
 from typing import Optional, List
 from app.domain.models.egresado import Egresado
+
+
 class Idioma(BaseModel):
     idioma: str
     nivel: str
@@ -12,6 +14,7 @@ class Experiencia(BaseModel):
     puesto: str
     periodo: str
     responsabilidades: List[str]
+
 
 class EgresadoBase(BaseModel):
     nombres: str
@@ -32,7 +35,6 @@ class EgresadoBase(BaseModel):
     github: Optional[str] = None
     cv: Optional[str] = None
     disponibilidad: bool = True
-
 
 
 class EgresadoCreate(EgresadoBase):

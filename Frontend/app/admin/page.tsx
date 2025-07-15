@@ -25,10 +25,11 @@ import { ReportesSection } from "@/components/tabs/ReportesSection"
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 import { AgregarEgresadoModal } from "@/components/modals/egresadoModal"
 import { AgregarEmpresaModal } from "@/components/modals/empresaModal"
-import LogoWithTheme from "@/components/logo-theme"
 import { ThemeToggle } from "@/components/theme-toggle"
+import LogoWithThemeAdmin from "@/components/logo-theme-admin"
+import withAuth from "@/components/hoc/withAuth"
 
-export default function AdminDashboard() {
+function AdminDashboard() {
   const { data: egresados, isLoading: egresadosLoading } = useEgresados()
   const { data: plazas, isLoading: plazasLoading, error } = useOfertas()
   const { data: contratacionesRaw, isLoading: historialLoading } = useContrataciones()
@@ -92,7 +93,7 @@ export default function AdminDashboard() {
         {/* Header Mejorado */}
         <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            <LogoWithTheme />
+            <LogoWithThemeAdmin />
           </div>
           
           <div className="flex items-center gap-4">
@@ -230,3 +231,5 @@ export default function AdminDashboard() {
     </motion.div>
   )
 }
+
+export default withAuth(AdminDashboard, ["1"])
