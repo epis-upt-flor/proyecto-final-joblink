@@ -97,6 +97,7 @@ export default function LoginPage() {
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="password">Contraseña</Label>
                                 <Button
+                                    type="button"
                                     variant="link"
                                     className="p-0 h-auto text-sm text-primary"
                                     onClick={() => setIsRecuperarModalOpen(true)}

@@ -3,7 +3,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Filter, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Link from 'next/link'
+import Image from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useContrataciones } from "@/hooks/useHistorial"
@@ -11,6 +13,7 @@ import { useEgresados } from "@/hooks/useEgresados"
 import { useOfertas } from "@/hooks/useOfertas"
 import { useEmpresas } from "@/hooks/useEmpresas"
 import { useAprobarOferta, useRechazarOferta } from "@/hooks/useOfertas"
+import { useTheme } from 'next-themes'
 
 import { PlazasSection } from "@/components/tabs/PlazasSection"
 import { EgresadosSection } from "@/components/tabs/EgresadosSection"
@@ -81,14 +84,31 @@ export default function AdminDashboard() {
     window.location.reload()
   }
 
-  console.log(contratacionesRaw)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
+  const logoSrc = theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'
+  
   return (
     <div className="min-h-screen bg-muted/40">
       <main className="flex-1">
-        <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6">
+        <header className="h-16 border-b bg-background flex items-center justify-between px-1 md:px-2">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold">LinkJob</h1>
+            <Link href="/" className="flex items-center gap-0">
+              {mounted && (
+                <Image
+                  src={logoSrc}
+                  alt="LinkJob Logo"
+                  width={55}
+                  height={55}
+                  priority
+                />
+              )}
+              <h1 className="text-xl font-bold">LinkJob</h1>
+            </Link>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
@@ -113,6 +133,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Panel de Administración</h1>
+              <br></br>
               <p className="text-muted-foreground">Gestiona el sistema de recomendación de egresados</p>
             </div>
           </div>

@@ -8,8 +8,11 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Sistema de Recomendación de Egresados",
+  title: "LinkJob",
   description: "Panel de administración para el sistema de recomendación de egresados",
+  icons: {
+    icon: "/favicon.png",
+  },
 }
 
 export default function RootLayout({

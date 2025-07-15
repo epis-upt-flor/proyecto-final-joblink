@@ -1,22 +1,45 @@
 "use client"
-import Link from "next/link"
-import { ArrowRight, Briefcase, Building2 } from "lucide-react"
 
+import Link from "next/link"
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { ArrowRight, Briefcase, Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function LandingPage() {
-    return (
+    const { theme } = useTheme()
+    const [mounted, setMounted] = useState(false)
+    
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const logoSrc = theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'
+    
+        return (
         <div className="min-h-screen flex flex-col">
             {/* Header */}
-            <header className="h-16 border-b bg-background flex items-center justify-between px-4 md:px-6">
+            <header className="h-16 border-b bg-background flex items-center justify-between px-1 md:px-2">
                 <div className="flex items-center gap-2">
-                    <h1 className="text-xl font-bold">LinkJob</h1>
+                <Link href="/" className="flex items-center gap-0">
+                {mounted && (
+                    <Image
+                    src={logoSrc}
+                    alt="LinkJob Logo"
+                    width={55}
+                    height={55}
+                    priority
+                    />
+                )}
+                <h1 className="text-xl font-bold">LinkJob</h1>
+                </Link>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Link href="/auth/login">
-                        <Button>Iniciar Sesión</Button>
-                    </Link>
+                <Link href="/auth/login">
+                    <Button>Iniciar Sesión</Button>
+                </Link>
                 </div>
             </header>
 

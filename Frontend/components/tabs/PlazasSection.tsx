@@ -47,6 +47,7 @@ export function PlazasSection({ plazas = [], loading, onAddPlaza }: any) {
                     <div className="flex justify-between items-center">
                         <div>
                             <CardTitle>Plazas de Trabajo Disponibles</CardTitle>
+                            <br></br>
                             <CardDescription>
                                 Gestiona las plazas de trabajo ofrecidas por la escuela y empresas asociadas.
                             </CardDescription>
