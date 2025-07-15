@@ -1,11 +1,14 @@
 "use client"
 
 import { jwtDecode } from "jwt-decode"
-import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, Moon, Sun } from "lucide-react"
+import { motion } from "framer-motion"
+import { useTheme } from "next-themes"
+import LogoWithTheme from "@/components/logo-theme"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +21,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
 export default function LoginPage() {
     const router = useRouter()
+    const { theme, setTheme } = useTheme()
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [isRecuperarModalOpen, setIsRecuperarModalOpen] = useState(false)
@@ -25,6 +29,10 @@ export default function LoginPage() {
         username: "",
         password: "",
     })
+
+    const toggleTheme = () => {
+        setTheme(theme === "dark" ? "light" : "dark")
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -70,88 +78,126 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center">Iniciar Sesión</CardTitle>
-                    <CardDescription className="text-center">
-                        Ingrese sus credenciales para acceder al sistema
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="username">Usuario</Label>
-                            <Input
-                                id="username"
-                                name="username"
-                                type="text"
-                                placeholder="ejemplo.admin"
-                                required
-                                value={formData.username}
-                                onChange={handleChange}
-                                disabled={isLoading}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <Label htmlFor="password">Contraseña</Label>
-                                <Button
-                                    type="button"
-                                    variant="link"
-                                    className="p-0 h-auto text-sm text-primary"
-                                    onClick={() => setIsRecuperarModalOpen(true)}
-                                >
-                                    ¿Olvidó su contraseña?
-                                </Button>
-                            </div>
-                            <div className="relative">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="min-h-screen flex flex-col"
+        >
+            {/* Header */}
+            <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-8">
+                <LogoWithTheme />
+                <ThemeToggle />
+            </header>
+            {/* Main Content */}
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="flex-1 flex items-center justify-center bg-muted/40 p-4"
+            >
+                <Card className="w-full max-w-md">
+                    <CardHeader className="space-y-1">
+                        <CardTitle className="text-2xl font-bold text-center">Iniciar Sesión</CardTitle>
+                        <CardDescription className="text-center">
+                            Ingrese sus credenciales para acceder al sistema
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="username">Usuario</Label>
                                 <Input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    placeholder="ejemplo.admin"
                                     required
-                                    value={formData.password}
+                                    value={formData.username}
                                     onChange={handleChange}
                                     disabled={isLoading}
                                 />
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="absolute right-0 top-0 h-full px-3"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                    <span className="sr-only">{showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}</span>
-                                </Button>
                             </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password">Contraseña</Label>
+                                    <Button
+                                        type="button"
+                                        variant="link"
+                                        className="p-0 h-auto text-sm text-primary"
+                                        onClick={() => setIsRecuperarModalOpen(true)}
+                                    >
+                                        ¿Olvidó su contraseña?
+                                    </Button>
+                                </div>
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        name="password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        required
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        disabled={isLoading}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4" />
+                                        ) : (
+                                            <Eye className="h-4 w-4" />
+                                        )}
+                                        <span className="sr-only">
+                                            {showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                        </span>
+                                    </Button>
+                                </div>
+                            </div>
+                            <Button type="submit" className="w-full" disabled={isLoading}>
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Iniciar Sesión
+                            </Button>
+                        </form>
+                    </CardContent>
+                    <CardFooter className="flex flex-col space-y-4">
+                        <div className="text-center">
+                            <p className="text-sm text-muted-foreground">
+                                Si no tiene credenciales de acceso, contacte al administrador del sistema.
+                            </p>
                         </div>
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Iniciar Sesión
-                        </Button>
-                    </form>
-                </CardContent>
-                <CardFooter className="flex flex-col space-y-4">
-                    <div className="text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Si no tiene credenciales de acceso, contacte al administrador del sistema.
-                        </p>
-                    </div>
-                    <div className="text-center">
-                        <Link href="/" className="text-sm text-muted-foreground hover:underline">
-                            Volver a la página principal
-                        </Link>
-                    </div>
-                </CardFooter>
-            </Card>
+                        <div className="text-center">
+                            <Link href="/" className="text-sm text-muted-foreground hover:underline">
+                                Volver a la página principal
+                            </Link>
+                        </div>
+                    </CardFooter>
+                </Card>
 
-            <RecuperarPasswordModal
-                isOpen={isRecuperarModalOpen}
-                onClose={() => setIsRecuperarModalOpen(false)}
-            />
-        </div>
+                <RecuperarPasswordModal
+                    isOpen={isRecuperarModalOpen}
+                    onClose={() => setIsRecuperarModalOpen(false)}
+                />
+            </motion.div>
+
+            {/* Footer */}
+            <motion.footer
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4"
+            >
+                <div className="container px-4 md:px-6 text-center">
+                    <p className="text-sm text-muted-foreground">
+                        © {new Date().getFullYear()} LinkJob. Todos los derechos reservados.
+                    </p>
+                </div>
+            </motion.footer>
+        </motion.div>
     )
 }
