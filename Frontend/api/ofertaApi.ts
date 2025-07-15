@@ -62,7 +62,7 @@ export async function obtenerOfertas(): Promise<Oferta[]> {
 }
 
 export async function obtenerOfertasPorEmpresa(empresaId: number): Promise<Oferta[]> {
-  const res = await fetch(`${API_URL}/ofertas/empresa/${empresaId}/`, {
+  const res = await fetch(`${API_URL}/ofertas/empresa/${empresaId}`, {
     headers: getAuthHeaders(),
   })
   if (!res.ok) throw new Error("Error al cargar ofertas por empresa")
@@ -70,7 +70,7 @@ export async function obtenerOfertasPorEmpresa(empresaId: number): Promise<Ofert
 }
 
 export async function obtenerOferta(id: number): Promise<Oferta> {
-  const res = await fetch(`${API_URL}/ofertas/${id}/`, {
+  const res = await fetch(`${API_URL}/ofertas/${id}`, {
     headers: getAuthHeaders(),
   })
   if (!res.ok) throw new Error("Error al cargar oferta")

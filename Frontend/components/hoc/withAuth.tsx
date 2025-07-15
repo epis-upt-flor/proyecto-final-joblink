@@ -53,7 +53,7 @@ export default function withAuth<T extends Record<string, any>>(
     if (checking) {
       return (
         <div className="flex h-screen items-center justify-center text-muted-foreground">
-          Verificando credenciales…
+          Cargando…
         </div>
       )
     }

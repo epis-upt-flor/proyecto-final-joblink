@@ -82,7 +82,4 @@ def obtener_ofertas_por_empresa(
     id_empresa: int,
     service: OfertaUseCase = Depends(get_oferta_service)
 ):
-    ofertas = service.obtener_ofertas_por_empresa(id_empresa)
-    if not ofertas:
-        raise HTTPException(status_code=404, detail="No se encontraron ofertas para esta empresa")
-    return ofertas
+    return service.obtener_ofertas_por_empresa(id_empresa) or []
