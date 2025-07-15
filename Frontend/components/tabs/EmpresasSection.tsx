@@ -46,16 +46,22 @@ export function EmpresasSection({ empresas = [], loading, onAddEmpresa }: any) {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Gestión de Empresas</CardTitle>
-          <br></br>
-          <CardDescription>Administra las empresas asociadas que contratan egresados.</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Gestión de Empresas</CardTitle>
+              <br></br>
+              <CardDescription>
+                Administra las empresas asociadas que contratan egresados.
+              </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={onAddEmpresa}>
+                  <PlusCircle className="h-4 w-4 mr-2" /> Agregar Empresa
+                </Button>
+              </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-end mb-4">
-            <Button size="sm" onClick={onAddEmpresa}>
-              <PlusCircle className="h-4 w-4 mr-2" /> Agregar Empresa
-            </Button>
-          </div>
           <Table>
             <TableHeader>
               <TableRow>

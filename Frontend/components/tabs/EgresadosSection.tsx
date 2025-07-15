@@ -48,19 +48,25 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
         <>
             <Card>
                 <CardHeader>
+                <div className="flex justify-between items-center">
+                    <div>
                     <CardTitle>Gestión de Egresados</CardTitle>
                     <br></br>
-                    <CardDescription>Administra los perfiles de egresados y sus habilidades profesionales.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex justify-end mb-4">
+                    <CardDescription>
+                        Administra los perfiles de egresados y sus habilidades profesionales.
+                    </CardDescription>
+                    </div>
+                    <div className="flex gap-2">
                         <Button variant="outline" size="sm" className="mr-2">
                             <FileUp className="h-4 w-4 mr-2" /> Carga Masiva
                         </Button>
                         <Button size="sm" onClick={onAddEgresado}>
-                            <PlusCircle className="h-4 w-4 mr-2" /> Agregar Egresado
+                        <PlusCircle className="h-4 w-4 mr-2" /> Agregar Egresado
                         </Button>
                     </div>
+                </div>
+                </CardHeader>
+                <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
