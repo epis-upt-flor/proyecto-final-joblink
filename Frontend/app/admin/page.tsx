@@ -1,11 +1,11 @@
 "use client"
 
+import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Filter, Moon } from "lucide-react"
+import { Filter, Moon, Sun, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import Link from 'next/link'
-import Image from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useContrataciones } from "@/hooks/useHistorial"
@@ -14,6 +14,7 @@ import { useOfertas } from "@/hooks/useOfertas"
 import { useEmpresas } from "@/hooks/useEmpresas"
 import { useAprobarOferta, useRechazarOferta } from "@/hooks/useOfertas"
 import { useTheme } from 'next-themes'
+import { toast } from "sonner"
 
 import { PlazasSection } from "@/components/tabs/PlazasSection"
 import { EgresadosSection } from "@/components/tabs/EgresadosSection"
@@ -24,7 +25,8 @@ import { ReportesSection } from "@/components/tabs/ReportesSection"
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 import { AgregarEgresadoModal } from "@/components/modals/egresadoModal"
 import { AgregarEmpresaModal } from "@/components/modals/empresaModal"
-import { toast } from "sonner"
+import LogoWithTheme from "@/components/logo-theme"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function AdminDashboard() {
   const { data: egresados, isLoading: egresadosLoading } = useEgresados()
@@ -40,30 +42,32 @@ export default function AdminDashboard() {
     localStorage.removeItem("token")
     window.location.href = "/auth/login"
   }
+
   const aprobarMutation = useAprobarOferta()
   const rechazarMutation = useRechazarOferta()
 
   const aprobar = (id: number) => {
     aprobarMutation.mutate(id, {
       onSuccess: () => {
-        toast("Oferta aprobada exitosamente")
+        toast.success("Oferta aprobada exitosamente")
       },
       onError: (error) => {
-        toast("Error al aprobar", {
+        toast.error("Error al aprobar", {
           description: String(error),
         })
       },
     })
   }
 
-
   const rechazar = ({ id, motivo }: { id: number; motivo: string }) => {
     rechazarMutation.mutate({ id, motivo }, {
       onSuccess: () => {
-        console.log("Oferta rechazada")
+        toast.success("Oferta rechazada exitosamente")
       },
       onError: (error) => {
-        alert("Error al rechazar la oferta: " + error)
+        toast.error("Error al rechazar la oferta", {
+          description: String(error),
+        })
       },
     })
   }
@@ -77,134 +81,152 @@ export default function AdminDashboard() {
     recomendado: c.recomendado ?? true,
   }))
 
-  const toggleTheme = () => {
-    const current = localStorage.getItem("theme")
-    const newTheme = current === "dark" ? "light" : "dark"
-    localStorage.setItem("theme", newTheme)
-    window.location.reload()
-  }
-
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const logoSrc = theme === 'dark' ? '/logo-dark.png' : '/logo-light.png'
-  
   return (
-    <div className="min-h-screen bg-muted/40">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-muted/40"
+    >
       <main className="flex-1">
-        <header className="h-16 border-b bg-background flex items-center justify-between px-1 md:px-2">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-0">
-              {mounted && (
-                <Image
-                  src={logoSrc}
-                  alt="LinkJob Logo"
-                  width={55}
-                  height={55}
-                  priority
-                />
-              )}
-              <h1 className="text-xl font-bold">LinkJob</h1>
-            </Link>
+        {/* Header Mejorado */}
+        <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
+          <div className="flex items-center gap-4">
+            <LogoWithTheme />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleTheme}>
-              <Moon className="h-5 w-5" />
-            </Button>
-
+          
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Admin" />
-                  <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/placeholder.svg" alt="Admin" />
+                    <AvatarFallback className="bg-primary text-primary-foreground">AD</AvatarFallback>
+                  </Avatar>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleLogout}>Cerrar sesión</DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="text-destructive focus:text-destructive"
+                >
+                  Cerrar sesión
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
 
+        {/* Contenido Principal */}
         <div className="p-4 md:p-6 space-y-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+          >
             <div>
-              <h1 className="text-2xl font-bold">Panel de Administración</h1>
-              <br></br>
-              <p className="text-muted-foreground">Gestiona el sistema de recomendación de egresados</p>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Panel de Administración</h1>
+              <p className="text-muted-foreground mt-2">
+                Gestión integral del sistema de recomendación laboral
+              </p>
             </div>
-          </div>
+          </motion.div>
 
-          <Tabs defaultValue="plazas" className="w-full">
-            <div className="flex items-center justify-between mb-4">
-              <TabsList className="grid grid-cols-6 w-full max-w-3xl">
-                <TabsTrigger value="plazas">Plazas</TabsTrigger>
-                <TabsTrigger value="egresados">Egresados</TabsTrigger>
-                <TabsTrigger value="empresas">Empresas</TabsTrigger>
-                <TabsTrigger value="aprobaciones">Aprobaciones</TabsTrigger>
-                <TabsTrigger value="historial">Historial</TabsTrigger>
-                <TabsTrigger value="reportes">Reportes</TabsTrigger>
-              </TabsList>
-            </div>
+          {/* Tabs con animación */}
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Tabs defaultValue="plazas" className="w-full">
+              <div className="overflow-x-auto pb-2">
+                <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
+                  <TabsTrigger value="plazas">Plazas</TabsTrigger>
+                  <TabsTrigger value="egresados">Egresados</TabsTrigger>
+                  <TabsTrigger value="empresas">Empresas</TabsTrigger>
+                  <TabsTrigger value="aprobaciones">Aprobaciones</TabsTrigger>
+                  <TabsTrigger value="historial">Historial</TabsTrigger>
+                  <TabsTrigger value="reportes">Reportes</TabsTrigger>
+                </TabsList>
+              </div>
 
-            <TabsContent value="plazas">
-              <PlazasSection plazas={plazas} loading={plazasLoading} onAddPlaza={() => setPlazaModalOpen(true)} />
-            </TabsContent>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <TabsContent value="plazas" className="mt-6">
+                  <PlazasSection 
+                    plazas={plazas} 
+                    loading={plazasLoading} 
+                    onAddPlaza={() => setPlazaModalOpen(true)} 
+                  />
+                </TabsContent>
 
-            <TabsContent value="egresados">
-              <EgresadosSection egresados={egresados} loading={egresadosLoading} onAddEgresado={() => setEgresadoModalOpen(true)} />
-            </TabsContent>
+                <TabsContent value="egresados" className="mt-6">
+                  <EgresadosSection 
+                    egresados={egresados} 
+                    loading={egresadosLoading} 
+                    onAddEgresado={() => setEgresadoModalOpen(true)} 
+                  />
+                </TabsContent>
 
-            <TabsContent value="empresas">
-              <EmpresasSection empresas={empresas} loading={empresasLoading} onAddEmpresa={() => setEmpresaModalOpen(true)} />
-            </TabsContent>
+                <TabsContent value="empresas" className="mt-6">
+                  <EmpresasSection 
+                    empresas={empresas} 
+                    loading={empresasLoading} 
+                    onAddEmpresa={() => setEmpresaModalOpen(true)} 
+                  />
+                </TabsContent>
 
-            <TabsContent value="aprobaciones">
-              <AprobacionesSection
-                ofertas={plazas}
-                onAprobar={aprobar}
-                onRechazar={rechazar}
-              />
-            </TabsContent>
+                <TabsContent value="aprobaciones" className="mt-6">
+                  <AprobacionesSection
+                    ofertas={plazas}
+                    onAprobar={aprobar}
+                    onRechazar={rechazar}
+                  />
+                </TabsContent>
 
+                <TabsContent value="historial" className="mt-6">
+                  {historialLoading ? (
+                    <div className="flex justify-center items-center h-32">
+                      <p className="text-muted-foreground">Cargando historial...</p>
+                    </div>
+                  ) : (
+                    <HistorialSection contrataciones={contrataciones} />
+                  )}
+                </TabsContent>
 
-
-            <TabsContent value="historial">
-              {historialLoading ? (
-                <p className="text-muted-foreground">Cargando historial...</p>
-              ) : (
-                <HistorialSection contrataciones={contrataciones} />
-              )}
-            </TabsContent>
-
-
-            <TabsContent value="reportes">
-              <ReportesSection />
-            </TabsContent>
-          </Tabs>
+                <TabsContent value="reportes" className="mt-6">
+                  <ReportesSection />
+                </TabsContent>
+              </motion.div>
+            </Tabs>
+          </motion.div>
         </div>
       </main>
 
+      {/* Modals */}
       <AgregarEgresadoModal
         open={egresadoModalOpen}
         onOpenChange={setEgresadoModalOpen}
-        onSuccess={() => console.log("Egresado agregado exitosamente")}
+        onSuccess={() => toast.success("Egresado agregado exitosamente")}
       />
 
       <AgregarEmpresaModal
         open={empresaModalOpen}
         onOpenChange={setEmpresaModalOpen}
-        onSuccess={() => console.log("Empresa agregada exitosamente")}
+        onSuccess={() => toast.success("Empresa agregada exitosamente")}
       />
 
       <AgregarOfertaModal
         open={plazaModalOpen}
         onOpenChange={setPlazaModalOpen}
-        onSuccess={() => console.log("Plaza agregada exitosamente")}
+        onSuccess={() => toast.success("Plaza agregada exitosamente")}
       />
-    </div>
+    </motion.div>
   )
 }

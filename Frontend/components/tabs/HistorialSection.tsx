@@ -15,6 +15,7 @@ export function HistorialSection({ contrataciones }: any) {
         <Card>
             <CardHeader>
                 <CardTitle>Historial de Contrataciones</CardTitle>
+                <br></br>
                 <CardDescription>Registro histórico de egresados contratados por empresas.</CardDescription>
             </CardHeader>
             <CardContent>

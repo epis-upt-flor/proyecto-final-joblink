@@ -30,6 +30,7 @@ export function AprobacionesSection({ ofertas = [], onAprobar, onRechazar }: any
         <Card>
             <CardHeader>
                 <CardTitle>Aprobación de Plazas</CardTitle>
+                <br></br>
                 <CardDescription>
                     Revisa y aprueba las plazas registradas por las empresas.
                 </CardDescription>

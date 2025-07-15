@@ -47,6 +47,7 @@ export function EmpresasSection({ empresas = [], loading, onAddEmpresa }: any) {
       <Card>
         <CardHeader>
           <CardTitle>Gestión de Empresas</CardTitle>
+          <br></br>
           <CardDescription>Administra las empresas asociadas que contratan egresados.</CardDescription>
         </CardHeader>
         <CardContent>

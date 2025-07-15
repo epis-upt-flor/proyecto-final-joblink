@@ -49,6 +49,7 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
             <Card>
                 <CardHeader>
                     <CardTitle>Gestión de Egresados</CardTitle>
+                    <br></br>
                     <CardDescription>Administra los perfiles de egresados y sus habilidades profesionales.</CardDescription>
                 </CardHeader>
                 <CardContent>

@@ -29,6 +29,7 @@ export function ReportesSection() {
     <Card>
       <CardHeader>
         <CardTitle>Reportes y Análisis</CardTitle>
+        <br></br>
         <CardDescription>
           Estadísticas y tendencias del sistema de recomendación.
         </CardDescription>
