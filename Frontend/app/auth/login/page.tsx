@@ -167,13 +167,18 @@ export default function LoginPage() {
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
                         <div className="text-center">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground mb-4">
                                 Si no tiene credenciales de acceso, contacte al administrador del sistema.
                             </p>
                         </div>
                         <div className="text-center">
-                            <Link href="/" className="text-sm text-muted-foreground hover:underline">
-                                Volver a la página principal
+                            <Link href="/">
+                                <Button 
+                                    variant="outline" 
+                                    className="text-primary hover:text-primary/90 hover:bg-primary/5 transition-colors"
+                                >
+                                    ← Volver a la página principal
+                                </Button>
                             </Link>
                         </div>
                     </CardFooter>
