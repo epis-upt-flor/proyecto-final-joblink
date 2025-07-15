@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Briefcase, Filter, MoreHorizontal, PlusCircle, Search, ArrowLeft } from 'lucide-react'
+import { Briefcase, Filter, MoreHorizontal, PlusCircle, LogOut, ArrowLeft, Settings } from 'lucide-react'
 import { useEmpresa } from "@/hooks/useEmpresas"
 import { useOfertas, useOfertasPorEmpresa } from "@/hooks/useOfertas"
 import { usePostulacionesEmpresa } from "@/hooks/usePostulaciones"
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 import LogoWithThemeEmpresa from "@/components/logo-theme-empresa"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -109,14 +109,24 @@ function EmpresaPortal() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setEditarModalOpen(true)}>
-                                Editar empresa
+                            <DropdownMenuLabel className="font-normal">
+                                <div className="flex flex-col space-y-1">
+                                    <p className="text-sm font-medium leading-none">Empresa</p>
+                                    <p className="text-xs leading-none text-muted-foreground">Perfil Empresarial</p>
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => setEditarModalOpen(true)}>
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Actualizar datos</span>
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem 
                                 onClick={handleLogout}
-                                className="text-destructive focus:text-destructive"
-                            >
-                                Cerrar sesión
+                                className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+                                >
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Cerrar sesión</span>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -134,7 +144,7 @@ function EmpresaPortal() {
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Panel de Gestión Empresarial</h1>
                         <p className="text-muted-foreground mt-2">
-                            Bienvenido, <span className="font-medium text-primary">{empresaActual?.nombre || "Empresa"}</span>
+                            Bienvenido, <span className="font-medium text-primary">{empresaActual?.nombre || "..."}</span>
                         </p>
                     </div>
                     <div className="flex items-center gap-2 w-full md:w-auto">
