@@ -1,5 +1,6 @@
 'use client'
 
+import Loading from "./loading";
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { format } from "date-fns"
@@ -63,8 +64,8 @@ export default function EgresadoDetallePage() {
 
     const formatDate = (str: string) => format(new Date(str), "dd 'de' MMMM 'de' yyyy", { locale: es })
     const getInitials = () => `${egresado?.nombres[0]}${egresado?.apellidos[0]}`
-
-    if (loading) return <p className="text-muted-foreground">Cargando...</p>
+    
+    if (loading) return <Loading />;
     if (!egresado) return null
 
     return (

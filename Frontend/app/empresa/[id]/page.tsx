@@ -13,6 +13,7 @@ import {
     CheckCircle, XCircle, ArrowLeft
 } from "lucide-react"
 import { fetchEmpresa } from "@/api/empresaApi"
+import Loading from "./loading";
 
 export default function EmpresaDetallePage() {
     const params = useParams()
@@ -44,7 +45,7 @@ export default function EmpresaDetallePage() {
         getEmpresa()
     }, [params.id, router])
 
-    if (loading) return <p className="text-center py-10">Cargando empresa...</p>
+    if (loading) return <Loading />;
     if (!empresa) return null
 
     return (
