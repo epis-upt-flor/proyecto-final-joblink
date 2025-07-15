@@ -50,14 +50,6 @@ export default function withAuth<T extends Record<string, any>>(
       checkAuth()
     }, [router])
 
-    if (checking) {
-      return (
-        <div className="flex h-screen items-center justify-center text-muted-foreground">
-          Cargando…
-        </div>
-      )
-    }
-
     return <WrappedComponent {...props} />
   }
 
