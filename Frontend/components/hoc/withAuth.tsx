@@ -36,7 +36,7 @@ export default function withAuth<T extends Record<string, any>>(
           }
 
           if (!allowedRoles.includes(decoded.role)) {
-            router.replace("/acceso-denegado")
+            router.replace("/no-disponible")
             return
           }
         } catch (err) {

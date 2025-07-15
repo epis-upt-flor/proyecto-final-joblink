@@ -23,8 +23,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AgregarOfertaModal } from "@/components/modals/ofertaModal"
 import LogoWithThemeEmpresa from "@/components/logo-theme-empresa"
 import { ThemeToggle } from "@/components/theme-toggle"
+import withAuth from "@/components/hoc/withAuth"
 
-export default function EmpresaPortal() {
+function EmpresaPortal() {
     const router = useRouter()
     const [empresaId, setEmpresaId] = useState<number | null>(null)
     const [ready, setReady] = useState(false)
@@ -131,7 +132,7 @@ export default function EmpresaPortal() {
                     className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Portal Empresarial</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Panel de Gestión Empresarial</h1>
                         <p className="text-muted-foreground mt-2">
                             Bienvenido, <span className="font-medium text-primary">{empresaActual?.nombre || "Empresa"}</span>
                         </p>
@@ -383,3 +384,5 @@ export default function EmpresaPortal() {
         </motion.div>
     )
 }
+
+export default withAuth(EmpresaPortal, ["2"])
