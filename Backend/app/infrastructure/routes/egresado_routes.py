@@ -2,6 +2,7 @@ from http.client import HTTPException
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
+from fastapi import Body
 
 from app.domain.interfaces.internal.egresado_usecase import EgresadoUseCase
 from app.infrastructure.database.db_session_provider import DBSessionProvider
@@ -71,3 +72,17 @@ def actualizar_egresado(
 def eliminar_egresado(id: int, service: EgresadoUseCase = Depends(get_service)):
     service.eliminar_egresado(id)
     return {"mensaje": "Egresado eliminado correctamente"}
+
+
+@router.post("/carga-masiva", response_model=dict)
+def registrar_egresados_masivo(
+    egresados_in: List[EgresadoCreate] = Body(...),
+    service: EgresadoUseCase = Depends(get_service)
+):
+    egresados = [Egresado(**e.model_dump()) for e in egresados_in]
+    guardados = service.registrar_egresados_masivo(egresados)
+
+    return {
+        "mensaje": f"{len(guardados)} egresados registrados correctamente",
+        "ids": [e.id for e in guardados]
+    }

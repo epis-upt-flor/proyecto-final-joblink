@@ -26,6 +26,21 @@ class EgresadoService(EgresadoUseCase):
             egresado_guardado)
         self.vector_repo.agregar_egresado(egresado_guardado, embedding)
         return egresado_guardado
+    
+    def registrar_egresados_masivo(self, egresados: List[Egresado]) -> List[Egresado]:
+        for e in egresados:
+            if self.repository.existe_por_email(e.email):
+                raise HTTPException(status_code=400, detail=f"El correo {e.email} ya está registrado")
+            if self.repository.existe_por_num_doc(e.numDoc):
+                raise HTTPException(status_code=400, detail=f"El número de documento {e.numDoc} ya está registrado")
+
+        egresados_guardados = self.repository.registrar_egresados_masivo(egresados)
+
+        for e in egresados_guardados:
+            embedding = self.embeddings.generar_embedding_egresado(e)
+            self.vector_repo.agregar_egresado(e, embedding)
+
+        return egresados_guardados
 
     def obtener_todos(self) -> List[Egresado]:
         return self.repository.obtener_egresados()

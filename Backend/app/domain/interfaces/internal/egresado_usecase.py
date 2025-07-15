@@ -19,3 +19,6 @@ class EgresadoUseCase(ABC):
 
     @abstractmethod
     def eliminar_egresado(self, id: int) -> bool: ...
+
+    @abstractmethod
+    def registrar_egresados_masivo(self, egresados: List[Egresado]) -> List[Egresado]: ...

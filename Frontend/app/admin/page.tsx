@@ -32,27 +32,48 @@ import LogoWithThemeAdmin from "@/components/logo-theme-admin"
 import withAuth from "@/components/hoc/withAuth"
 
 function AdminDashboard() {
-  const { data: egresados, isLoading: egresadosLoading } = useEgresados()
-  const { data: plazas, isLoading: plazasLoading, error } = useOfertas()
+  const {
+    data: egresados,
+    isLoading: egresadosLoading,
+    refetch: refetchEgresados,
+  } = useEgresados()
+
+  const {
+    data: plazas,
+    isLoading: plazasLoading,
+    error,
+    refetch: refetchPlazas,
+  } = useOfertas()
+
+  const {
+    data: empresas,
+    isLoading: empresasLoading,
+    refetch: refetchEmpresas,
+  } = useEmpresas()
+
   const { data: contratacionesRaw, isLoading: historialLoading } = useContrataciones()
-  const { data: empresas, isLoading: empresasLoading } = useEmpresas()
 
   const [egresadoModalOpen, setEgresadoModalOpen] = useState(false)
   const [empresaModalOpen, setEmpresaModalOpen] = useState(false)
   const [plazaModalOpen, setPlazaModalOpen] = useState(false)
+
+  const [activeTab, setActiveTab] = useState("plazas")
+
+  const aprobarMutation = useAprobarOferta()
+  const rechazarMutation = useRechazarOferta()
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     window.location.href = "/auth/login"
   }
 
-  const aprobarMutation = useAprobarOferta()
-  const rechazarMutation = useRechazarOferta()
-
   const aprobar = (id: number) => {
     aprobarMutation.mutate(id, {
       onSuccess: () => {
         toast.success("Oferta aprobada exitosamente")
+        if (activeTab === "plazas") {
+          refetchPlazas()
+        }
       },
       onError: (error) => {
         toast.error("Error al aprobar", {
@@ -66,6 +87,9 @@ function AdminDashboard() {
     rechazarMutation.mutate({ id, motivo }, {
       onSuccess: () => {
         toast.success("Oferta rechazada exitosamente")
+        if (activeTab === "plazas") {
+          refetchPlazas()
+        }
       },
       onError: (error) => {
         toast.error("Error al rechazar la oferta", {
@@ -76,15 +100,14 @@ function AdminDashboard() {
   }
 
   const contrataciones = (contratacionesRaw || []).map((c: any) => ({
-    iniciales: c.nombreEgresado?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "EG",
+    iniciales:
+      c.nombreEgresado?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) || "EG",
     nombre: c.nombreEgresado || "Egresado",
     empresa: c.nombreEmpresa || "Empresa",
     puesto: c.puesto || "Puesto no definido",
     fecha: new Date(c.fechaFin).toLocaleDateString("es-PE"),
     recomendado: c.recomendado ?? true,
   }))
-
-  const [activeTab, setActiveTab] = useState("plazas")
 
   return (
     <motion.div
@@ -203,6 +226,7 @@ function AdminDashboard() {
                           plazas={plazas}
                           loading={plazasLoading}
                           onAddPlaza={() => setPlazaModalOpen(true)}
+                          onRefresh={refetchPlazas}
                         />
                       )}
                     </motion.div>
@@ -230,6 +254,7 @@ function AdminDashboard() {
                           egresados={egresados}
                           loading={egresadosLoading}
                           onAddEgresado={() => setEgresadoModalOpen(true)}
+                          onRefresh={refetchEgresados}
                         />
                       )}
                     </motion.div>
@@ -257,6 +282,7 @@ function AdminDashboard() {
                           empresas={empresas}
                           loading={empresasLoading}
                           onAddEmpresa={() => setEmpresaModalOpen(true)}
+                          onRefresh={refetchEmpresas}
                         />
                       )}
                     </motion.div>
@@ -329,19 +355,34 @@ function AdminDashboard() {
       <AgregarEgresadoModal
         open={egresadoModalOpen}
         onOpenChange={setEgresadoModalOpen}
-        onSuccess={() => toast.success("Egresado agregado exitosamente")}
+        onSuccess={() => {
+          toast.success("Egresado agregado exitosamente")
+          if (activeTab === "egresados") {
+            refetchEgresados()
+          }
+        }}
       />
 
       <AgregarEmpresaModal
         open={empresaModalOpen}
         onOpenChange={setEmpresaModalOpen}
-        onSuccess={() => toast.success("Empresa agregada exitosamente")}
+        onSuccess={() => {
+          toast.success("Empresa agregada exitosamente");
+          if (activeTab === "empresas") {
+            refetchEmpresas()
+          }
+        }}
       />
 
       <AgregarOfertaModal
         open={plazaModalOpen}
         onOpenChange={setPlazaModalOpen}
-        onSuccess={() => toast.success("Plaza agregada exitosamente")}
+        onSuccess={() => {
+          toast.success("Plaza agregada exitosamente")
+          if (activeTab === "plazas") {
+            refetchPlazas()
+          }
+        }}
       />
     </motion.div>
   )

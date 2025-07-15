@@ -29,6 +29,14 @@ export type Egresado = {
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 export type EgresadoInput = Omit<Egresado, "id">
 
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem("token")
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+
 export async function fetchEgresados(): Promise<Egresado[]> {
   const res = await fetch(`${API_URL}/egresados/`)
   if (!res.ok) throw new Error("Error al cargar egresados")
@@ -84,4 +92,13 @@ export async function cargaMasivaEgresados(file: File): Promise<{ message: strin
 
   if (!res.ok) throw new Error("Error en la carga masiva de egresados")
   return res.json()
+}
+
+export async function crearEgresadosMasivo(data: any[]): Promise<void> {
+  const res = await fetch(`${API_URL}/egresados/carga-masiva`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error("Error al cargar egresados")
 }

@@ -16,10 +16,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import EditarEgresadoModal from "../modals/editarEgresadoModal"
+import { CargaMasivaEgresadosModal } from "@/components/modals/agregarMasivo";
 
 const ITEMS_PER_PAGE = 3
 
-export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any) {
+export function EgresadosSection({ egresados = [], loading, onAddEgresado, onRefresh }: any) {
     const [page, setPage] = useState(0)
     const router = useRouter()
     const totalPages = Math.ceil(egresados.length / ITEMS_PER_PAGE)
@@ -44,6 +45,8 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
         setModalAbierto(true)
     }
 
+    const [cargaModalOpen, setCargaModalOpen] = useState(false);
+
     return (
         <>
             <Card>
@@ -57,9 +60,15 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
                     </CardDescription>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="mr-2">
-                            <FileUp className="h-4 w-4 mr-2" /> Carga Masiva
+                        <Button
+                        variant="outline"
+                        size="sm"
+                        className="mr-2"
+                        onClick={() => setCargaModalOpen(true)}
+                        >
+                        <FileUp className="h-4 w-4 mr-2" /> Carga Masiva
                         </Button>
+
                         <Button size="sm" onClick={onAddEgresado}>
                         <PlusCircle className="h-4 w-4 mr-2" /> Agregar Egresado
                         </Button>
@@ -163,6 +172,12 @@ export function EgresadosSection({ egresados = [], loading, onAddEgresado }: any
                 open={modalAbierto}
                 onClose={() => setModalAbierto(false)}
             />
+            <CargaMasivaEgresadosModal
+            open={cargaModalOpen}
+            onOpenChange={setCargaModalOpen}
+            onSuccess={onRefresh}
+            />
+
         </>
     )
 }

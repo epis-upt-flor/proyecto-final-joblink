@@ -15,6 +15,15 @@ class EgresadoRepositorySQL(EgresadoRepository):
         self.db.commit()
         self.db.refresh(orm)
         return self._to_domain(orm)
+    
+    def registrar_egresados_masivo(self, egresados: List[EgresadoDomain]) -> List[EgresadoDomain]:
+        orms = [self._to_orm(e) for e in egresados]
+        self.db.bulk_save_objects(orms)
+        self.db.commit()
+        ids = [orm.id for orm in self.db.query(EgresadoORM.id).order_by(EgresadoORM.id.desc()).limit(len(orms)).all()]
+        for orm, id_ in zip(orms, reversed(ids)):
+            orm.id = id_
+        return [self._to_domain(orm) for orm in orms]
 
     def obtener_egresados(self) -> List[EgresadoDomain]:
         egresados = self.db.query(EgresadoORM).all()

@@ -22,3 +22,6 @@ class EgresadoRepository(ABC):
     @abstractmethod
     def obtener_nombres_por_ids(self, ids: List[int]) -> List[Dict]:
         pass
+    
+    @abstractmethod
+    def registrar_egresados_masivo(self, egresados: List[Egresado]) -> List[Egresado]: ...
