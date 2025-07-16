@@ -5,7 +5,7 @@ export default async function RecuperarPage({ searchParams }: { searchParams: { 
   const token = searchParams.token
 
   if (!token) {
-    redirect("/404")
+    redirect("/auth/recuperar/token-expirado")
   }
 
   const res = await fetch(
@@ -17,7 +17,7 @@ export default async function RecuperarPage({ searchParams }: { searchParams: { 
   )
 
   if (!res.ok) {
-    redirect("/404")
+    redirect("/auth/recuperar/token-expirado")
   }
 
   return <RecuperarForm token={token} />
