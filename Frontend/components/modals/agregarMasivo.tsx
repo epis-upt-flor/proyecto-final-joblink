@@ -87,7 +87,6 @@ export function CargaMasivaEgresadosModal({ open, onOpenChange, onSuccess }: { o
     setIsSubmitting(true)
 
     try {
-      // Mapear los datos del excel al modelo
       const payload = preview.map(row => ({
         nombres: row.nombres || "",
         apellidos: row.apellidos || "",
@@ -108,21 +107,21 @@ export function CargaMasivaEgresadosModal({ open, onOpenChange, onSuccess }: { o
         idiomas: row.idiomas ? JSON.parse(row.idiomas) : [],
       }))
 
-      await crearEgresadosMasivo(payload)
+      const result = await crearEgresadosMasivo(payload)
 
       toast.success("¡Carga exitosa!", {
-        description: `${preview.length} egresados fueron registrados correctamente`,
+        description: `${result.agregados} egresados agregados. ${result.omitidos.length} omitidos.`,
         icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
       })
-      
+
       setFile(null)
       setPreview([])
       onOpenChange(false)
       onSuccess?.()
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
       toast.error("Error en la carga", {
-        description: "Hubo un problema al registrar los egresados",
+        description: err?.message || "Hubo un problema al registrar los egresados",
         icon: <XCircle className="w-5 h-5 text-destructive" />
       })
     } finally {

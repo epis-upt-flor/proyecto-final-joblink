@@ -80,9 +80,4 @@ def registrar_egresados_masivo(
     service: EgresadoUseCase = Depends(get_service)
 ):
     egresados = [Egresado(**e.model_dump()) for e in egresados_in]
-    guardados = service.registrar_egresados_masivo(egresados)
-
-    return {
-        "mensaje": f"{len(guardados)} egresados registrados correctamente",
-        "ids": [e.id for e in guardados]
-    }
+    return service.registrar_egresados_masivo(egresados)

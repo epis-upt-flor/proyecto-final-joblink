@@ -80,25 +80,19 @@ export async function eliminarEgresado(id: number): Promise<void> {
   if (!res.ok) throw new Error("Error al eliminar egresado")
 }
 
-// Para la carga masiva de egresados
-export async function cargaMasivaEgresados(file: File): Promise<{ message: string; count: number }> {
-  const formData = new FormData()
-  formData.append("file", file)
-
-  const res = await fetch(`${API_URL}/egresados/carga-masiva`, {
-    method: "POST",
-    body: formData,
-  })
-
-  if (!res.ok) throw new Error("Error en la carga masiva de egresados")
-  return res.json()
-}
-
-export async function crearEgresadosMasivo(data: any[]): Promise<void> {
+export async function crearEgresadosMasivo(data: any[]): Promise<{ agregados: number; omitidos: any[] }> {
   const res = await fetch(`${API_URL}/egresados/carga-masiva`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   })
-  if (!res.ok) throw new Error("Error al cargar egresados")
+
+  const result = await res.json()
+
+  if (!res.ok) {
+    const msg = result?.detail || "Error en la carga masiva de egresados"
+    throw new Error(msg)
+  }
+
+  return result
 }

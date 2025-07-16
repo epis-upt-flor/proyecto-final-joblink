@@ -6,7 +6,6 @@ from fastapi import HTTPException
 from app.domain.interfaces.external.vector_db_repository import VectorDBRepository
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 
-
 class EgresadoService(EgresadoUseCase):
     EGRESADO_NOT_FOUND = "Egresado no encontrado"
     def __init__(self, repository: EgresadoRepository, vector_repo: VectorDBRepository):
@@ -27,20 +26,48 @@ class EgresadoService(EgresadoUseCase):
         self.vector_repo.agregar_egresado(egresado_guardado, embedding)
         return egresado_guardado
     
-    def registrar_egresados_masivo(self, egresados: List[Egresado]) -> List[Egresado]:
-        for e in egresados:
-            if self.repository.existe_por_email(e.email):
-                raise HTTPException(status_code=400, detail=f"El correo {e.email} ya está registrado")
-            if self.repository.existe_por_num_doc(e.numDoc):
-                raise HTTPException(status_code=400, detail=f"El número de documento {e.numDoc} ya está registrado")
+    def registrar_egresados_masivo(self, egresados: List[Egresado]) -> dict:
+        egresados_validos = []
+        egresados_omitidos = []
 
-        egresados_guardados = self.repository.registrar_egresados_masivo(egresados)
+        for e in egresados:
+            email_duplicado = self.repository.existe_por_email(e.email)
+            doc_duplicado = self.repository.existe_por_num_doc(e.numDoc)
+
+            if email_duplicado or doc_duplicado:
+                motivos = []
+                if email_duplicado:
+                    motivos.append("correo ya registrado")
+                if doc_duplicado:
+                    motivos.append("número de documento ya registrado")
+                egresados_omitidos.append({
+                    "nombres": f"{e.nombres} {e.apellidos}",
+                    "email": e.email,
+                    "numDoc": e.numDoc,
+                    "motivos": motivos
+                })
+            else:
+                egresados_validos.append(e)
+
+        if not egresados_validos:
+            return {
+                "agregados": 0,
+                "omitidos": egresados_omitidos,
+                "mensaje": "No se agregaron egresados porque todos los registros contenían datos ya existentes."
+            }
+
+        egresados_guardados = self.repository.registrar_egresados_masivo(egresados_validos)
 
         for e in egresados_guardados:
             embedding = self.embeddings.generar_embedding_egresado(e)
             self.vector_repo.agregar_egresado(e, embedding)
 
-        return egresados_guardados
+        return {
+            "agregados": len(egresados_guardados),
+            "ids": [e.id for e in egresados_guardados],
+            "omitidos": egresados_omitidos,
+            "mensaje": f"{len(egresados_guardados)} egresados registrados correctamente."
+        }
 
     def obtener_todos(self) -> List[Egresado]:
         return self.repository.obtener_egresados()

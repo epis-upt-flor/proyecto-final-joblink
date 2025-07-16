@@ -66,5 +66,8 @@ export function useCargaMasivaEgresados() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["egresados"] })
     },
+    onError: (error: any) => {
+      console.error("Error en carga masiva:", error.message)
+    }
   })
 }
