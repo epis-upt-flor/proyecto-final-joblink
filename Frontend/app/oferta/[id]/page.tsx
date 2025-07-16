@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Loading from "./loading";
 
 export default function OfertaDetallePage() {
     const params = useParams()
@@ -67,7 +68,7 @@ export default function OfertaDetallePage() {
         getData()
     }, [params.id, router])
 
-    if (loading) return <p className="text-center py-10">Cargando oferta...</p>
+    if (loading) return <Loading />;
     if (!oferta || !empresa) return null
 
     const fecha = (str?: string) =>

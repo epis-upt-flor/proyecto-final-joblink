@@ -109,7 +109,7 @@ export function CargaMasivaEgresadosModal({ open, onOpenChange, onSuccess }: { o
 
       const result = await crearEgresadosMasivo(payload)
 
-      toast.success("¡Carga exitosa!", {
+      toast.success("¡Carga completa!", {
         description: `${result.agregados} egresados agregados. ${result.omitidos.length} omitidos.`,
         icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
       })
@@ -152,7 +152,7 @@ export function CargaMasivaEgresadosModal({ open, onOpenChange, onSuccess }: { o
       Sube un archivo Excel o CSV con la información de los egresados
     </DialogDescription>
   </DialogHeader>
-
+  <div className="border-t border-border my-2"></div>
   <div className="flex-1 overflow-y-auto">
     <AnimatePresence mode="wait">
       {!file ? (

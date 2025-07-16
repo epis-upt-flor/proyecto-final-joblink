@@ -1,27 +1,27 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.infrastructure.database.db_session_provider import DBSessionProvider
 from app.infrastructure.repositories.oferta_repository_sql import OfertaRepositorySQL
 from app.application.services.oferta_service import OfertaService
+from app.application.services.usuario_service import UserService
 from app.domain.interfaces.internal.oferta_usecase import OfertaUseCase
 from app.domain.models.oferta import Oferta as OfertaDomain
 from app.infrastructure.repositories.vector_db_repository_upstash import VectorDBRepositoryUpstash
 from app.infrastructure.embeddings.embeddings_generator import GeneradorEmbeddings
 from app.infrastructure.schemas.oferta_schema import (
     OfertaCreate,
-    OfertaUpdate,
+    OfertaUpdateSegura,
     OfertaOut,
-    OfertaUpdateSegura
 )
 
 router = APIRouter(prefix="/ofertas", tags=["Ofertas"])
 db_provider = DBSessionProvider()
+user_service = UserService()
+
 
 # 💉 Inyección del servicio
-
-
 def get_oferta_service(db: Session = Depends(db_provider.get_db)) -> OfertaUseCase:
     oferta_repo = OfertaRepositorySQL(db)
     vector_repo = VectorDBRepositoryUpstash()
@@ -32,10 +32,23 @@ def get_oferta_service(db: Session = Depends(db_provider.get_db)) -> OfertaUseCa
 @router.post("/", response_model=OfertaOut)
 def crear_oferta(
     payload: OfertaCreate,
-    service: OfertaUseCase = Depends(get_oferta_service)
+    authorization: str = Header(...),
+    db: Session = Depends(db_provider.get_db),
+    service: OfertaUseCase = Depends(get_oferta_service),
 ):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Formato de autorización inválido")
+
+    token = authorization.split(" ", 1)[1].strip()
+    usuario = user_service.obtener_usuario_actual(token, db)
+
+    es_admin = usuario.idRol == 1
+
     oferta_domain = OfertaDomain(**payload.model_dump())
-    return service.registrar(oferta_domain)
+
+    resultado = service.registrar(oferta_domain, es_admin)
+
+    return resultado
 
 
 @router.get("/", response_model=List[OfertaOut])
@@ -57,25 +70,28 @@ def actualizar_oferta(
     return service.actualizar(id, payload.model_dump(exclude_unset=True))
 
 
-
 @router.delete("/{id}", response_model=dict)
 def eliminar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
     service.eliminar(id)
     return {"mensaje": "Oferta eliminada correctamente"}
 
 
-@router.patch("/{id}/aprobar/")
+@router.patch("/{id}/aprobar/", response_model=OfertaOut)
 def aprobar_oferta(id: int, service: OfertaUseCase = Depends(get_oferta_service)):
     return service.aprobar_oferta(id)
 
 
-@router.patch("/{id}/rechazar/")
-def rechazar_oferta(id: int, payload: dict, service: OfertaUseCase = Depends(get_oferta_service)):
+@router.patch("/{id}/rechazar/", response_model=OfertaOut)
+def rechazar_oferta(
+    id: int,
+    payload: dict,
+    service: OfertaUseCase = Depends(get_oferta_service)
+):
     motivo = payload.get("motivo")
     if not motivo:
-        raise HTTPException(
-            status_code=400, detail="Motivo de rechazo requerido")
+        raise HTTPException(status_code=400, detail="Motivo de rechazo requerido")
     return service.rechazar_oferta(id, motivo)
+
 
 @router.get("/empresa/{id_empresa}", response_model=List[OfertaOut])
 def obtener_ofertas_por_empresa(

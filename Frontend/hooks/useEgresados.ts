@@ -5,7 +5,7 @@ import {
   crearEgresado,
   actualizarEgresado,
   eliminarEgresado,
-  cargaMasivaEgresados,
+  crearEgresadosMasivo,
   type EgresadoInput,
 } from "@/api/egresadoApi"
 
@@ -62,7 +62,7 @@ export function useCargaMasivaEgresados() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: cargaMasivaEgresados,
+    mutationFn: crearEgresadosMasivo,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["egresados"] })
     },

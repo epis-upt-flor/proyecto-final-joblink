@@ -196,7 +196,7 @@ function AdminDashboard() {
                   <TabsTrigger value="plazas">Plazas</TabsTrigger>
                   <TabsTrigger value="egresados">Egresados</TabsTrigger>
                   <TabsTrigger value="empresas">Empresas</TabsTrigger>
-                  <TabsTrigger value="aprobaciones">Aprobaciones</TabsTrigger>
+                  <TabsTrigger value="aprobaciones">Solicitudes</TabsTrigger>
                   <TabsTrigger value="historial">Historial</TabsTrigger>
                   <TabsTrigger value="reportes">Reportes</TabsTrigger>
                 </TabsList>

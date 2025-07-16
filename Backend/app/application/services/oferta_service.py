@@ -7,6 +7,7 @@ from app.domain.interfaces.external.vector_db_repository import VectorDBReposito
 from app.domain.interfaces.external.iembeddings import IEmbeddings
 from app.domain.models.enum import EstadoOferta, EstadoPubli
 
+
 class OfertaService(OfertaUseCase):
     OFERTA_NOT_FOUND = "Oferta no encontrada"
     OFERTA_NOT_PENDING = "La oferta no está pendiente"  
@@ -16,10 +17,12 @@ class OfertaService(OfertaUseCase):
         self.vector_repo = vector_repo
         self.embeddings = embeddings
 
-    def registrar(self, oferta: Oferta) -> Oferta:
-        if not oferta.estado:
+    def registrar(self, oferta: Oferta, es_admin: bool = False) -> Oferta:
+        if es_admin:
+            oferta.estado = EstadoOferta.ACTIVA
+            oferta.estadoPubli = EstadoPubli.PUBLICADA
+        else:
             oferta.estado = EstadoOferta.PENDIENTE
-        if not oferta.estadoPubli:
             oferta.estadoPubli = EstadoPubli.NO_PUBLICADA
 
         oferta_guardada = self.repo.guardar(oferta)
