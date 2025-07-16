@@ -49,3 +49,11 @@ class RecuperacionService(RecuperacionUseCase):
         self.cache.delete(f"recuperar:{token}")
 
         return {"message": "Contraseña actualizada correctamente"}
+
+    def validar_token(self, token: str) -> dict:
+        user_id = self.cache.get(f"recuperar:{token}")
+        if not user_id:
+            raise HTTPException(
+                status_code=400, detail="Token inválido o expirado"
+            )
+        return {"message": "Token válido"}

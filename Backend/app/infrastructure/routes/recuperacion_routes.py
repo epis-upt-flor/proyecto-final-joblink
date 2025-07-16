@@ -34,3 +34,8 @@ def solicitar_token(payload: EmailRequest, service: RecuperacionUseCase = Depend
 @router.post("/cambiar/")
 def cambiar_password(payload: CambioPasswordRequest, service: RecuperacionUseCase = Depends(get_recuperacion_service)):
     return service.cambiar_contrasena_con_token(payload.token, payload.nueva_contrasena)
+
+
+@router.get("/validar/")
+def validar_token(token: str, service: RecuperacionUseCase = Depends(get_recuperacion_service)):
+    return service.validar_token(token)

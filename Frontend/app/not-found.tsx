@@ -13,15 +13,20 @@ export default function NoDisponiblePage() {
       animate={{ opacity: 1 }}
       className="flex flex-col min-h-screen"
     >
-      {/* Header */}
-      <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-2">
-          <LogoWithTheme />
-        </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-        </div>
-      </header>
+            {/* Header */}
+            <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-8">
+                <div className="flex items-center gap-2">
+                    <LogoWithTheme />
+                </div>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <Link href="/auth/login">
+                        <Button variant="outline" className="rounded-full">
+                            Iniciar Sesión
+                        </Button>
+                    </Link>
+                </div>
+            </header>
 
       {/* Main content */}
       <main className="flex flex-1 flex-col items-center justify-center text-center px-4">
