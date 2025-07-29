@@ -174,11 +174,11 @@ function EmpresaPortal() {
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Título</TableHead>
-                                        <TableHead>Área</TableHead>
                                         <TableHead>Modalidad</TableHead>
                                         <TableHead>Locación</TableHead>
                                         <TableHead>Salario</TableHead>
                                         <TableHead>Vacantes</TableHead>
+                                        <TableHead>Estado de Publicación</TableHead>
                                         <TableHead>Estado</TableHead>
                                         <TableHead>Acciones</TableHead>
                                     </TableRow>
@@ -204,7 +204,6 @@ function EmpresaPortal() {
                                         plazasEmpresa.map((plaza) => (
                                             <TableRow key={plaza.id}>
                                                 <TableCell className="font-medium">{plaza.titulo}</TableCell>
-                                                <TableCell>{plaza.area}</TableCell>
                                                 <TableCell>{plaza.modalidad}</TableCell>
                                                 <TableCell>{plaza.locacion}</TableCell>
                                                 <TableCell>
@@ -223,9 +222,25 @@ function EmpresaPortal() {
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell>
+                                                <span
+                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    ${
+                                                        plaza.estado === "ACTIVA"
+                                                        ? "bg-green-100 text-green-800"
+                                                        : plaza.estado === "PENDIENTE"
+                                                        ? "bg-yellow-100 text-yellow-800"
+                                                        : plaza.estado === "CERRADA"
+                                                        ? "bg-red-100 text-red-800"
+                                                        : "bg-muted text-muted-foreground"
+                                                    }`}
+                                                >
+                                                    {plaza.estado}
+                                                </span>
+                                                </TableCell>
+                                                <TableCell>
                                                     <div className="flex gap-2">
-                                                        <Button 
-                                                            variant="outline" 
+                                                        <Button
+                                                            variant="outline"
                                                             size="sm"
                                                             onClick={() => handleVerDetalle(plaza.id)}
                                                         >
