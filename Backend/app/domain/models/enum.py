@@ -4,7 +4,7 @@ from enum import Enum
 class TipoDocumento(str, Enum):
     DNI = "DNI"
     PASAPORTE = "PASAPORTE"
-    CARNET_EXT = "CARNET_EXT"
+    CARNET_EXT = "CARNET DE EXTRANJERIA"
 
 
 class EstadoOferta(str, Enum):
@@ -15,7 +15,7 @@ class EstadoOferta(str, Enum):
 
 class EstadoPubli(str, Enum):
     PUBLICADA = "PUBLICADA"
-    NO_PUBLICADA = "NO_PUBLICADA"
+    NO_PUBLICADA = "NO PUBLICADA"
 
 
 class EstadoPostulacion(str, Enum):

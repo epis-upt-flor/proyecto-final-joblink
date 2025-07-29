@@ -15,7 +15,7 @@ export const ofertaSchema = z.object({
     fechaInicio: z.string().min(1),
     tiempo: z.coerce.number().min(0),
     fechaPubli: z.string().min(1),
-    estadoPubli: z.enum(["PUBLICADA", "NO_PUBLICADA"]).optional(),
+    estadoPubli: z.enum(["PUBLICADA", "NO PUBLICADA"]).optional(),
     idEmpresa: z.coerce.number(),
 
     funciones: z.array(z.string()).optional(),

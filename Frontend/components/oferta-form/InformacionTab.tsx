@@ -31,8 +31,8 @@ interface Props {
 
 
 const tipos = [
-    "TIEMPO_COMPLETO",
-    "MEDIO_TIEMPO",
+    "TIEMPO COMPLETO",
+    "MEDIO TIEMPO",
     "PRACTICAS",
     "FREELANCE",
     "TEMPORAL",

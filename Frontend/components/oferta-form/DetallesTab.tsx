@@ -131,28 +131,6 @@ export function DetallesTab({
                 />
             </div>
 
-            <FormField
-                control={form.control}
-                name="estadoPubli"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Estado de Publicación</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Seleccione estado" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                <SelectItem value="PUBLICADA">Publicada</SelectItem>
-                                <SelectItem value="NO_PUBLICADA">No Publicada</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-
             <div>
                 <FormLabel>Funciones</FormLabel>
                 <div className="flex gap-2 mb-2">

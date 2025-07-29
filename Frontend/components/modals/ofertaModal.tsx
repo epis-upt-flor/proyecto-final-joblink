@@ -46,7 +46,7 @@ export function AgregarOfertaModal({
     resolver: zodResolver(ofertaSchema),
     defaultValues: {
       titulo: "",
-      tipo: "TIEMPO_COMPLETO",
+      tipo: "TIEMPO COMPLETO",
       area: "",
       modalidad: "PRESENCIAL",
       horario: "",

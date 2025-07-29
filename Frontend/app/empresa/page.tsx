@@ -215,7 +215,7 @@ function EmpresaPortal() {
                                                     <Badge variant={
                                                         plaza.estadoPubli === "PUBLICADA"
                                                             ? "default"
-                                                            : plaza.estadoPubli === "NO_PUBLICADA"
+                                                            : plaza.estadoPubli === "NO PUBLICADA"
                                                                 ? "destructive"
                                                                 : "outline"
                                                     }>

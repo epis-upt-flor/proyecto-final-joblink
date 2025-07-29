@@ -20,7 +20,7 @@ export interface Oferta {
   fechaInicio: string
   tiempo: number
   fechaPubli: string
-  estadoPubli: "PUBLICADA" | "NO_PUBLICADA"
+  estadoPubli: "PUBLICADA" | "NO PUBLICADA"
   idEmpresa: number
   empresa?: {
     id: number
@@ -42,7 +42,7 @@ export interface OfertaUpdate {
   fechaInicio?: string
   tiempo?: number
   fechaPubli?: string
-  estadoPubli?: "PUBLICADA" | "NO_PUBLICADA"
+  estadoPubli?: "PUBLICADA" | "NO PUBLICADA"
 }
 
 function getAuthHeaders(): HeadersInit {

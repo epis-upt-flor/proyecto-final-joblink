@@ -89,7 +89,7 @@ class OfertaService(OfertaUseCase):
 
         updated_data = {
             "estado": "CERRADA",
-            "estadoPubli": "NO_PUBLICADA",
+            "estadoPubli": "NO PUBLICADA",
             "motivo": motivo
         }
 
