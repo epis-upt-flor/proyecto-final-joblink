@@ -29,6 +29,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import LogoWithThemeEmpresa from "@/components/logo-theme-empresa"
 import Loading from "./loading"
 import LogoWithThemeAdmin from "@/components/logo-theme-admin"
+import { CheckCircle, X, UserCheck } from "lucide-react"
+import { ConfirmRecommendModal } from "@/components/modals/ConfirmRecommendModal"
 
 export default function OfertaDetallePage() {
     const params = useParams()
@@ -41,7 +43,8 @@ export default function OfertaDetallePage() {
     const [mostrarPostulados, setMostrarPostulados] = useState(false)
     const [postulados, setPostulados] = useState<any[]>([])
     const [rol, setRol] = useState<number | null>(null)
-    const [editarModalOpen, setEditarModalOpen] = useState(false)
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+    const [isRecommending, setIsRecommending] = useState(false)
 
     useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -474,16 +477,31 @@ export default function OfertaDetallePage() {
                                         whileTap={{ scale: 0.98 }}
                                     >
                                         <Button 
-                                            className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg"
-                                            onClick={() => router.push(`/admin/recomendar/${oferta.id}`)}
+                                        className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg"
+                                        onClick={() => setIsConfirmModalOpen(true)}
                                         >
-                                            Recomendar Egresados
+                                        Recomendar Egresados
                                         </Button>
                                     </motion.div>
                                 )
                             )}
                         </motion.div>
                     </div>
+                        <ConfirmRecommendModal
+                        isOpen={isConfirmModalOpen}
+                        onClose={() => setIsConfirmModalOpen(false)}
+                        onConfirm={async () => {
+                            setIsRecommending(true)
+                            try {
+                            await router.push(`/admin/recomendar/${oferta.id}`)
+                            } finally {
+                            setIsRecommending(false)
+                            setIsConfirmModalOpen(false)
+                            }
+                        }}
+                        loading={isRecommending}
+                        offerTitle={oferta.titulo}
+                        />
                 </div>
             </motion.div>
         </div>
