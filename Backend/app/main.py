@@ -1,6 +1,6 @@
-from fastapi import FastAPI
+from app.infrastructure.routes import reporte_routes, auth_routes, egresado_routes, empresa_routes, oferta_routes, recuperacion_routes, postulacion_routes, contrato_routes, recomendador_routes
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import usuario, auth, empresa, contrato, recuperacion, egresado, oferta, recomendacion
 
 app = FastAPI()
 
@@ -15,14 +15,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(usuario.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
-app.include_router(empresa.router, prefix="/api")
-app.include_router(egresado.router, prefix="/api")
-app.include_router(oferta.router, prefix="/api")
-app.include_router(recomendacion.router, prefix="/api")
-app.include_router(contrato.router, prefix="/api")
-app.include_router(recuperacion.router, prefix="/api")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def ignore_favicon():
+    return Response(status_code=204)
+
+app.include_router(reporte_routes.router, prefix="/api")
+app.include_router(auth_routes.router, prefix="/api")
+app.include_router(empresa_routes.router, prefix="/api")
+app.include_router(egresado_routes.router, prefix="/api")
+app.include_router(oferta_routes.router, prefix="/api")
+app.include_router(contrato_routes.router, prefix="/api")
+app.include_router(postulacion_routes.router, prefix="/api")
+app.include_router(recomendador_routes.router, prefix="/api")
+app.include_router(recuperacion_routes.router, prefix="/api")
+
 
 @app.get("/")
 def read_root():
